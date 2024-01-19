@@ -1,0 +1,8 @@
+{
+    "ReadMe": "Depth defines the size of the initial free group. The generators define the generating group elements. Generators need to be lower case letters. The Relators contain the relators of the desired group presentation. Upper-Case letters are inverse elements. HasPhysics adds spring physics to the cayley graph. When entering big groups, i.e. big depth and a big generator-set, the program is prone to sometimes stop working",
+
+    "depth" : 5,
+    "generators" : ["a", "b"],
+    "relators" : ["abAB"],
+    "hasPhysics" : true
+}
