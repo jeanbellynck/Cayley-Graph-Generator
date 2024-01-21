@@ -31,7 +31,8 @@ public class GroupGallery : MonoBehaviour
         new string[] {"GL(2, ℤ)", "The general linear group of 2-matrices", "a, b, j", "abaBAB, abaabaabaaba, jj, jaja, jbjb"},
         new string[] {"H", "The Heisenberg group", "x, y, z", "zyxYX, xzXZ, yzYZ"},
         new string[] {"BS(1, 2)", "A Baumslag-Solitar group", "a, b", "aabAb"},
-        new string[] {"²F₄(2)'", "Tits group", "a, b", "aa, bbb, ababababababababababababab, abABabABabABabABabAB, ababABABababABABababABABababABAB, ababababaBababababaBababababaBababababaBababababaBababababaBababababaB"}
+        new string[] {"²F₄(2)'", "Tits group", "a, b", "aa, bbb, ababababababababababababab, abABabABabABabABabAB, ababABABababABABababABABababABAB, ababababaBababababaBababababaBababababaBababababaBababababaBababababaB"},
+        new string[] {"?", "???", "a, b, c", "aaa, bbb, ccc, abAbA, acab"}
     };
     public GameObject groupPrefab;
     public GameObject groupGallery;
