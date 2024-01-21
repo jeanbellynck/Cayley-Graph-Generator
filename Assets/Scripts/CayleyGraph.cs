@@ -106,6 +106,10 @@ public class CayleyGraph : MonoBehaviour
     }
 
     public void openHelpPage() {
-        Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+        Application.OpenURL("https://jeanbellynck.github.io/");
+    }
+
+    public void openGitHub() {
+        Application.OpenURL("https://github.com/jeanbellynck/Cayley-Graph-Generator");
     }
 }
