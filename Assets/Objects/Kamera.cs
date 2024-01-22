@@ -60,18 +60,22 @@ public class Kamera : MonoBehaviour
         }
         
         // If mouse or finger is down, rotate the camera
-        if (Input.GetMouseButton(0))
-        {
-            turn.x += Input.GetAxis("Mouse X") * rotationSpeed * 5;
-            turn.y += Input.GetAxis("Mouse Y") * rotationSpeed * 5;
-            transform.parent.localRotation = Quaternion.Euler(-turn.y, turn.x, 0);
+        if (Input.GetMouseButton(0)) {
+            float h = Input.GetAxis("Mouse X") * rotationSpeed * 5;
+            float v = Input.GetAxis("Mouse Y") * rotationSpeed * 5;
+
+            // Create a rotation for each axis and multiply them together
+            Quaternion rotation = Quaternion.Euler(-v, h, 0);
+            transform.parent.rotation = transform.parent.rotation * rotation;
         }
-        if (Input.touchCount == 1)
-        {
+        if (Input.touchCount == 1) {
             Touch touchZero = Input.GetTouch(0);
-            turn.x += touchZero.deltaPosition.x * rotationSpeed;
-            turn.y += touchZero.deltaPosition.y * rotationSpeed;
-            transform.parent.localRotation = Quaternion.Euler(-turn.y, turn.x, 0);
+            float h = touchZero.deltaPosition.x * rotationSpeed;
+            float v = touchZero.deltaPosition.y * rotationSpeed;
+
+            // Create a rotation for each axis and multiply them together
+            Quaternion rotation = Quaternion.Euler(-v, h, 0);
+            transform.parent.rotation = transform.parent.rotation * rotation;
         }
         
     }
