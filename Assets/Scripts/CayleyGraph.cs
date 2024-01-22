@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.Video;
 
 public class CayleyGraph : MonoBehaviour
@@ -86,7 +87,7 @@ public class CayleyGraph : MonoBehaviour
             Destroy(node.gameObject);
         }
         knotenVerwalter.resetKnoten();
-        physik.maximalForce = 10;
+        physik.startUp();
 
         
         Debug.Log("Start Visualization");

@@ -68,17 +68,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
         }
 
         DrawMesh();
-        // Reduce the maximal force of the physics engine to 0 over 5 seconds
-        float originalForce = physik.maximalForce;
-        float remainingTime = 5;
-        float timeStep = 0.1f;
-        while(remainingTime > 0) {
-            remainingTime -= timeStep;
-            physik.maximalForce = originalForce * remainingTime / 5;
-            yield return new WaitForSeconds(timeStep);
-        }
-        physik.maximalForce = 0;
-
+        physik.shutDown();
     }
 
 

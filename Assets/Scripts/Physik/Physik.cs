@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Unity.VisualScripting;
 
 public class Physik : MonoBehaviour{
     public float idealeLänge;
@@ -15,7 +16,11 @@ public class Physik : MonoBehaviour{
     public float oppositeForceFactor;
     [Range(0.0f,20.0f)]
     public float angleForceFactor;
-    public float maximalForce = 1;
+
+    public float usualMaximalForce = 10;
+    // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
+    public float actualMaximalForce = 10;
+    public float shutDownTime = 5;
     char[] generators;
     Dictionary<char, Dictionary<char, float>> sumArrowAngles = new Dictionary<char, Dictionary<char, float>>();
     // Necessary since if you dont count to many the average is too small
@@ -46,6 +51,7 @@ public class Physik : MonoBehaviour{
         }
     }
 
+    
 
     public void UpdatePh(Knotenverwalter knotenV, Kantenverwalter kantenV, float präzision) {
         this.präzision = präzision;
@@ -57,6 +63,15 @@ public class Physik : MonoBehaviour{
         
         //smitteKraftBerechnen(knotenV, kantenV); 
         //fixIdentity(knotenV);
+
+        
+        // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
+        if(actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
+            actualMaximalForce -= usualMaximalForce*Time.deltaTime / shutDownTime;
+        }
+        if(actualMaximalForce < 0) {
+            actualMaximalForce = 0;
+        }
     }
 
     
@@ -70,7 +85,7 @@ public class Physik : MonoBehaviour{
             knoten.repelForce = Vector3.zero;
             knoten.oppositeForce = Vector3.zero;
             knoten.angleForce = Vector3.zero;
-            knoten.maximalForce = maximalForce;
+            knoten.maximalForce = actualMaximalForce;
         }
     }
 
@@ -234,5 +249,16 @@ public class Physik : MonoBehaviour{
                 knoten.angleForce = Vector3.zero;
             }
         }
+    }
+
+    public void startUp() {
+        actualMaximalForce = usualMaximalForce;
+    }
+
+    /** 
+    * Slowly reduces the maximal force to 0. This is used to stop the simulation.
+    */
+    public void shutDown() {
+        actualMaximalForce -= 0.01f;
     }
 }
