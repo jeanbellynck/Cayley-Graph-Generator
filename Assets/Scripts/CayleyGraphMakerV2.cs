@@ -17,6 +17,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
     // Start is called before the first frame update
     public override void InitializeCGMaker()
     {
+        StopAllCoroutines();
         operationColors = new Dictionary<char, Color>();
         for(int i = 0; i<generators.Length; i++) {
             operationColors.Add(generators[i], colourList[i]);

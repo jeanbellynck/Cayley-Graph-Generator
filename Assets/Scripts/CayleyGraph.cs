@@ -63,6 +63,7 @@ public class CayleyGraph : MonoBehaviour
     public GameObject vertexNumberInputField;
 
     public void startVisualization() {
+        StopAllCoroutines();
         setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text);        
         setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);

@@ -41,26 +41,35 @@ public class Kamera : MonoBehaviour
         // Zoom by mouse wheel
         cam.orthographicSize = Math.Max(1, cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel")*wheelSensitivity);
 
-        // Zoom by finger pinch
+        // Zoom by finger pinch is broken on WebGL. Zoom will be deactived on mobile devices.
         if (Input.touchCount == 2)
         {
             Touch touchZero = Input.GetTouch(0);
             Touch touchOne = Input.GetTouch(1);
             
-            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
-            
-            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
-            
-            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
-            
-            cam.orthographicSize += deltaMagnitudeDiff * pinchSensitivity;
-            cam.orthographicSize = Math.Max(1, cam.orthographicSize);
+            if (touchZero.phase == TouchPhase.Moved && touchOne.phase == TouchPhase.Moved) {
+                Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+                Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+                
+                float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+                float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+                
+                
+                print("Previous Position " + touchZeroPrevPos + " " + touchOnePrevPos);
+                print("Delta " + touchZero.deltaPosition + " " + touchOne.deltaPosition);
+                print("Current Position " + touchZeroPrevPos + " " + touchOnePrevPos);
+
+                float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+                print(deltaMagnitudeDiff);
+
+                deltaMagnitudeDiff = Mathf.Clamp(deltaMagnitudeDiff, -5, 5);
+                cam.orthographicSize += deltaMagnitudeDiff * pinchSensitivity;
+                cam.orthographicSize = Math.Max(1, cam.orthographicSize);
+            }
         }
         
         // If mouse or finger is down, rotate the camera
-        if (Input.GetMouseButton(0)) {
+        if (Input.GetMouseButton(0) && Input.touchCount != 2) {
             float h = Input.GetAxis("Mouse X") * rotationSpeed * 5;
             float v = Input.GetAxis("Mouse Y") * rotationSpeed * 5;
 
@@ -70,12 +79,14 @@ public class Kamera : MonoBehaviour
         }
         if (Input.touchCount == 1) {
             Touch touchZero = Input.GetTouch(0);
-            float h = touchZero.deltaPosition.x * rotationSpeed;
-            float v = touchZero.deltaPosition.y * rotationSpeed;
+            if (touchZero.phase == TouchPhase.Moved) {
+                float h = touchZero.deltaPosition.x * rotationSpeed;
+                float v = touchZero.deltaPosition.y * rotationSpeed;
 
-            // Create a rotation for each axis and multiply them together
-            Quaternion rotation = Quaternion.Euler(-v, h, 0);
-            transform.parent.rotation = transform.parent.rotation * rotation;
+                // Create a rotation for each axis and multiply them together
+                Quaternion rotation = Quaternion.Euler(-v, h, 0);
+                transform.parent.rotation = transform.parent.rotation * rotation;
+            }
         }
         
     }

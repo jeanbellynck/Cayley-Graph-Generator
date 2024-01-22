@@ -6,14 +6,13 @@ public class GroupGallery : MonoBehaviour
 {
     // List of groups to be displayed, parameters are name, generators and relators.
     string[][] groupList = {
-        
         new string[] {"C₅×C₁₂", "Product of two cyclic groups, shaped like a torus", "a, b", "abAB, aaaaa, bbbbbbbbbbbb"},
         new string[] {"e", "The trivial group", "", ""},
         new string[] {"C₂", "The cyclic group of order 2", "a", "aa"},
         new string[] {"V₄", "The Klein group", "a, b", "aa, bb, abAB"},
         new string[] {"D₃ ≅ S₃", "The dihedral group of order 6", "r, f", "rrr, ff, rfrf"},
         new string[] {"D∞", "The infinite dihedral group", "r, f", "ff, rfrf"},
-        new string[] {"S₄", "The symmetric group on 4 symbols", "a, b, c", "aa, bb, cc, acac, ababab, bcbcbc"},
+        //new string[] {"S₄", "The symmetric group on 4 symbols", "a, b, c", "aa, bb, cc, acAC, ababab, bcbcbc"},
         new string[] {"T ≅ A₄", "The symmetry group of the tetrahedron", "s, t", "ss, ttt, ststst"},
         new string[] {"O ≅ S₄", "The symmetry group of the octahedron", "s, t", "ss, ttt, stststst"},
         new string[] {"I ≅ A₅", "The symmetry group of the icosahedron", "s, t", "ss, ttt, ststststst"},
