@@ -30,6 +30,7 @@ public class Kante : MonoBehaviour
         SetStartpunkt(startpunkt);
         SetEndpunkt(endpunkt);
         endPoint = endpunkt;
+        Update();
     }
 
     public void SetFarbe(Color farbe1, Color farbe2) {
