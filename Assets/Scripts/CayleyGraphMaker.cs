@@ -12,6 +12,7 @@ public abstract class CayleyGraphMaker : MonoBehaviour
     protected MeshManager meshManager;
     protected GameObject knotenPrefab;
     protected GameObject kantenPrefab;
+    protected Physik physik;
     protected int complexSize;
     protected Color[] colourList = new Color[]{new Color(0,0,255), new Color(255, 0, 0), new Color(0, 255, 0), new Color(255, 255,0 )};
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
@@ -32,5 +33,11 @@ public abstract class CayleyGraphMaker : MonoBehaviour
     }
 
     public abstract void InitializeCGMaker();
+
+    public void setPhysics(Physik physik)
+    {
+        this.physik = physik;
+    }
+
     internal abstract void setVertexNumber(int v);
 }

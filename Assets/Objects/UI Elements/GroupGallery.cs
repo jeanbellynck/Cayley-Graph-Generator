@@ -22,7 +22,7 @@ public class GroupGallery : MonoBehaviour
         new string[] {"ℤ²", "ℤ² from three generators", "a, b, c", "abAB, abC"},
         new string[] {"Q₈", "The quaternion group", "i, j", "iiii, jijI, ijiJ"},
         new string[] {"F₂", "Free Group with two Generators", "a, b", ""},
-        new string[] {"F₂", "Free Group with three Generators", "a, b, c", ""},
+        new string[] {"F₃", "Free Group with three Generators", "a, b, c", ""},
         new string[] {"B₃", "The braid group on three strands", "a, b", "abaBAB"},
         new string[] {"B₄", "The braid group on four strands", "a, b, c", "abaBAB, bcbCBC, acAC"},
         new string[] {"ℍ", "A Simple hyperbolic group", "a, b", "abab, aaaaa, bbbbb"},

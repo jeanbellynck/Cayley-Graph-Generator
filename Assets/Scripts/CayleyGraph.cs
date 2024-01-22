@@ -65,6 +65,7 @@ public class CayleyGraph : MonoBehaviour
         setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text);        
         setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
+        cayleyGraphMaker.setPhysics(physik);
         int complexSize = int.Parse(complexInputField.GetComponent<UnityEngine.UI.InputField>().text);
 
         // Destroy Mesh Objects
@@ -85,6 +86,7 @@ public class CayleyGraph : MonoBehaviour
             Destroy(node.gameObject);
         }
         knotenVerwalter.resetKnoten();
+        physik.maximalForce = 10;
 
         
         Debug.Log("Start Visualization");

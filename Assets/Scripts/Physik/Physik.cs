@@ -7,14 +7,15 @@ public class Physik : MonoBehaviour{
     public float radius;
     public float präzision;
 
-    [Range(0.0f,10.0f)]
+    [Range(0.0f,20.0f)]
     public float repelForceFactor; 
-    [Range(0.0f,10.0f)]
+    [Range(0.0f,20.0f)]
     public float attractForceFactor;
-    [Range(0.0f,10.0f)]
+    [Range(0.0f,20.0f)]
     public float oppositeForceFactor;
-    [Range(0.0f,10.0f)]
+    [Range(0.0f,20.0f)]
     public float angleForceFactor;
+    public float maximalForce = 1;
     char[] generators;
     Dictionary<char, Dictionary<char, float>> sumArrowAngles = new Dictionary<char, Dictionary<char, float>>();
     // Necessary since if you dont count to many the average is too small
@@ -25,8 +26,6 @@ public class Physik : MonoBehaviour{
     public Physik(float idealeLänge, float radius) {
         this.idealeLänge = idealeLänge;
         this.radius = radius;
-
-        
     }
 
     public void setGenerators(char[] generators) {
@@ -55,18 +54,23 @@ public class Physik : MonoBehaviour{
         if(attractForceFactor != 0) kantenKraftBerechnen(kantenV);
         if(oppositeForceFactor != 0) calculateOppositionForce(knotenV, kantenV);
         if(angleForceFactor != 0) calculateArrowAverageForce(knotenV, kantenV);
+        
         //smitteKraftBerechnen(knotenV, kantenV); 
         //fixIdentity(knotenV);
     }
 
     
-
+    /**
+     * Sets the speed of all vertices to 0.
+     * Also bounds th force by the maximal force.
+     */
     private void geschwindigkeitenZurücksetzen(Knotenverwalter knotenV) {
         foreach(Knoten knoten in knotenV.GetKnoten()) {
             knoten.attractForce = Vector3.zero;
             knoten.repelForce = Vector3.zero;
             knoten.oppositeForce = Vector3.zero;
             knoten.angleForce = Vector3.zero;
+            knoten.maximalForce = maximalForce;
         }
     }
 

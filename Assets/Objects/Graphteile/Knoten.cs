@@ -11,6 +11,7 @@ public class Knoten : MonoBehaviour
     public Vector3 attractForce = Vector3.zero;
     public Vector3 oppositeForce = Vector3.zero;
     public Vector3 angleForce = Vector3.zero;
+    public float maximalForce = 1;
     public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
     
     public int distance = 0; // Measures the distance to the identity
@@ -30,7 +31,10 @@ public class Knoten : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        transform.position += Time.deltaTime * (repelForce+attractForce+oppositeForce+angleForce);
+        Vector3 force = repelForce + attractForce + oppositeForce + angleForce;
+        force = Vector3.ClampMagnitude(force, maximalForce);
+
+        transform.position += force * Time.deltaTime;
         transform.position = Vector3.Min(transform.position, new Vector3(100, 100, 100));
         transform.position = Vector3.Max(transform.position, new Vector3(-100, -100, -100));
         //DrawCircle(radius);

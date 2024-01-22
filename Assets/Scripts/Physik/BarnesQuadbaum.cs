@@ -113,10 +113,10 @@ public class BarnesQuadbaum {
             if(2*radius/Vector3.Distance(punkt, schwerpunkt) < präzision && !punktInBounds(punkt)) {
                 return masse * BerechneKraft(punkt, schwerpunkt);
             } else {
-                return (not.BerechneKraftAufKnoten(punkt) + nwt.BerechneKraftAufKnoten(punkt)
+                return not.BerechneKraftAufKnoten(punkt) + nwt.BerechneKraftAufKnoten(punkt)
                     + sot.BerechneKraftAufKnoten(punkt) + swt.BerechneKraftAufKnoten(punkt)
                     + nob.BerechneKraftAufKnoten(punkt) + nwb.BerechneKraftAufKnoten(punkt)
-                    + sob.BerechneKraftAufKnoten(punkt) + swb.BerechneKraftAufKnoten(punkt));
+                    + sob.BerechneKraftAufKnoten(punkt) + swb.BerechneKraftAufKnoten(punkt);
             }
         }
     }
