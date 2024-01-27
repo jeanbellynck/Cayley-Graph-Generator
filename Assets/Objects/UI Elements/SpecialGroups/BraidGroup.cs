@@ -6,7 +6,7 @@ public class BraidGroup : Group
     public BraidGroup()
     {
         name = "B<sub>n</sub>";
-        description = "The briad groups";
+        description = "The braid groups";
         parameters = new string[][] {new string[] {"n", "3", "Amount of strands the braid groups acts on"}};
         updatePresentation();
     }

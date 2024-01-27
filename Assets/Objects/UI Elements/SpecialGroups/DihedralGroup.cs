@@ -19,9 +19,9 @@ public class DihedralGroup : Group
             List<string> gen = new List<string>(){"r", "s"};
             List<string> rel = new List<string>
             {
+                "rsrs",
                 "ss",
-                string.Concat(Enumerable.Repeat("r", n)),
-                "rsrs"
+                string.Concat(Enumerable.Repeat("r", n))
             };
        
             generators = gen.ToArray();
