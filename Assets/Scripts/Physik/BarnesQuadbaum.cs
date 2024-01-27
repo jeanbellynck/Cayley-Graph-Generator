@@ -100,7 +100,7 @@ public class BarnesQuadbaum {
         }
     }
 
-    public Vector3 BerechneKraftAufKnoten(Vector3 punkt) {
+    public Vector3 calculateRepulsionForceOnVertex(Vector3 punkt, float repulsionDistance) {
         if(masse == 0) {
             return Vector3.zero;
         } else if(masse == 1) {
@@ -110,13 +110,17 @@ public class BarnesQuadbaum {
                 return BerechneKraft(punkt, punktItem);
             }
         } else {
+            // Ignore points that are far away.
+            if(repulsionDistance != 0 && Vector3.Distance(punkt, schwerpunkt) > repulsionDistance) {
+                return Vector2.zero;
+            }
             if(2*radius/Vector3.Distance(punkt, schwerpunkt) < präzision && !punktInBounds(punkt)) {
                 return masse * BerechneKraft(punkt, schwerpunkt);
             } else {
-                return not.BerechneKraftAufKnoten(punkt) + nwt.BerechneKraftAufKnoten(punkt)
-                    + sot.BerechneKraftAufKnoten(punkt) + swt.BerechneKraftAufKnoten(punkt)
-                    + nob.BerechneKraftAufKnoten(punkt) + nwb.BerechneKraftAufKnoten(punkt)
-                    + sob.BerechneKraftAufKnoten(punkt) + swb.BerechneKraftAufKnoten(punkt);
+                return not.calculateRepulsionForceOnVertex(punkt, repulsionDistance) + nwt.calculateRepulsionForceOnVertex(punkt, repulsionDistance)
+                    + sot.calculateRepulsionForceOnVertex(punkt, repulsionDistance) + swt.calculateRepulsionForceOnVertex(punkt, repulsionDistance)
+                    + nob.calculateRepulsionForceOnVertex(punkt, repulsionDistance) + nwb.calculateRepulsionForceOnVertex(punkt, repulsionDistance)
+                    + sob.calculateRepulsionForceOnVertex(punkt, repulsionDistance) + swb.calculateRepulsionForceOnVertex(punkt, repulsionDistance);
             }
         }
     }

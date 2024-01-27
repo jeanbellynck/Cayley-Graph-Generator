@@ -14,7 +14,7 @@ public abstract class CayleyGraphMaker : MonoBehaviour
     protected GameObject kantenPrefab;
     protected Physik physik;
     protected int complexSize;
-    protected Color[] colourList = new Color[]{new Color(0,0,255), new Color(255, 0, 0), new Color(0, 255, 0), new Color(255, 255,0 )};
+    protected Color[] colourList = new Color[]{new Color(255, 0, 0), new Color(0,0,255), new Color(0, 255, 0), new Color(255, 255,0 )};
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
     protected string[] relators;// = new string[]{"abAB"};
 

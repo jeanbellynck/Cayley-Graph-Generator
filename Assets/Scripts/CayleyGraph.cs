@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
@@ -41,16 +42,13 @@ public class CayleyGraph : MonoBehaviour
         }
     }
 
-    public void setGenerators(string generators) {
+    public void setGenerators(string[] generators) {
         Debug.Log("Generators: " + generators);
-        generators = generators.Replace(" ", string.Empty).Replace(",", string.Empty);
-        this.generators = generators.ToCharArray();
+        this.generators = string.Join("", generators).ToCharArray();
     }
 
-    public void setRelators(string relators) {
-        Debug.Log("Relators: " + relators);
-        relators = relators.Replace(" ", string.Empty);
-        this.relators = relators.Split(',');
+    public void setRelators(string[] relators) {
+        this.relators = relators;
     }
 
     public void setVertexNumber(string vertexNumber) {
@@ -63,8 +61,8 @@ public class CayleyGraph : MonoBehaviour
     public GameObject vertexNumberInputField;
 
     public void startVisualization() {
-        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text);        
-        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
+        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(','));        
+        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(','));
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.setPhysics(physik);
         int complexSize = int.Parse(complexInputField.GetComponent<UnityEngine.UI.InputField>().text);
@@ -97,11 +95,11 @@ public class CayleyGraph : MonoBehaviour
     }
 
 
-    public void setGroupAndStartVisualisation(string name, string generators, string relators) {
+    public void setGroupAndStartVisualisation(string name, string[] generators, string[] relators) {
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
-        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = generators;
-        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = relators;
+        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", generators);
+        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", relators);
         setGenerators(generators);
         setRelators(relators);
         startVisualization();

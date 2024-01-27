@@ -20,7 +20,12 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
         StopAllCoroutines();
         operationColors = new Dictionary<char, Color>();
         for(int i = 0; i<generators.Length; i++) {
-            operationColors.Add(generators[i], colourList[i]);
+            if(i < colourList.Length) {
+                operationColors.Add(generators[i], colourList[i]);
+            }else{
+                operationColors.Add(generators[i], new Color(Random.Range(0, 255), Random.Range(0, 255), Random.Range(0, 255)));
+            }
+            
         }
 
         drawNeutralElement();

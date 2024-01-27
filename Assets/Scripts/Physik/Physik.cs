@@ -4,7 +4,7 @@ using System;
 using Unity.VisualScripting;
 
 public class Physik : MonoBehaviour{
-    public float idealeLänge;
+    public float idealLength;
     public float radius;
     public float präzision;
 
@@ -21,6 +21,8 @@ public class Physik : MonoBehaviour{
     // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
     public float actualMaximalForce = 10;
     public float shutDownTime = 5;
+
+    public float velocityDecay = 0.9f;
     char[] generators;
     Dictionary<char, Dictionary<char, float>> sumArrowAngles = new Dictionary<char, Dictionary<char, float>>();
     // Necessary since if you dont count to many the average is too small
@@ -29,7 +31,7 @@ public class Physik : MonoBehaviour{
 
     
     public Physik(float idealeLänge, float radius) {
-        this.idealeLänge = idealeLänge;
+        this.idealLength = idealeLänge;
         this.radius = radius;
     }
 
@@ -56,11 +58,13 @@ public class Physik : MonoBehaviour{
     public void UpdatePh(Knotenverwalter knotenV, Kantenverwalter kantenV, float präzision) {
         this.präzision = präzision;
         geschwindigkeitenZurücksetzen(knotenV);
-        if(repelForceFactor != 0) knotenKraftBerechnen(knotenV);
-        if(attractForceFactor != 0) kantenKraftBerechnen(kantenV);
+        if(repelForceFactor != 0) calculateRepulsionForces(knotenV);
+        if(attractForceFactor != 0) calculateLinkForces(kantenV);
         if(oppositeForceFactor != 0) calculateOppositionForce(knotenV, kantenV);
         if(angleForceFactor != 0) calculateArrowAverageForce(knotenV, kantenV);
         
+        updateVertices(knotenV);
+
         //smitteKraftBerechnen(knotenV, kantenV); 
         //fixIdentity(knotenV);
 
@@ -74,6 +78,17 @@ public class Physik : MonoBehaviour{
         }
     }
 
+    private void updateVertices(Knotenverwalter knotenV) {
+        foreach(Knoten knoten in knotenV.GetKnoten()) {
+            Vector3 force = knoten.repelForce + knoten.attractForce + knoten.oppositeForce + knoten.angleForce;
+            force = Vector3.ClampMagnitude(force, actualMaximalForce);
+
+            knoten.transform.position += knoten.velocity * Time.deltaTime;
+            knoten.velocity *= velocityDecay;
+            knoten.velocity = knoten.velocity + force;
+            knoten.transform.position = Vector3.ClampMagnitude(knoten.transform.position, 100);
+        }
+    }
     
     /**
      * Sets the speed of all vertices to 0.
@@ -85,11 +100,12 @@ public class Physik : MonoBehaviour{
             knoten.repelForce = Vector3.zero;
             knoten.oppositeForce = Vector3.zero;
             knoten.angleForce = Vector3.zero;
-            knoten.maximalForce = actualMaximalForce;
         }
     }
 
-    private void knotenKraftBerechnen(Knotenverwalter knotenV) {
+    public float repulsionDistance;
+
+    private void calculateRepulsionForces(Knotenverwalter knotenV) {
         // Abstoßung durch Knoten
         BarnesQuadbaum bqb = new BarnesQuadbaum(Vector2.zero, radius, präzision);
         foreach(Knoten knoten in knotenV.GetKnoten()) {
@@ -97,17 +113,18 @@ public class Physik : MonoBehaviour{
         }
         bqb.BerechneSchwerpunkt();
         foreach(Knoten knoten in knotenV.GetKnoten()) {
-            knoten.repelForce = Vector3.zero;
-            knoten.repelForce = repelForceFactor * bqb.BerechneKraftAufKnoten(knoten.transform.position);
+            knoten.repelForce = repelForceFactor * bqb.calculateRepulsionForceOnVertex(knoten.transform.position + knoten.velocity*Time.deltaTime, repulsionDistance);
         }
     }
 
-    private void kantenKraftBerechnen(Kantenverwalter kantenVerwalter) {
-        // Anziehung durch Graphen
-        foreach(Kante kante in kantenVerwalter.GetKanten()) {
-            Vector3 kraft = kantenKraftBerechnen(kante.startPoint, kante.endPoint) ;
-            kante.startPoint.attractForce += attractForceFactor * kraft;
-            kante.endPoint.attractForce -= attractForceFactor * kraft;
+    public int stabilityIterations = 1;
+    private void calculateLinkForces(Kantenverwalter kantenVerwalter) {
+        for(int i = 0; i < stabilityIterations; i++) {
+            foreach(Kante kante in kantenVerwalter.GetKanten()) {
+                Vector3 kraft = calculateLinkForce(kante.startPoint, kante.endPoint) ;
+                kante.startPoint.attractForce += attractForceFactor * kraft;
+                kante.endPoint.attractForce -= attractForceFactor * kraft;
+            }
         }
     }
 
@@ -149,11 +166,11 @@ public class Physik : MonoBehaviour{
     }
 
     
-    public int recalculationIteration = 10;
+    public int arrowAverageRecalculationIteration = 10;
     int currentIteration = 0;
 
     private void calculateArrowAverageForce(Knotenverwalter knotenV, Kantenverwalter kantenV) {
-        if(currentIteration == recalculationIteration) {
+        if(currentIteration == arrowAverageRecalculationIteration) {
             calculateAverageAngles(knotenV, kantenV);
             currentIteration = 0;
         }
@@ -224,19 +241,14 @@ public class Physik : MonoBehaviour{
         return 1.0f - (k / (1.0f + k));
     }
 
-
-    private void mitteKraftBerechnen(Knotenverwalter knotenV, Kantenverwalter kantenV) {
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            if(kantenV.GetEingehendeKnoten(knoten).Count+ kantenV.GetAusgehendeKnoten(knoten).Count == 1) {
-                //knoten.geschwindigkeit += (20/knoten.transform.position.magnitude) * knoten.transform.position.normalized;
-                //knoten.geschwindigkeit += 1 * knoten.transform.position.normalized;
-            }
-        }
-    }
-
-    private Vector3 kantenKraftBerechnen(Knoten gewirkter, Knoten wirkender) {
-        Vector3 diff = wirkender.transform.position - gewirkter.transform.position; 
-        return diff.normalized*(Mathf.Min(diff.magnitude-idealeLänge, 10));
+    private Vector3 calculateLinkForce(Knoten source, Knoten target) {
+        Vector3 diff = target.transform.position + target.velocity*Time.deltaTime - source.transform.position - source.velocity*Time.deltaTime;
+        float mag = diff.magnitude;
+        return (mag - idealLength) / mag * diff;
+        
+        
+        //Vector3 diff = target.transform.position - source.transform.position; 
+        //return diff.normalized*(Mathf.Min(diff.magnitude-idealeLänge, 10));
         //return diff.normalized*Mathf.Log(diff.magnitude/idealeLänge);
     }
 
