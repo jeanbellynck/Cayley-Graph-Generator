@@ -15,7 +15,7 @@ public class GroupOption : MonoBehaviour
         // Set button (TMP) text to group name
         transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>().text = group.name; 
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = group.description;
-        transform.GetChild(0).GetChild(1).GetChild(1).GetComponent<Text>().text = "〈" + string.Join(", ", group.generators) + " : " + string.Join(", ", group.relators) + "〉";
+        setPresentation();
         
         // For each parameter create a new parameter object and set it as a child of the groupOption object.
         for(int i = 0; i < group.parameters.Length; i++)
@@ -52,5 +52,36 @@ public class GroupOption : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(transform.GetComponent<RectTransform>());
         LayoutRebuilder.ForceRebuildLayoutImmediate(transform.parent.GetComponent<RectTransform>());
         //LayoutRebuilder.ForceRebuildLayoutImmediate(transform.parent.GetComponent<RectTransform>());
+    }
+
+    public void setPresentation() {
+        string presentation = "〈" + string.Join(", ", group.generators) + " : " + string.Join(", ", group.relators) + "〉";
+        // If there is an exponent of the presentation surround the number with <sup></sup>
+        int i = 0;
+        while (i < presentation.Length)
+        {
+            if (presentation[i] == '^')
+            {
+                int power = findPowerValue(presentation, i);
+                presentation = presentation.Substring(0, i) + "<sup>" + power.ToString() + "</sup>" + presentation.Substring(i + power.ToString().Length + 1);
+                i += power.ToString().Length + 11;
+            }
+            i++;
+        }
+
+        transform.GetChild(0).GetChild(1).GetChild(1).GetComponent<TMP_Text>().text = presentation;
+    }
+
+    private static int findPowerValue(string symbol, int powerIndex)
+    {
+        int i = 1;
+        if(powerIndex+i < symbol.Length && symbol[powerIndex+i] == '-') {
+            i++;
+        }
+        while (powerIndex+i < symbol.Length && char.IsDigit(symbol[powerIndex+i]))
+        {
+            i++;
+        }
+        return int.Parse(symbol.Substring(powerIndex + 1, --i));
     }
 }
