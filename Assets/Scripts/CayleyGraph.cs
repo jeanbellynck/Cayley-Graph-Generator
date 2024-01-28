@@ -31,12 +31,7 @@ public class CayleyGraph : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Test the relaoator decoder
-        print(RelatorDecoder.decodeRelator("[(ab)^3, (ba)^3]"));
-        print(RelatorDecoder.decodeRelator("[(abC)^-3, (baC)^3]"));
-        print(RelatorDecoder.decodeRelator("[[a, b], c]"));
-        print(RelatorDecoder.decodeRelator("((aC)^-2)^-2"));
-        RelatorDecoder.decodeRelator("a^3");
+
     }
 
 
@@ -53,6 +48,10 @@ public class CayleyGraph : MonoBehaviour
     }
 
     public void setRelators(string[] relators) {
+        // Apply the Relotor Decoder
+        for(int i = 0; i < relators.Length; i++) {
+            relators[i] = RelatorDecoder.decodeRelator(relators[i]);
+        }
         this.relators = relators;
     }
 
@@ -66,8 +65,8 @@ public class CayleyGraph : MonoBehaviour
     public GameObject vertexNumberInputField;
 
     public void startVisualization() {
-        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(','));        
-        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(','));
+        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(';'));        
+        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(';'));
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.setPhysics(physik);
         int complexSize = int.Parse(complexInputField.GetComponent<UnityEngine.UI.InputField>().text);
@@ -103,8 +102,8 @@ public class CayleyGraph : MonoBehaviour
     public void setGroupAndStartVisualisation(string name, string[] generators, string[] relators) {
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
-        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", generators);
-        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", relators);
+        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", generators);
+        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", relators);
         setGenerators(generators);
         setRelators(relators);
         startVisualization();

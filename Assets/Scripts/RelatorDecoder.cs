@@ -7,8 +7,8 @@ using System.Text;
 public class RelatorDecoder
 {
     public static string decodeRelator(string symbol) {
-        //return decodeOneRelator(symbol.Replace(" ", ""));
-        return "";
+        return decodeOneRelator(symbol.Replace(" ", ""));
+        //return "";
     }
     
     /**
@@ -36,7 +36,7 @@ public class RelatorDecoder
                 insideBracket1 = decodeOneRelator(insideBracket1);
                 insideBracket2 = decodeOneRelator(insideBracket2);
                 
-                string newSubSymbol = "(" + insideBracket1 + ")(" + insideBracket2 + ")(" + insideBracket1 + ")^-1(" + insideBracket2 + ")^-1";
+                string newSubSymbol = "((" + insideBracket1 + ")(" + insideBracket2 + ")(" + insideBracket1 + ")^-1(" + insideBracket2 + ")^-1)";
                 symbol = symbol.Substring(0, i) + newSubSymbol + symbol.Substring(closingBracketIndex + 1);
             }
             else if (symbol[i] == '(') // Rule: (abc)^3 -> abCabCabC and (abc) -> abc
@@ -46,7 +46,7 @@ public class RelatorDecoder
             else // Rule: a^-1 -> a^1 and a^3 -> aaa
             {
                 if(i+1 < symbol.Length && symbol[i+1] == '^') {
-                    symbol = symbol.Substring(0, i) + "(" + symbol[i+1].ToString() + ")" + symbol.Substring(i+2);
+                    symbol = symbol.Substring(0, i) + "(" + symbol[i].ToString() + ")" + symbol.Substring(i+1);
                 } else {
                     i++;
                 }
@@ -129,6 +129,9 @@ public class RelatorDecoder
             // Repeat the inside of the brackets
             insideBrackets = string.Concat(Enumerable.Repeat(insideBrackets, power));
             symbol = mySubstring(symbol, 0, bracketIndex) + insideBrackets + symbol.Substring(closingParenthesisIndex + 2 + power.ToString().Length);
+        }
+        else {
+            symbol = mySubstring(symbol, 0, bracketIndex) + insideBrackets + symbol.Substring(closingParenthesisIndex + 1);
         }
         return symbol;
     }  
