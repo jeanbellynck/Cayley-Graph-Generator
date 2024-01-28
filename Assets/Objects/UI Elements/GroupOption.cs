@@ -14,7 +14,7 @@ public class GroupOption : MonoBehaviour
     {
         // Set button (TMP) text to group name
         transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>().text = group.name; 
-        transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Text>().text = group.description;
+        transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = group.description;
         setPresentation();
         
         // For each parameter create a new parameter object and set it as a child of the groupOption object.

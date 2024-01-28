@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,10 +34,10 @@ public class GroupGallery : MonoBehaviour
         new Group("ℍ²", "A simple hyperbolic group", "a; b", "abab; a^5; b^5"),
         new Group("H", "The Heisenberg group", "x; y; z", "zyxYX; xzXZ; yzYZ"),
         new BSGroup(),
-        new Group("F", "Thompson group F", "a; b", "[aB, Aba]; [aB; AABaa]"),
+        new Group("F", "Thompson group F", "a; b", "[aB, Aba]; [aB, AABaa]"),
         new Group("²F<sub>4</sub>(2)'", "Tits group", "a; b", "a^2; b^3; (ab)^13; [a, b]^5, [a, bab]^4, ((ab)^4aB)^6"),
         //new RandomGroup(),
-        new Group("?", "???", "a, b, c", "aaa, bbb, ccc, abAbA, acab")
+        new Group("?", "???", "a; b; c", "aaa; bbb; ccc; abAbA; acab")
     };
     
     
@@ -51,7 +52,7 @@ public class GroupGallery : MonoBehaviour
     {
         // Add a finite group label
         GameObject finiteGroupLabel = Instantiate(labelPrefab, transform);
-        finiteGroupLabel.GetComponent<Text>().text = "Finite Group Examples";
+        finiteGroupLabel.GetComponent<TMP_Text>().text = "Finite Group Examples";
         finiteGroupLabel.transform.SetParent(groupGallery.transform);
 
 
@@ -68,7 +69,7 @@ public class GroupGallery : MonoBehaviour
         
         // Add an infinite group label
         GameObject infiniteGroupLabel = Instantiate(labelPrefab, transform);
-        infiniteGroupLabel.GetComponent<Text>().text = "Infinite Group Examples";
+        infiniteGroupLabel.GetComponent<TMP_Text>().text = "Infinite Group Examples";
         infiniteGroupLabel.transform.SetParent(groupGallery.transform);
 
         // For each Group create a new group object and set it as a child of the gallery.
