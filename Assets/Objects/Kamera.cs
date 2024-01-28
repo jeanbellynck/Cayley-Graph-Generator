@@ -53,17 +53,10 @@ public class Kamera : MonoBehaviour
                 
                 float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
                 float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
-                
-                
-                print("Previous Position " + touchZeroPrevPos + " " + touchOnePrevPos);
-                print("Delta " + touchZero.deltaPosition + " " + touchOne.deltaPosition);
-                print("Current Position " + touchZeroPrevPos + " " + touchOnePrevPos);
-
                 float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
-                print(deltaMagnitudeDiff);
 
                 deltaMagnitudeDiff = Mathf.Clamp(deltaMagnitudeDiff, -5, 5);
-                cam.orthographicSize += deltaMagnitudeDiff * pinchSensitivity;
+                cam.orthographicSize -= deltaMagnitudeDiff * pinchSensitivity;
                 cam.orthographicSize = Math.Max(1, cam.orthographicSize);
             }
         }
@@ -88,6 +81,17 @@ public class Kamera : MonoBehaviour
                 transform.parent.rotation = transform.parent.rotation * rotation;
             }
         }
-        
+    }
+
+    public void zoomIn()
+    {
+        Camera cam = Camera.main;
+        cam.orthographicSize = Math.Max(1, cam.orthographicSize - 3);
+    }
+
+    public void zoomOut()
+    {
+        Camera cam = Camera.main;
+        cam.orthographicSize = Math.Max(1, cam.orthographicSize + 3);
     }
 }

@@ -31,7 +31,12 @@ public class CayleyGraph : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        // Test the relaoator decoder
+        print(RelatorDecoder.decodeRelator("[(ab)^3, (ba)^3]"));
+        print(RelatorDecoder.decodeRelator("[(abC)^-3, (baC)^3]"));
+        print(RelatorDecoder.decodeRelator("[[a, b], c]"));
+        print(RelatorDecoder.decodeRelator("((aC)^-2)^-2"));
+        RelatorDecoder.decodeRelator("a^3");
     }
 
 

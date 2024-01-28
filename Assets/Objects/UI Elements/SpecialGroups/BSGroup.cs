@@ -8,7 +8,7 @@ public class BSGroup : Group
     {
         name = "BS(m, n)";
         description = "The Baumslag-Solitar group";
-        parameters = new string[][] {new string[] {"m", "1", "First exponent of the relation a<sup>n</sup> = ba<sup>m</sup>B"}, new string[] {"n", "2", "Second exponent of the relation a<sup>n</sup> = ba<sup>m</sup>B"}};
+        parameters = new string[][] {new string[] {"m", "1", "First exponent of the relation a^n = ba^mB"}, new string[] {"n", "2", "Second exponent of the relation a^n = ba^mB"}};
         updatePresentation();
     }
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +18,7 @@ public class GroupGallery : MonoBehaviour
         new Group("O ≅ S<sub>4</sub>", "The symmetry group of the octahedron", "s, t", "ss, ttt, stststst"),
         new Group("I ≅ A<sub>5</sub>", "The symmetry group of the icosahedron", "s, t", "ss, ttt, ststststst"),
         new Group("Rub<sub>2×2×2</sub>", "The group of the 2x2x2 Rubiks cube", "a, b, c", "aaaa, bbbb, cccc, ababaBABAB, bcbcbCBCBC, abcbaCABCB, bcacbABCAC, cabacBCABA, acacabababcbcb"),
-        new MonsterGroup()
+        //new MonsterGroup()
     };
 
     Group[] infiniteGroups = {
@@ -37,6 +35,7 @@ public class GroupGallery : MonoBehaviour
         new BSGroup(),
         new Group("F", "Thompson group F", "a, b", "aBAbabAABa, aBAAbaabAAABaa"),
         new Group("²F<sub>4</sub>(2)'", "Tits group", "a, b", "aa, bbb, ababababababababababababab, abABabABabABabABabAB, ababABABababABABababABABababABAB, ababababaBababababaBababababaBababababaBababababaBababababaBababababaB"),
+        //new RandomGroup(),
         new Group("?", "???", "a, b, c", "aaa, bbb, ccc, abAbA, acab")
     };
     
