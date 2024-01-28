@@ -29,7 +29,7 @@ public class BraidGroup : Group
             {
                 for (int j = 0; j < i-1; j++)
                 {
-                    rel.Add(gen[i]+gen[j]+Gen[i]+Gen[j]);
+                    rel.Add("[" + gen[j] +","+ gen[i]+ "]");
                 }
             }
             for (int i = 0; i < n-2; i++)

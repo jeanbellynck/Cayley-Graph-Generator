@@ -26,6 +26,7 @@ public class FreeGroup : Group
             }
        
             generators = gen.ToArray();
+            relators = new string[]{};
         }
     }
 }

@@ -14,7 +14,7 @@ public class Group {
         
         this.name = "Group";
         this.description = "Group description";
-        this.generators = new string[]{"a, b"};
+        this.generators = new string[]{"a; b"};
         this.relators = new string[]{"abAB"};
         this.parameters = new string[0][];
     }
@@ -23,8 +23,8 @@ public class Group {
     {
         this.name = name;
         this.description = description;
-        this.generators = generators.Replace(" ", "").Split(',');
-        this.relators = relators.Replace(" ", "").Split(',');
+        this.generators = generators.Replace(" ", "").Split(';');
+        this.relators = relators.Replace(" ", "").Split(';');
         this.parameters = new string[0][];
     }
     
@@ -32,8 +32,8 @@ public class Group {
     {
         this.name = name;
         this.description = description;
-        this.generators = generators.Replace(" ", "").Split(',');
-        this.relators = relators.Replace(" ", "").Split(',');
+        this.generators = generators.Replace(" ", "").Split(';');
+        this.relators = relators.Replace(" ", "").Split(';');
         this.parameters = parameters;
     }
  

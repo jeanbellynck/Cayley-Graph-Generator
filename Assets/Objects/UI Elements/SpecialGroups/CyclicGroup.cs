@@ -14,11 +14,7 @@ public class CyclicGroup : Group
         if (int.TryParse(parameters[0][1], out int n) && n >= 1)
         {
             generators = new string[]{"a"};
-            string relator = "";
-            for (int i = 0; i < int.Parse(parameters[0][1]); i++)
-            {
-                relator += "a";
-            }
+            string relator = "a^" + n.ToString();
             relators = new string[]{relator};
         }
     }

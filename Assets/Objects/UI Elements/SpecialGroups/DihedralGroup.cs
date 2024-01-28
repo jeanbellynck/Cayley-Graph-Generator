@@ -20,8 +20,8 @@ public class DihedralGroup : Group
             List<string> rel = new List<string>
             {
                 "rsrs",
-                "ss",
-                string.Concat(Enumerable.Repeat("r", n))
+                "s^2",
+                "r^" + n.ToString()
             };
        
             generators = gen.ToArray();

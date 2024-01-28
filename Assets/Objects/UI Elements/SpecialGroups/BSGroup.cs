@@ -19,15 +19,15 @@ public class BSGroup : Group
         {
             string relator = "";
             if(n > 0) {
-                relator += string.Concat(Enumerable.Repeat("a", n));
+                relator += "a^" + n.ToString();
             }else{
-                relator += string.Concat(Enumerable.Repeat("A", n));
+                relator += "A^" + (-n).ToString();
             }
             relator += "b";
             if(m > 0) {
-                relator += string.Concat(Enumerable.Repeat("A", m));
+                relator += "A^" + m.ToString();
             }else{
-                relator += string.Concat(Enumerable.Repeat("a", m));
+                relator += "a^" + (-m).ToString();
             }
             relator += "B";
             

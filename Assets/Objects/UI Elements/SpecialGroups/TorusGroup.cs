@@ -18,7 +18,7 @@ public class TorusGroup : Group
         if (int.TryParse(parameters[0][1], out int m) && m >= 1 && int.TryParse(parameters[1][1], out int n) && n >= 1)
         {
             generators = new string[]{"a", "b"};
-            relators = new string[]{"abAB", string.Concat(Enumerable.Repeat("a", n)), string.Concat(Enumerable.Repeat("b", m))};
+            relators = new string[]{"[a, b]", "a^" + m.ToString(), "b^" + n.ToString()};
         }
     }
 }

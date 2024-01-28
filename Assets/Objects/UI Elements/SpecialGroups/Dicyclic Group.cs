@@ -20,8 +20,8 @@ public class DicyclicGroup : Group
             List<string> gen = new List<string>{"r", "f"};
             List<string> rel = new List<string>
             {
-                string.Concat(Enumerable.Repeat("r", 2 * n)),
-                string.Concat(Enumerable.Repeat("r", n)) + "FF",
+                "r^" + (2*n).ToString(),
+                "r^" + (n).ToString() + "F^2",
                 "frFr"
             };
        

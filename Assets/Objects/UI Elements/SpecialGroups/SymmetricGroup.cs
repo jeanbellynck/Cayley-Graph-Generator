@@ -27,13 +27,13 @@ public class SymmetricGroup : Group
             }
             for (int i = 0; i < n-1; i++)
             {
-                rel.Add(gen[i] + gen[i]);
+                rel.Add(gen[i] + "^2");
             }
             for (int i = 0; i < n-1; i++)
             {
                 for (int j = 0; j < i-1; j++)
                 {
-                    rel.Add(gen[i]+gen[j]+Gen[i]+Gen[j]);
+                    rel.Add("[" + gen[j] +","+ gen[i]+ "]");
                 }
             }
             for (int i = 0; i < n-2; i++)

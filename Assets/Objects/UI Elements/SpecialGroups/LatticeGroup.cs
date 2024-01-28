@@ -29,7 +29,7 @@ public class LatticeGroup : Group
             {
                 for (int j = 0; j < i; j++)
                 {
-                    rel.Add(gen[i]+gen[j]+Gen[i]+Gen[j]);
+                    rel.Add("[" + gen[j] +","+ gen[i]+ "]");
                 }
             }
        
