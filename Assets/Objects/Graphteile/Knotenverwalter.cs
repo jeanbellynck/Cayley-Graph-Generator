@@ -4,29 +4,29 @@ using System.Collections.Generic;
 
 public class VertexManager {
     public int idCounter = 0;
-    private Dictionary<string, Knoten> knotenMap = new Dictionary<string, Knoten>();
+    private Dictionary<string, Vertex> knotenMap = new Dictionary<string, Vertex>();
     
-    public ICollection<Knoten> getVertex() {
+    public ICollection<Vertex> getVertex() {
         return knotenMap.Values;
     }
 
 
-    public Knoten getVertex(string key) {
+    public Vertex getVertex(string key) {
         return knotenMap[key];
     }
 
 
-    public void AddKnoten(Knoten vertex) {
+    public void AddKnoten(Vertex vertex) {
         vertex.id = idCounter;
         idCounter++;
         knotenMap.Add(vertex.name, vertex);
     }
 
-    public void RemoveKnoten(Knoten vertex) {
+    public void RemoveVertex(Vertex vertex) {
         knotenMap.Remove(vertex.name);
     }
 
-    public bool ContainsKnoten(Knoten vertex) {
+    public bool ContainsVertex(Vertex vertex) {
         return knotenMap.ContainsKey(vertex.name);
     }
 
@@ -34,7 +34,7 @@ public class VertexManager {
         return knotenMap.ContainsKey(knotenName);
     }
 
-    public Knoten getNeutral()
+    public Vertex getNeutral()
     {
         return knotenMap[""];
     }

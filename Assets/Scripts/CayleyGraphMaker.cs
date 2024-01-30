@@ -7,8 +7,8 @@ using System.Linq;
 
 public abstract class CayleyGraphMaker : MonoBehaviour
 {
-    protected VertexManager knotenverwalter;
-    protected EdgeManager kantenverwalter;
+    protected VertexManager vertexManager;
+    protected EdgeManager edgeManager;
     protected MeshManager meshManager;
     protected GameObject knotenPrefab;
     protected GameObject kantenPrefab;
@@ -20,8 +20,8 @@ public abstract class CayleyGraphMaker : MonoBehaviour
 
 
     public void InitializeCGMaker(VertexManager knotenverwalter, EdgeManager kantenverwalter, MeshManager meshManager, GameObject knotenPrefab, GameObject kantenPrefab, Color[] colourList, char[] generators, string[] relators, int complexSize) {
-        this.knotenverwalter = knotenverwalter;
-        this.kantenverwalter = kantenverwalter;
+        this.vertexManager = knotenverwalter;
+        this.edgeManager = kantenverwalter;
         this.meshManager = meshManager;
         this.knotenPrefab = knotenPrefab;
         this.kantenPrefab = kantenPrefab;

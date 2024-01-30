@@ -12,11 +12,11 @@ public class EdgeManager {
         return edges.Values;
     }
 
-    public Kante GetKante(string von, string zu) {
+    public Kante GetEdge(string von, string zu) {
         return edges[(von, zu)];
     }
 
-    public void AddKante(Kante edge) {
+    public void AddEdge(Kante edge) {
         edges.Add((edge.startPoint.name, edge.endPoint.name), edge);
         if(eingehendeKnoten.ContainsKey(edge.endPoint.name)) {
             eingehendeKnoten[edge.endPoint.name].Add(edge.startPoint.name);
@@ -34,7 +34,7 @@ public class EdgeManager {
         }
     }
 
-    public void RemoveKante(string von, string zu) {
+    public void RemoveEdge(string von, string zu) {
         edges.Remove((von, zu));
         if(eingehendeKnoten.ContainsKey(zu)) {
             if(eingehendeKnoten[zu].Contains(von)) {
@@ -48,11 +48,11 @@ public class EdgeManager {
         }
     }
 
-    public bool ContainsKante(string von, string zu) {
+    public bool ContainsEdge(string von, string zu) {
         return edges.ContainsKey((von, zu));
     }
 
-    public Knoten followEdge(Knoten vertex, char op) {
+    public Vertex followEdge(Vertex vertex, char op) {
         if(vertex == null) {
             return null;
         }
@@ -76,14 +76,14 @@ public class EdgeManager {
     }
 
 
-    public List<Knoten> GetAngehängteKanten(Knoten vertex) {
-        List<Knoten> res = GetAusgehendeKnoten(vertex);
-        res.AddRange(GetEingehendeKnoten(vertex));
+    public List<Vertex> GetAngehängteKanten(Vertex vertex) {
+        List<Vertex> res = GetOutgoingVertices(vertex);
+        res.AddRange(GetIngoingVertices(vertex));
         return res;
     }
 
-    public List<Knoten> GetAusgehendeKnoten(Knoten vertex) {
-        List<Knoten> erg = new List<Knoten>();
+    public List<Vertex> GetOutgoingVertices(Vertex vertex) {
+        List<Vertex> erg = new List<Vertex>();
         if(ausgehendeKnoten.ContainsKey(vertex.name)) {
             foreach(string ausgehenderKnoten in ausgehendeKnoten[vertex.name]) {
                 erg.Add(edges[(vertex.name, ausgehenderKnoten)].endPoint);
@@ -92,8 +92,8 @@ public class EdgeManager {
         return erg;
     }
 
-    public List<Knoten> GetEingehendeKnoten(Knoten vertex) {
-        List<Knoten> erg = new List<Knoten>();
+    public List<Vertex> GetIngoingVertices(Vertex vertex) {
+        List<Vertex> erg = new List<Vertex>();
         if(eingehendeKnoten.ContainsKey(vertex.name)) {
             foreach(string eingehenderKnoten in eingehendeKnoten[vertex.name]) {
                 erg.Add(edges[(eingehenderKnoten, vertex.name)].startPoint);

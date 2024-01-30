@@ -84,8 +84,8 @@ public class CayleyGraph : MonoBehaviour
         }
         edgeManagererwalter.resetKanten();
         // Destroy vertices Objects
-        ICollection<Knoten> nodes = vertexManagererwalter.getVertex();
-        foreach(Knoten node in nodes) {
+        ICollection<Vertex> nodes = vertexManagererwalter.getVertex();
+        foreach(Vertex node in nodes) {
             Destroy(node.gameObject);
         }
         vertexManagererwalter.resetKnoten();

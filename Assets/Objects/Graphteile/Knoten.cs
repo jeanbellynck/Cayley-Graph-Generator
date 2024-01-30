@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Knoten : MonoBehaviour
+public class Vertex : MonoBehaviour
 {
     // Used by Link force algorithm
     public Vector3 velocity = Vector3.zero;
@@ -14,8 +14,6 @@ public class Knoten : MonoBehaviour
     public Vector3 attractForce = Vector3.zero;
     public Vector3 oppositeForce = Vector3.zero;
     public Vector3 angleForce = Vector3.zero;
-    public float velocityDecay = 0.9f;
-    public float maximalForce = 1;
     public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
     
     public int distance = 0; // Measures the distance to the identity

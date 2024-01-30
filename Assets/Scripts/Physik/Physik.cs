@@ -80,7 +80,7 @@ public class Physik : MonoBehaviour{
     }
 
     private void updateVertices(VertexManager vertexManager) {
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             Vector3 force = vertex.repelForce + vertex.attractForce + vertex.oppositeForce + vertex.angleForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
 
@@ -96,7 +96,7 @@ public class Physik : MonoBehaviour{
      * Also bounds th force by the maximal force.
      */
     private void geschwindigkeitenZurücksetzen(VertexManager vertexManager) {
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             vertex.attractForce = Vector3.zero;
             vertex.repelForce = Vector3.zero;
             vertex.oppositeForce = Vector3.zero;
@@ -109,11 +109,11 @@ public class Physik : MonoBehaviour{
     private void calculateRepulsionForces(VertexManager vertexManager) {
         // Abstoßung durch Knoten
         BarnesQuadbaum bqb = new BarnesQuadbaum(Vector2.zero, radius, präzision);
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             bqb.Add(vertex.transform.position);
         }
         bqb.BerechneSchwerpunkt();
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             vertex.repelForce = repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
         }
     }
@@ -137,12 +137,12 @@ public class Physik : MonoBehaviour{
      */
     private void calculateOppositionForce(VertexManager vertexManager, EdgeManager edgeManager) {
         // ToDo: Da ist noch eine Menge manueller Code drin.
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             char[] alphabet = {'a', 'b'}; 
             
             foreach(char gen in alphabet) {
-                Knoten front = edgeManager.followEdge(vertex, gen);
-                Knoten back = edgeManager.followEdge(vertex, char.ToUpper(gen));
+                Vertex front = edgeManager.followEdge(vertex, gen);
+                Vertex back = edgeManager.followEdge(vertex, char.ToUpper(gen));
                 if(front != null && back != null) {
                     front.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(vertex, front, back);
                     back.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(vertex, back, front);
@@ -152,7 +152,7 @@ public class Physik : MonoBehaviour{
         } 
     }
     
-    private Vector3 calculateOppositionForceBetweenTwoVertices(Knoten vertexBase, Knoten vertex1, Knoten vertex2) {
+    private Vector3 calculateOppositionForceBetweenTwoVertices(Vertex vertexBase, Vertex vertex1, Vertex vertex2) {
         if(vertex1.name == vertex2.name) {return Vector3.zero;}
         
         Vector3 v = Vector3.Normalize(vertex1.transform.position - vertexBase.transform.position);
@@ -177,12 +177,12 @@ public class Physik : MonoBehaviour{
         }
         currentIteration++;
 
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             vertex.stress = 0;
             foreach(char gen1 in generators) {
                 foreach(char gen2 in generators) {
-                    Knoten vertex1 = edgeManager.followEdge(vertex, gen1);
-                    Knoten vertex2 = edgeManager.followEdge(vertex, gen2);
+                    Vertex vertex1 = edgeManager.followEdge(vertex, gen1);
+                    Vertex vertex2 = edgeManager.followEdge(vertex, gen2);
                     
                     if(gen1 != gen2 && vertex1 != null && vertex2 != null && vertex1.name != vertex2.name) {
                         Vector3 force = angleForceFactor*calculateAverageAngleForceBetweenTwoVertices(vertex, vertex1, vertex2, averageArrowAngles[gen1][gen2]);
@@ -205,9 +205,9 @@ public class Physik : MonoBehaviour{
                 sumArrowAngles[gen1][gen2] = 0f;
                 averageArrowAngles[gen1][gen2] = 0f;
 
-                foreach(Knoten vertex in vertexManager.getVertex()) {
-                    Knoten vertex1 = edgeManager.followEdge(vertex, gen1);
-                    Knoten vertex2 = edgeManager.followEdge(vertex, gen2);
+                foreach(Vertex vertex in vertexManager.getVertex()) {
+                    Vertex vertex1 = edgeManager.followEdge(vertex, gen1);
+                    Vertex vertex2 = edgeManager.followEdge(vertex, gen2);
                     
                     if(vertex1 != null && vertex2 != null && vertex1.id != vertex2.id) {
                         // Thing is calculated twice, this can be optimized
@@ -222,7 +222,7 @@ public class Physik : MonoBehaviour{
     }
 
     
-    private Vector3 calculateAverageAngleForceBetweenTwoVertices(Knoten vertexBase, Knoten vertex1, Knoten vertex2, float averageAngle) {
+    private Vector3 calculateAverageAngleForceBetweenTwoVertices(Vertex vertexBase, Vertex vertex1, Vertex vertex2, float averageAngle) {
         Vector3 v = Vector3.Normalize(vertex1.transform.position - vertexBase.transform.position);
         Vector3 w = Vector3.Normalize(vertex2.transform.position - vertexBase.transform.position);
 
@@ -242,7 +242,7 @@ public class Physik : MonoBehaviour{
         return 1.0f - (k / (1.0f + k));
     }
 
-    private Vector3 calculateLinkForce(Knoten source, Knoten target) {
+    private Vector3 calculateLinkForce(Vertex source, Vertex target) {
         Vector3 diff = target.transform.position + target.velocity*Time.deltaTime - source.transform.position - source.velocity*Time.deltaTime;
         float mag = diff.magnitude;
         return (mag - idealLength) / mag * diff;
@@ -254,7 +254,7 @@ public class Physik : MonoBehaviour{
     }
 
     private void fixIdentity(VertexManager vertexManager) {
-        foreach(Knoten vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in vertexManager.getVertex()) {
             if(vertex.name == "") {
                 vertex.attractForce = Vector3.zero;
                 vertex.repelForce = Vector3.zero;

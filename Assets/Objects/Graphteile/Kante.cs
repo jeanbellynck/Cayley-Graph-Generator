@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Kante : MonoBehaviour
 {
-    public Knoten startPoint;
-    public Knoten endPoint;
+    public Vertex startPoint;
+    public Vertex endPoint;
 
     public float lineWidth = 0.1f;
     public float arrowWidth = 0.2f;
@@ -16,19 +16,19 @@ public class Kante : MonoBehaviour
     // Start is called before the first frame update
     void Start(){}
 
-    public void SetStartpunkt(Knoten startpunkt) {
+    public void setStart(Vertex startpunkt) {
         startPoint = startpunkt;
         startpunkt.addEdge(this);
     }
 
-    public void SetEndpunkt(Knoten endpunkt) {
+    public void SetEnd(Vertex endpunkt) {
         endPoint = endpunkt;
         endpunkt.addEdge(this);
     }
     
-    public void SetEndpunkte(Knoten startpunkt, Knoten endpunkt) {
-        SetStartpunkt(startpunkt);
-        SetEndpunkt(endpunkt);
+    public void SetEndpoints(Vertex startpunkt, Vertex endpunkt) {
+        setStart(startpunkt);
+        SetEnd(endpunkt);
         endPoint = endpunkt;
         Update();
     }
