@@ -42,7 +42,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
 
     void drawNeutralElement() {
         // Erzeugen des symmetrischen Alphabets
-        Vertex neutral = createVertex(null, ' ');
+        Vertex neutral = CreateVertex(null, ' ');
         Camera.main.GetComponent<Kamera>().target = neutral.transform;
     }
 
@@ -61,11 +61,11 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
 
             foreach(char gen in generators) {
                 if(!borderVertex.edges.ContainsKey(gen)) {
-                    Vertex newVertex = createVertex(borderVertex, gen);
+                    Vertex newVertex = CreateVertex(borderVertex, gen);
                     relatorCandidates.Add(newVertex);
                 }
                 if(!borderVertex.edges.ContainsKey(char.ToUpper(gen))) {
-                    Vertex newVertex = createVertex(borderVertex, char.ToUpper(gen));
+                    Vertex newVertex = CreateVertex(borderVertex, char.ToUpper(gen));
                     relatorCandidates.Add(newVertex);
                 }
             }
@@ -81,7 +81,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
     /**
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
-    private Vertex createVertex(Vertex predecessor, char gen) {
+    private Vertex CreateVertex(Vertex predecessor, char gen) {
         // Zufallsverschiebung
         Vector3 elementPosition = Vector3.zero;
         Vertex neuerKnoten;
@@ -224,14 +224,15 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
     }
 
     /**
-    * Merges the two given groupElements. The groupElement with the shorter name is deleted and all edges are redirected to the other groupElement.
+    * Merges vertex1 with vertex2. The groupElement with the shorter name is deleted and all edges are redirected to the other groupElement.
     */
-    void MergesVertices(Vertex branch1, Vertex branch2) {
-        if(branch1.Equals(branch2)) {
+    void MergesVertices(Vertex vertex1, Vertex vertex2) {
+        if(vertex1.Equals(vertex2)) {
             return;
         }
+        int distanceToNeutralElement = Mathf.Min(vertex1.distanceToNeutralElement, vertex2.distanceToNeutralElement);
         // Neuen Knoten erstellen, soll den Namen des kürzeren Wegs tragen
-        Vertex shortWord;
+        /**Vertex shortWord;
         Vertex longWord;
         if(branch1.name.Length <= branch2.name.Length) {
             shortWord = branch1;
@@ -239,41 +240,41 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
         } else {
             shortWord = branch2;
             longWord = branch1;
-        }
+        }**/
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
-        foreach(Vertex outgoingVertex in edgeManager.GetOutgoingVertices(longWord)) {
-            Kante edge = edgeManager.GetEdge(longWord.name, outgoingVertex.name);
-            if(edgeManager.ContainsEdge(shortWord.name, outgoingVertex.name)) {
-                Debug.Assert(edgeManager.GetEdge(shortWord.name, outgoingVertex.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
+        foreach(Vertex outgoingVertex in edgeManager.GetOutgoingVertices(vertex1)) {
+            Kante edge = edgeManager.GetEdge(vertex1.name, outgoingVertex.name);
+            if(edgeManager.ContainsEdge(vertex2.name, outgoingVertex.name)) {
+                Debug.Assert(edgeManager.GetEdge(vertex2.name, outgoingVertex.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
                 // Duplikat löschen
                 Destroy(edge.gameObject);
             } else {
-                edge.setStart(shortWord);
+                edge.setStart(vertex2);
                 edgeManager.AddEdge(edge);
             }
-            edgeManager.RemoveEdge(longWord.name, outgoingVertex.name);
+            edgeManager.RemoveEdge(vertex1.name, outgoingVertex.name);
         }
-        foreach(Vertex ingoingVertex in edgeManager.GetIngoingVertices(longWord)) {
-            Kante edge = edgeManager.GetEdge(ingoingVertex.name, longWord.name);
-            if(edgeManager.ContainsEdge(ingoingVertex.name, shortWord.name)) {
-                Debug.Assert(edgeManager.GetEdge(ingoingVertex.name, shortWord.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
+        foreach(Vertex ingoingVertex in edgeManager.GetIngoingVertices(vertex1)) {
+            Kante edge = edgeManager.GetEdge(ingoingVertex.name, vertex1.name);
+            if(edgeManager.ContainsEdge(ingoingVertex.name, vertex2.name)) {
+                Debug.Assert(edgeManager.GetEdge(ingoingVertex.name, vertex2.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
                 Destroy(edge.gameObject);
             } else {
-                edge.SetEnd(shortWord);
+                edge.SetEnd(vertex2);
                 edgeManager.AddEdge(edge);
             }
-            edgeManager.RemoveEdge(ingoingVertex.name, longWord.name);
+            edgeManager.RemoveEdge(ingoingVertex.name, vertex1.name);
         }
         
         // Anderen Knoten löschen
-        vertexManager.RemoveVertex(longWord);
-        Destroy(longWord.gameObject);
+        vertexManager.RemoveVertex(vertex1);
+        Destroy(vertex1.gameObject);
 
         // Aktuellen Knoten sicherheitshalber nochmal prüfen
-        AddBorderVertex(shortWord, shortWord.distanceToNeutralElement);
-        edgeMergeCandidates.Add(shortWord);
-        relatorCandidates.Add(shortWord);
+        AddBorderVertex(vertex2, vertex2.distanceToNeutralElement);
+        edgeMergeCandidates.Add(vertex2);
+        relatorCandidates.Add(vertex2);
     }
 
     
