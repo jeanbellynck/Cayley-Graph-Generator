@@ -37,8 +37,8 @@ public class DreiAst : DreiBaum{
         // Inhalt und Kanten setzen
         this.inhalt = inhalt;
         this.inhalt.transform.parent = transform;
-        this.kante = vorherigeKante;
-        kante.transform.parent = transform;
+        this.edge = vorherigeKante;
+        edge.transform.parent = transform;
         Vector3 inhaltPos = this.inhalt.transform.position;
         float vergangeneZeit = 0;
         while(vergangeneZeit < animationsZeit) {
@@ -99,7 +99,7 @@ public class DreiAst : DreiBaum{
     public override void updatePosition() {
         print("UpdatePosition wurde aufgerufen.");
         foreach (KeyValuePair<int, DreiBaum> eintrag in aeste) {
-            //kante.UpdatePostion();
+            //edge.UpdatePostion();
             eintrag.Value.transform.position = transform.position + Quaternion.Euler(0,0,eintrag.Key) * Vector3.right * kantenlaenge;
             eintrag.Value.updatePosition();
         }

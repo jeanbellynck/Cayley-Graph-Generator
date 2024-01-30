@@ -18,7 +18,7 @@ public class GroupGallery : MonoBehaviour
         new Group("T ≅ A<sub>4</sub>", "The symmetry group of the tetrahedron", "s; t", "s^2; t^3; (st)^3"),
         new Group("O ≅ S<sub>4</sub>", "The symmetry group of the octahedron", "s; t", "s^2; t^3; (st)^4"),
         new Group("I ≅ A<sub>5</sub>", "The symmetry group of the icosahedron", "s; t", "s^2; t^3; (st)^5"),
-        new Group("Rub<sub>2×2×2</sub>", "The group of the 2x2x2 Rubiks cube", "a; b; c", "a^4; b^4; c^4; ababaBABAB; bcbcbCBCBC; abcbaCABCB; bcacbABCAC; cabacBCABA; (ac)^2(ab)^3(cb)^2"),
+        new Group("Rub<sub>2×2×2</sub>", "The group of the 2x2x2 Rubiks cube", "a; b; c", "a^4; b^4; c^4; ababa=babab; ababa = babab; bcbcb = cbcbc; abcba = bcbac; bcacb = cacba; cabac = abacb; (ac)^2(ab)^3(cb)^2"),
         //new MonsterGroup()
     };
 

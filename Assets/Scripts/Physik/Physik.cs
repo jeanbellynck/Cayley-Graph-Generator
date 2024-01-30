@@ -6,7 +6,8 @@ using Unity.VisualScripting;
 public class Physik : MonoBehaviour{
     public float idealLength;
     public float radius;
-    public float präzision;
+    public float präzision; // Used by the QuadTree. Determines the size of the smallest quad. The smaller the more precise but the more expensive. 
+    public float hyperbolicScaling = 1; // Determines how fast the hyperbolic space is scaled. 1 is no scaling. This is simulated by shortening edges the farther you go.
 
     [Range(0.0f,20.0f)]
     public float repelForceFactor; 
@@ -30,8 +31,8 @@ public class Physik : MonoBehaviour{
     Dictionary<char, Dictionary<char, float>> averageArrowAngles = new Dictionary<char, Dictionary<char, float>>();
 
     
-    public Physik(float idealeLänge, float radius) {
-        this.idealLength = idealeLänge;
+    public Physik(float idealeLength, float radius) {
+        this.idealLength = idealeLength;
         this.radius = radius;
     }
 
@@ -55,18 +56,18 @@ public class Physik : MonoBehaviour{
 
     
 
-    public void UpdatePh(Knotenverwalter knotenV, Kantenverwalter kantenV, float präzision) {
+    public void UpdatePh(VertexManager vertexManager, EdgeManager edgeManager, float präzision) {
         this.präzision = präzision;
-        geschwindigkeitenZurücksetzen(knotenV);
-        if(repelForceFactor != 0) calculateRepulsionForces(knotenV);
-        if(attractForceFactor != 0) calculateLinkForces(kantenV);
-        if(oppositeForceFactor != 0) calculateOppositionForce(knotenV, kantenV);
-        if(angleForceFactor != 0) calculateArrowAverageForce(knotenV, kantenV);
+        geschwindigkeitenZurücksetzen(vertexManager);
+        if(repelForceFactor != 0) calculateRepulsionForces(vertexManager);
+        if(attractForceFactor != 0) calculateLinkForces(edgeManager);
+        if(oppositeForceFactor != 0) calculateOppositionForce(vertexManager, edgeManager);
+        if(angleForceFactor != 0) calculateArrowAverageForce(vertexManager, edgeManager);
         
-        updateVertices(knotenV);
+        updateVertices(vertexManager);
 
-        //smitteKraftBerechnen(knotenV, kantenV); 
-        //fixIdentity(knotenV);
+        //smitteKraftBerechnen(vertexManager, edgeManager); 
+        //fixIdentity(vertexManager);
 
         
         // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
@@ -78,15 +79,15 @@ public class Physik : MonoBehaviour{
         }
     }
 
-    private void updateVertices(Knotenverwalter knotenV) {
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            Vector3 force = knoten.repelForce + knoten.attractForce + knoten.oppositeForce + knoten.angleForce;
+    private void updateVertices(VertexManager vertexManager) {
+        foreach(Knoten vertex in vertexManager.getVertex()) {
+            Vector3 force = vertex.repelForce + vertex.attractForce + vertex.oppositeForce + vertex.angleForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
 
-            knoten.transform.position += knoten.velocity * Time.deltaTime;
-            knoten.velocity *= velocityDecay;
-            knoten.velocity = knoten.velocity + force;
-            knoten.transform.position = Vector3.ClampMagnitude(knoten.transform.position, 100);
+            vertex.transform.position += vertex.velocity * Time.deltaTime;
+            vertex.velocity *= velocityDecay;
+            vertex.velocity = vertex.velocity + force;
+            vertex.transform.position = Vector3.ClampMagnitude(vertex.transform.position, 100);
         }
     }
     
@@ -94,36 +95,36 @@ public class Physik : MonoBehaviour{
      * Sets the speed of all vertices to 0.
      * Also bounds th force by the maximal force.
      */
-    private void geschwindigkeitenZurücksetzen(Knotenverwalter knotenV) {
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            knoten.attractForce = Vector3.zero;
-            knoten.repelForce = Vector3.zero;
-            knoten.oppositeForce = Vector3.zero;
-            knoten.angleForce = Vector3.zero;
+    private void geschwindigkeitenZurücksetzen(VertexManager vertexManager) {
+        foreach(Knoten vertex in vertexManager.getVertex()) {
+            vertex.attractForce = Vector3.zero;
+            vertex.repelForce = Vector3.zero;
+            vertex.oppositeForce = Vector3.zero;
+            vertex.angleForce = Vector3.zero;
         }
     }
 
     public float repulsionDistance;
 
-    private void calculateRepulsionForces(Knotenverwalter knotenV) {
+    private void calculateRepulsionForces(VertexManager vertexManager) {
         // Abstoßung durch Knoten
         BarnesQuadbaum bqb = new BarnesQuadbaum(Vector2.zero, radius, präzision);
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            bqb.Add(knoten.transform.position);
+        foreach(Knoten vertex in vertexManager.getVertex()) {
+            bqb.Add(vertex.transform.position);
         }
         bqb.BerechneSchwerpunkt();
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            knoten.repelForce = repelForceFactor * bqb.calculateRepulsionForceOnVertex(knoten.transform.position + knoten.velocity*Time.deltaTime, repulsionDistance);
+        foreach(Knoten vertex in vertexManager.getVertex()) {
+            vertex.repelForce = repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
         }
     }
 
     public int stabilityIterations = 1;
-    private void calculateLinkForces(Kantenverwalter kantenVerwalter) {
+    private void calculateLinkForces(EdgeManager edgeManagererwalter) {
         for(int i = 0; i < stabilityIterations; i++) {
-            foreach(Kante kante in kantenVerwalter.GetKanten()) {
-                Vector3 kraft = calculateLinkForce(kante.startPoint, kante.endPoint) ;
-                kante.startPoint.attractForce += attractForceFactor * kraft;
-                kante.endPoint.attractForce -= attractForceFactor * kraft;
+            foreach(Kante edge in edgeManagererwalter.GetKanten()) {
+                Vector3 force = calculateLinkForce(edge.startPoint, edge.endPoint) ;
+                edge.startPoint.attractForce += attractForceFactor * force;
+                edge.endPoint.attractForce -= attractForceFactor * force;
             }
         }
     }
@@ -134,18 +135,18 @@ public class Physik : MonoBehaviour{
      * The force is 1 if the angle between the vertices is very small 
      * ToDO: Check, when input and output are the same. Normalize the force.
      */
-    private void calculateOppositionForce(Knotenverwalter knotenV, Kantenverwalter kantenV) {
+    private void calculateOppositionForce(VertexManager vertexManager, EdgeManager edgeManager) {
         // ToDo: Da ist noch eine Menge manueller Code drin.
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
+        foreach(Knoten vertex in vertexManager.getVertex()) {
             char[] alphabet = {'a', 'b'}; 
             
             foreach(char gen in alphabet) {
-                Knoten front = kantenV.kanteFolgen(knoten, gen);
-                Knoten back = kantenV.kanteFolgen(knoten, char.ToUpper(gen));
+                Knoten front = edgeManager.followEdge(vertex, gen);
+                Knoten back = edgeManager.followEdge(vertex, char.ToUpper(gen));
                 if(front != null && back != null) {
-                    front.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(knoten, front, back);
-                    back.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(knoten, back, front);
-                    knoten.oppositeForce += 0.5f * oppositeForceFactor * ((front.transform.position -knoten.transform.position).normalized + (back.transform.position -knoten.transform.position).normalized)/2;
+                    front.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(vertex, front, back);
+                    back.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(vertex, back, front);
+                    vertex.oppositeForce += 0.5f * oppositeForceFactor * ((front.transform.position -vertex.transform.position).normalized + (back.transform.position -vertex.transform.position).normalized)/2;
                 }
             }
         } 
@@ -169,24 +170,24 @@ public class Physik : MonoBehaviour{
     public int arrowAverageRecalculationIteration = 10;
     int currentIteration = 0;
 
-    private void calculateArrowAverageForce(Knotenverwalter knotenV, Kantenverwalter kantenV) {
+    private void calculateArrowAverageForce(VertexManager vertexManager, EdgeManager edgeManager) {
         if(currentIteration == arrowAverageRecalculationIteration) {
-            calculateAverageAngles(knotenV, kantenV);
+            calculateAverageAngles(vertexManager, edgeManager);
             currentIteration = 0;
         }
         currentIteration++;
 
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            knoten.stress = 0;
+        foreach(Knoten vertex in vertexManager.getVertex()) {
+            vertex.stress = 0;
             foreach(char gen1 in generators) {
                 foreach(char gen2 in generators) {
-                    Knoten vertex1 = kantenV.kanteFolgen(knoten, gen1);
-                    Knoten vertex2 = kantenV.kanteFolgen(knoten, gen2);
+                    Knoten vertex1 = edgeManager.followEdge(vertex, gen1);
+                    Knoten vertex2 = edgeManager.followEdge(vertex, gen2);
                     
                     if(gen1 != gen2 && vertex1 != null && vertex2 != null && vertex1.name != vertex2.name) {
-                        Vector3 force = angleForceFactor*calculateAverageAngleForceBetweenTwoVertices(knoten, vertex1, vertex2, averageArrowAngles[gen1][gen2]);
-                        vertex1.angleForce += 1 / (1+knoten.distance) * force;
-                        knoten.stress += force.magnitude;
+                        Vector3 force = angleForceFactor*calculateAverageAngleForceBetweenTwoVertices(vertex, vertex1, vertex2, averageArrowAngles[gen1][gen2]);
+                        vertex1.angleForce += 1 / (1+vertex.distance) * force;
+                        vertex.stress += force.magnitude;
                     }
                 }
             }
@@ -197,20 +198,20 @@ public class Physik : MonoBehaviour{
     /**
      * Goes over each pair of angles and calculates theirs averages. This is done once per recalculationIteration to reduce the number of calculations.
      **/
-    private void calculateAverageAngles(Knotenverwalter knotenV, Kantenverwalter kantenV) {
+    private void calculateAverageAngles(VertexManager vertexManager, EdgeManager edgeManager) {
         foreach(char gen1 in generators) {
             foreach(char gen2 in generators) {
                 countedArrowAngles[gen1][gen2] = 0;
                 sumArrowAngles[gen1][gen2] = 0f;
                 averageArrowAngles[gen1][gen2] = 0f;
 
-                foreach(Knoten knoten in knotenV.GetKnoten()) {
-                    Knoten vertex1 = kantenV.kanteFolgen(knoten, gen1);
-                    Knoten vertex2 = kantenV.kanteFolgen(knoten, gen2);
+                foreach(Knoten vertex in vertexManager.getVertex()) {
+                    Knoten vertex1 = edgeManager.followEdge(vertex, gen1);
+                    Knoten vertex2 = edgeManager.followEdge(vertex, gen2);
                     
                     if(vertex1 != null && vertex2 != null && vertex1.id != vertex2.id) {
                         // Thing is calculated twice, this can be optimized
-                        sumArrowAngles[gen1][gen2] += Vector3.Angle(vertex1.transform.position - knoten.transform.position, vertex2.transform.position - knoten.transform.position);
+                        sumArrowAngles[gen1][gen2] += Vector3.Angle(vertex1.transform.position - vertex.transform.position, vertex2.transform.position - vertex.transform.position);
                         countedArrowAngles[gen1][gen2] += 1;
                     }
                 }
@@ -252,13 +253,13 @@ public class Physik : MonoBehaviour{
         //return diff.normalized*Mathf.Log(diff.magnitude/idealeLänge);
     }
 
-    private void fixIdentity(Knotenverwalter knotenV) {
-        foreach(Knoten knoten in knotenV.GetKnoten()) {
-            if(knoten.name == "") {
-                knoten.attractForce = Vector3.zero;
-                knoten.repelForce = Vector3.zero;
-                knoten.oppositeForce = Vector3.zero;
-                knoten.angleForce = Vector3.zero;
+    private void fixIdentity(VertexManager vertexManager) {
+        foreach(Knoten vertex in vertexManager.getVertex()) {
+            if(vertex.name == "") {
+                vertex.attractForce = Vector3.zero;
+                vertex.repelForce = Vector3.zero;
+                vertex.oppositeForce = Vector3.zero;
+                vertex.angleForce = Vector3.zero;
             }
         }
     }
@@ -272,5 +273,11 @@ public class Physik : MonoBehaviour{
     */
     public void shutDown() {
         actualMaximalForce -= 0.01f;
+    }
+
+    public void setHyperbolicScaling(string scaling) {
+        print("scaling changed to:" + scaling);
+        if(float.TryParse(scaling, out float s) && s != 0) {}
+
     }
 }

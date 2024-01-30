@@ -43,7 +43,7 @@ public class GroupOption : MonoBehaviour
     public void updateParameter(int parameterIndex, string parameterValue) {
         group.parameters[parameterIndex][1] = parameterValue;  
         group.updatePresentation();
-        transform.GetChild(0).GetChild(1).GetChild(1).GetComponent<Text>().text = "〈" + string.Join(", ", group.generators) + " : " + string.Join(", ", group.relators) + "〉";
+        setPresentation();
         // Update Layout using LayoutRebuilder (copied from https://stackoverflow.com/questions/60201481/unity-3d-vertical-layout-group-not-placing-elements-where-they-should-be)
         //LayoutRebuilder.MarkLayoutForRebuild(transform.parent.GetComponent<RectTransform>());
         

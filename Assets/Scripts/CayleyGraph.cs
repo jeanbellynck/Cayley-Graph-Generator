@@ -11,8 +11,8 @@ public class CayleyGraph : MonoBehaviour
     public Physik physik;// = new Physik(10, 100);
 
 
-    public Knotenverwalter knotenVerwalter = new Knotenverwalter();
-    public Kantenverwalter kantenVerwalter = new Kantenverwalter();
+    public VertexManager vertexManagererwalter = new VertexManager();
+    public EdgeManager edgeManagererwalter = new EdgeManager();
     public MeshManager meshManager = new MeshManager();
 
     public CayleyGraphMaker cayleyGraphMaker;
@@ -38,7 +38,7 @@ public class CayleyGraph : MonoBehaviour
     // Update is called once per frame
     void Update() {
         if(hatPhysik) {
-            physik.UpdatePh(knotenVerwalter, kantenVerwalter, präzisionsfaktor*Time.deltaTime);
+            physik.UpdatePh(vertexManagererwalter, edgeManagererwalter, präzisionsfaktor*Time.deltaTime);
         }
     }
 
@@ -78,23 +78,23 @@ public class CayleyGraph : MonoBehaviour
         }
         meshManager.resetMeshes();
         // Destroy edges Objects
-        ICollection<Kante> edges = kantenVerwalter.GetKanten();
+        ICollection<Kante> edges = edgeManagererwalter.GetKanten();
         foreach(Kante edge in edges) {
             Destroy(edge.gameObject);
         }
-        kantenVerwalter.resetKanten();
+        edgeManagererwalter.resetKanten();
         // Destroy vertices Objects
-        ICollection<Knoten> nodes = knotenVerwalter.GetKnoten();
+        ICollection<Knoten> nodes = vertexManagererwalter.getVertex();
         foreach(Knoten node in nodes) {
             Destroy(node.gameObject);
         }
-        knotenVerwalter.resetKnoten();
+        vertexManagererwalter.resetKnoten();
         physik.startUp();
 
         
         Debug.Log("Start Visualization");
         physik.setGenerators(generators);
-        cayleyGraphMaker.InitializeCGMaker(knotenVerwalter, kantenVerwalter, meshManager, knotenPrefab, kantenPrefab, colourList, generators, relators, complexSize);
+        cayleyGraphMaker.InitializeCGMaker(vertexManagererwalter, edgeManagererwalter, meshManager, knotenPrefab, kantenPrefab, colourList, generators, relators, complexSize);
         hatPhysik = true;
     }
 

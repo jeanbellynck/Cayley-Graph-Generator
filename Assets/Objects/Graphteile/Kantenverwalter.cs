@@ -2,40 +2,40 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Kantenverwalter {
-    IDictionary<(string, string), Kante> kanten = new Dictionary<(string, string), Kante>();
+public class EdgeManager {
+    IDictionary<(string, string), Kante> edges = new Dictionary<(string, string), Kante>();
     IDictionary<string, List<string>> eingehendeKnoten = new Dictionary<string, List<string>>();
     IDictionary<string, List<string>> ausgehendeKnoten = new Dictionary<string, List<string>>();
     
 
     public ICollection<Kante> GetKanten() {
-        return kanten.Values;
+        return edges.Values;
     }
 
     public Kante GetKante(string von, string zu) {
-        return kanten[(von, zu)];
+        return edges[(von, zu)];
     }
 
-    public void AddKante(Kante kante) {
-        kanten.Add((kante.startPoint.name, kante.endPoint.name), kante);
-        if(eingehendeKnoten.ContainsKey(kante.endPoint.name)) {
-            eingehendeKnoten[kante.endPoint.name].Add(kante.startPoint.name);
+    public void AddKante(Kante edge) {
+        edges.Add((edge.startPoint.name, edge.endPoint.name), edge);
+        if(eingehendeKnoten.ContainsKey(edge.endPoint.name)) {
+            eingehendeKnoten[edge.endPoint.name].Add(edge.startPoint.name);
         } else {
             List<string> newList = new List<string>();
-            newList.Add(kante.startPoint.name);
-            eingehendeKnoten.Add(kante.endPoint.name, newList);
+            newList.Add(edge.startPoint.name);
+            eingehendeKnoten.Add(edge.endPoint.name, newList);
         }
-        if(ausgehendeKnoten.ContainsKey(kante.startPoint.name)) {
-            ausgehendeKnoten[kante.startPoint.name].Add(kante.endPoint.name);
+        if(ausgehendeKnoten.ContainsKey(edge.startPoint.name)) {
+            ausgehendeKnoten[edge.startPoint.name].Add(edge.endPoint.name);
         } else {
             List<string> newList = new List<string>();
-            newList.Add(kante.endPoint.name);
-            ausgehendeKnoten.Add(kante.startPoint.name, newList);
+            newList.Add(edge.endPoint.name);
+            ausgehendeKnoten.Add(edge.startPoint.name, newList);
         }
     }
 
     public void RemoveKante(string von, string zu) {
-        kanten.Remove((von, zu));
+        edges.Remove((von, zu));
         if(eingehendeKnoten.ContainsKey(zu)) {
             if(eingehendeKnoten[zu].Contains(von)) {
                 eingehendeKnoten[zu].Remove(von);
@@ -49,26 +49,26 @@ public class Kantenverwalter {
     }
 
     public bool ContainsKante(string von, string zu) {
-        return kanten.ContainsKey((von, zu));
+        return edges.ContainsKey((von, zu));
     }
 
-    public Knoten kanteFolgen(Knoten knoten, char op) {
-        if(knoten == null) {
+    public Knoten followEdge(Knoten vertex, char op) {
+        if(vertex == null) {
             return null;
         }
 
 
         // Old Code
-        if(char.IsLower(op) && ausgehendeKnoten.ContainsKey(knoten.name)) {
-            foreach(string ausgehenderKnoten in ausgehendeKnoten[knoten.name]) {
-                if(kanten[(knoten.name, ausgehenderKnoten)].name == op.ToString()) {
-                    return kanten[(knoten.name, ausgehenderKnoten)].endPoint;
+        if(char.IsLower(op) && ausgehendeKnoten.ContainsKey(vertex.name)) {
+            foreach(string ausgehenderKnoten in ausgehendeKnoten[vertex.name]) {
+                if(edges[(vertex.name, ausgehenderKnoten)].name == op.ToString()) {
+                    return edges[(vertex.name, ausgehenderKnoten)].endPoint;
                 }
             }
-        } else if(eingehendeKnoten.ContainsKey(knoten.name)) {
-            foreach(string eingehenderKnoten in eingehendeKnoten[knoten.name]) {
-                if(kanten[(eingehenderKnoten, knoten.name)].name.ToUpper() == op.ToString()) {
-                    return kanten[(eingehenderKnoten, knoten.name)].startPoint;
+        } else if(eingehendeKnoten.ContainsKey(vertex.name)) {
+            foreach(string eingehenderKnoten in eingehendeKnoten[vertex.name]) {
+                if(edges[(eingehenderKnoten, vertex.name)].name.ToUpper() == op.ToString()) {
+                    return edges[(eingehenderKnoten, vertex.name)].startPoint;
                 }
             }
         }
@@ -76,27 +76,27 @@ public class Kantenverwalter {
     }
 
 
-    public List<Knoten> GetAngehängteKanten(Knoten knoten) {
-        List<Knoten> res = GetAusgehendeKnoten(knoten);
-        res.AddRange(GetEingehendeKnoten(knoten));
+    public List<Knoten> GetAngehängteKanten(Knoten vertex) {
+        List<Knoten> res = GetAusgehendeKnoten(vertex);
+        res.AddRange(GetEingehendeKnoten(vertex));
         return res;
     }
 
-    public List<Knoten> GetAusgehendeKnoten(Knoten knoten) {
+    public List<Knoten> GetAusgehendeKnoten(Knoten vertex) {
         List<Knoten> erg = new List<Knoten>();
-        if(ausgehendeKnoten.ContainsKey(knoten.name)) {
-            foreach(string ausgehenderKnoten in ausgehendeKnoten[knoten.name]) {
-                erg.Add(kanten[(knoten.name, ausgehenderKnoten)].endPoint);
+        if(ausgehendeKnoten.ContainsKey(vertex.name)) {
+            foreach(string ausgehenderKnoten in ausgehendeKnoten[vertex.name]) {
+                erg.Add(edges[(vertex.name, ausgehenderKnoten)].endPoint);
             }
         }
         return erg;
     }
 
-    public List<Knoten> GetEingehendeKnoten(Knoten knoten) {
+    public List<Knoten> GetEingehendeKnoten(Knoten vertex) {
         List<Knoten> erg = new List<Knoten>();
-        if(eingehendeKnoten.ContainsKey(knoten.name)) {
-            foreach(string eingehenderKnoten in eingehendeKnoten[knoten.name]) {
-                erg.Add(kanten[(eingehenderKnoten, knoten.name)].startPoint);
+        if(eingehendeKnoten.ContainsKey(vertex.name)) {
+            foreach(string eingehenderKnoten in eingehendeKnoten[vertex.name]) {
+                erg.Add(edges[(eingehenderKnoten, vertex.name)].startPoint);
             }
         }
         return erg;
@@ -104,7 +104,7 @@ public class Kantenverwalter {
 
     public void resetKanten()
     {
-        kanten.Clear();
+        edges.Clear();
         eingehendeKnoten.Clear();
         ausgehendeKnoten.Clear();
     }

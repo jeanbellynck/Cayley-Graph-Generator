@@ -34,7 +34,7 @@ public class BraidGroup : Group
             }
             for (int i = 0; i < n-2; i++)
             {
-                rel.Add(gen[i]+gen[i+1]+gen[i]+Gen[i+1]+Gen[i]+Gen[i+1]);
+                rel.Add(gen[i]+gen[i+1]+gen[i]+ "=" + gen[i+1]+gen[i]+gen[i+1]);
             }
        
             generators = gen.ToArray();

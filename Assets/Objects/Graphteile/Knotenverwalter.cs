@@ -2,32 +2,32 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Knotenverwalter {
+public class VertexManager {
     public int idCounter = 0;
     private Dictionary<string, Knoten> knotenMap = new Dictionary<string, Knoten>();
     
-    public ICollection<Knoten> GetKnoten() {
+    public ICollection<Knoten> getVertex() {
         return knotenMap.Values;
     }
 
 
-    public Knoten GetKnoten(string key) {
+    public Knoten getVertex(string key) {
         return knotenMap[key];
     }
 
 
-    public void AddKnoten(Knoten knoten) {
-        knoten.id = idCounter;
+    public void AddKnoten(Knoten vertex) {
+        vertex.id = idCounter;
         idCounter++;
-        knotenMap.Add(knoten.name, knoten);
+        knotenMap.Add(vertex.name, vertex);
     }
 
-    public void RemoveKnoten(Knoten knoten) {
-        knotenMap.Remove(knoten.name);
+    public void RemoveKnoten(Knoten vertex) {
+        knotenMap.Remove(vertex.name);
     }
 
-    public bool ContainsKnoten(Knoten knoten) {
-        return knotenMap.ContainsKey(knoten.name);
+    public bool ContainsKnoten(Knoten vertex) {
+        return knotenMap.ContainsKey(vertex.name);
     }
 
     public bool ContainsKnoten(string knotenName) {

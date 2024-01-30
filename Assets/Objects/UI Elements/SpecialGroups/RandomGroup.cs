@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 public class RandomGroup : Group
 {
@@ -17,9 +16,9 @@ public class RandomGroup : Group
         // A non-negative number integer 
         if (int.TryParse(parameters[0][1], out int n) && n >= 1 && int.TryParse(parameters[1][1], out int m) && m >= 1 && float.TryParse(parameters[2][1], out float p) && p >= 0 && p <= 1)
         {
-            List<string> gen = new List<string>();
-            List<string> Gen = new List<string>(); // Uppercase
-            List<string> rel = new List<string>();
+            List<string> gen = new List<string>(); // Lowercase Generators 
+            List<string> Gen = new List<string>(); // Uppercase Generators
+            List<string> rel = new List<string>(); // Relators
             
             for (int i = 0; i < n; i++)
             {
@@ -27,39 +26,11 @@ public class RandomGroup : Group
                 Gen.Add(((char) ('A' + i)).ToString()) ;
             }
 
-            // All possible words of length of length i
-            List<List<string>> possibleWords = new List<List<string>>(m);
-            // Add Generators to 1-length-words
-            possibleWords.Add(new List<string>());
-            possibleWords[0].AddRange(gen);
-            possibleWords[0].AddRange(Gen);
-            for(int i = 1; i <= m; i++)
-            {
-                possibleWords.Add(new List<string>());
-                foreach(string word in possibleWords[i-1])
-                {
-                    for(int k = 0; k < gen.Count; k++)
-                    {
-                        if(word[i-1] != Gen[k][0]) possibleWords[i].Add(word + gen[k]);
-                        if(word[i-1] != gen[k][0]) possibleWords[i].Add(word + Gen[k]);
-                    }
-                }
-            }
-            List<string> words = new List<string>();
-            foreach(List<string> list in possibleWords)
-            {
-                words.AddRange(list);
-            }
+            // Generates a random set of relators. The Relators have length <= m and are included with probability p
+            // Copy the Python script as C# code here:
 
-            Random random = new Random();
-            // Add relators
-            for(int i = 1; i < words.Count; i++)
-            {
-                if(random.NextDouble() < p)
-                {
-                    rel.Add(words[i]);
-                }
-            }
+            
+             
 
             generators = gen.ToArray();
             relators = rel.ToArray();

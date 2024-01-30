@@ -31,7 +31,7 @@ public class DreiBlatt : DreiBaum {
         return null;
     }
     public override void updatePosition() {
-        //kante.UpdatePostion();
+        //edge.UpdatePostion();
     }
 
     void Update() {}

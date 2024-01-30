@@ -125,8 +125,8 @@ public class CayleyGraphMakerV1 : CayleyGraphMaker
         Kante neueKante = Instantiate(kantenPrefab, transform).GetComponent<Kante>();
         neueKante.SetFarbe(operationColors[Char.ToLower(letzterBuchstabe)], new Color(100,100,100));
         neueKante.name = ""+Char.ToLower(letzterBuchstabe);
-        Knoten startKnoten = knotenverwalter.GetKnoten(elementName);
-        Knoten endKnoten = knotenverwalter.GetKnoten(elementName+letzterBuchstabe);
+        Knoten startKnoten = knotenverwalter.getVertex(elementName);
+        Knoten endKnoten = knotenverwalter.getVertex(elementName+letzterBuchstabe);
         if(Char.IsLower(letzterBuchstabe)) {
             neueKante.SetEndpunkte(startKnoten, endKnoten);
         }else{
@@ -142,7 +142,7 @@ public class CayleyGraphMakerV1 : CayleyGraphMaker
                 print("Prüfe, ob das Element " + element + " in der Knotenmenge ist ");
                 if(knotenverwalter.ContainsKnoten(element)) {
                     print("Wende Relator " + relator + " auf " + element + " an");
-                    RelatorAnwenden(knotenverwalter.GetKnoten(element), relator);
+                    RelatorAnwenden(knotenverwalter.getVertex(element), relator);
                     print("Vereine alle Zweige");
                     yield return AlleZweigeVereinen();
                 }
@@ -156,7 +156,7 @@ public class CayleyGraphMakerV1 : CayleyGraphMaker
         Knoten aktuellesWort = anfangselement;
         // Kante folgen
         foreach(char op in relator) {
-            aktuellesWort = kantenverwalter.kanteFolgen(aktuellesWort, op);
+            aktuellesWort = kantenverwalter.followEdge(aktuellesWort, op);
             if(aktuellesWort == null) return;
         }
         
@@ -175,12 +175,12 @@ public class CayleyGraphMakerV1 : CayleyGraphMaker
                     iterator = 0;
                     yield return new WaitForSeconds(0.001f);
                 }
-                Knoten knoten = knotenverwalter.GetKnoten(knotenAbzuarbeiten[0]); 
+                Knoten vertex = knotenverwalter.getVertex(knotenAbzuarbeiten[0]); 
 
                 bool duplikateGefunden = false;
                 Dictionary<char, Knoten> geprüfteKanten = new Dictionary<char, Knoten>();
-                foreach(Knoten ausgehenderKnoten in kantenverwalter.GetAusgehendeKnoten(knoten)) {
-                    char aktuelleOp = kantenverwalter.GetKante(knoten.name, ausgehenderKnoten.name).name[0];
+                foreach(Knoten ausgehenderKnoten in kantenverwalter.GetAusgehendeKnoten(vertex)) {
+                    char aktuelleOp = kantenverwalter.GetKante(vertex.name, ausgehenderKnoten.name).name[0];
                     
                     if(geprüfteKanten.ContainsKey(aktuelleOp)) {
                         ZweigeVereinen(geprüfteKanten[aktuelleOp], ausgehenderKnoten);
@@ -190,8 +190,8 @@ public class CayleyGraphMakerV1 : CayleyGraphMaker
                     }
                 }
                 geprüfteKanten = new Dictionary<char, Knoten>();
-                foreach(Knoten eingehenderKnoten in kantenverwalter.GetEingehendeKnoten(knoten)) {
-                    char aktuelleOp = kantenverwalter.GetKante(eingehenderKnoten.name, knoten.name).name[0];
+                foreach(Knoten eingehenderKnoten in kantenverwalter.GetEingehendeKnoten(vertex)) {
+                    char aktuelleOp = kantenverwalter.GetKante(eingehenderKnoten.name, vertex.name).name[0];
                     
                     if(geprüfteKanten.ContainsKey(aktuelleOp)) {
                         ZweigeVereinen(geprüfteKanten[aktuelleOp], eingehenderKnoten);
@@ -233,25 +233,25 @@ public class CayleyGraphMakerV1 : CayleyGraphMaker
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
         foreach(Knoten ausgehenderKnoten in kantenverwalter.GetAusgehendeKnoten(langesWort)) {
-            Kante kante = kantenverwalter.GetKante(langesWort.name, ausgehenderKnoten.name);
+            Kante edge = kantenverwalter.GetKante(langesWort.name, ausgehenderKnoten.name);
             if(kantenverwalter.ContainsKante(kurzesWort.name, ausgehenderKnoten.name)) {
-                Debug.Assert(kantenverwalter.GetKante(kurzesWort.name, ausgehenderKnoten.name).name == kante.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
+                Debug.Assert(kantenverwalter.GetKante(kurzesWort.name, ausgehenderKnoten.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
                 // Duplikat löschen
-                Destroy(kante.gameObject);
+                Destroy(edge.gameObject);
             } else {
-                kante.SetStartpunkt(kurzesWort);
-                kantenverwalter.AddKante(kante);
+                edge.SetStartpunkt(kurzesWort);
+                kantenverwalter.AddKante(edge);
             }
             kantenverwalter.RemoveKante(langesWort.name, ausgehenderKnoten.name);
         }
         foreach(Knoten eingehenderKnoten in kantenverwalter.GetEingehendeKnoten(langesWort)) {
-            Kante kante = kantenverwalter.GetKante(eingehenderKnoten.name, langesWort.name);
+            Kante edge = kantenverwalter.GetKante(eingehenderKnoten.name, langesWort.name);
             if(kantenverwalter.ContainsKante(eingehenderKnoten.name, kurzesWort.name)) {
-                Debug.Assert(kantenverwalter.GetKante(eingehenderKnoten.name, kurzesWort.name).name == kante.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
-                Destroy(kante.gameObject);
+                Debug.Assert(kantenverwalter.GetKante(eingehenderKnoten.name, kurzesWort.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
+                Destroy(edge.gameObject);
             } else {
-                kante.SetEndpunkt(kurzesWort);
-                kantenverwalter.AddKante(kante);
+                edge.SetEndpunkt(kurzesWort);
+                kantenverwalter.AddKante(edge);
             }
             kantenverwalter.RemoveKante(eingehenderKnoten.name, langesWort.name);
         }

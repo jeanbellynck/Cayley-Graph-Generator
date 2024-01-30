@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class DreiBaum : MonoBehaviour{
     protected GameObject inhalt;
-    protected Line kante;
+    protected Line edge;
     protected bool inAnimation = false;
     protected int richtung;
     
@@ -18,9 +18,9 @@ public abstract class DreiBaum : MonoBehaviour{
 
     public void linieErstellen(GameObject linePrefab, GameObject start, Transform parent) {
         GameObject kanteGO = Instantiate(linePrefab, parent);
-        kante = kanteGO.GetComponent<Line>();
-        kante.startPoint = start;
-        kante.endPoint = inhalt;
+        edge = kanteGO.GetComponent<Line>();
+        edge.startPoint = start;
+        edge.endPoint = inhalt;
     }
 
     public GameObject getInhalt() {
@@ -28,7 +28,7 @@ public abstract class DreiBaum : MonoBehaviour{
     }
     
     public Line getKante() {
-        return kante;
+        return edge;
     }
 
     public abstract void setPosition(Vector3 position);

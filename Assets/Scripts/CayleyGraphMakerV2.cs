@@ -50,7 +50,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
 
     IEnumerator createNewElementsAndApplyRelators() {
         // ToDo: So zählen, dass bis tatsächliche Anzahl an Teilchen erreicht wird und aufhören, wenn kein Rand mehr übrig blebt. 
-        while(vertexNumber > knotenverwalter.GetKnoten().Count) {
+        while(vertexNumber > knotenverwalter.getVertex().Count) {
             yield return new WaitForSeconds(1/drawingSpeed);
 
             Knoten borderVertex = GetNextBorderVertex();
@@ -121,12 +121,12 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
         kantenverwalter.AddKante(neueKante);
     }
     
-    void addBorderVertex(Knoten knoten, int distance) {
+    void addBorderVertex(Knoten vertex, int distance) {
         if(randKnoten.Count <= distance) {
             randKnoten.Add(new List<Knoten>());
         }
-        knoten.distanceToNeutralElement = distance;
-        randKnoten[distance].Add(knoten);
+        vertex.distanceToNeutralElement = distance;
+        randKnoten[distance].Add(vertex);
     }
     
     public Knoten GetNextBorderVertex() {
@@ -167,25 +167,25 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
         }
     }
 
-    void mergeEdges(Knoten knoten) {
+    void mergeEdges(Knoten vertex) {
         // Can be optimzed to use edge information inside the vertices.
         Dictionary<char, Knoten> geprüfteKanten = new Dictionary<char, Knoten>();
-        foreach(Knoten ausgehenderKnoten in kantenverwalter.GetAusgehendeKnoten(knoten)) {
-            char aktuelleOp = kantenverwalter.GetKante(knoten.name, ausgehenderKnoten.name).name[0];
+        foreach(Knoten ausgehenderKnoten in kantenverwalter.GetAusgehendeKnoten(vertex)) {
+            char aktuelleOp = kantenverwalter.GetKante(vertex.name, ausgehenderKnoten.name).name[0];
             
             if(geprüfteKanten.ContainsKey(aktuelleOp)) {
-                edgeMergeCandidates.Add(knoten);
+                edgeMergeCandidates.Add(vertex);
                 elementeVereinen(geprüfteKanten[aktuelleOp], ausgehenderKnoten);
             } else {
                 geprüfteKanten.Add(aktuelleOp, ausgehenderKnoten);
             }
         }
         geprüfteKanten = new Dictionary<char, Knoten>();
-        foreach(Knoten eingehenderKnoten in kantenverwalter.GetEingehendeKnoten(knoten)) {
-            char aktuelleOp = kantenverwalter.GetKante(eingehenderKnoten.name, knoten.name).name[0];
+        foreach(Knoten eingehenderKnoten in kantenverwalter.GetEingehendeKnoten(vertex)) {
+            char aktuelleOp = kantenverwalter.GetKante(eingehenderKnoten.name, vertex.name).name[0];
             
             if(geprüfteKanten.ContainsKey(aktuelleOp)) {
-                edgeMergeCandidates.Add(knoten);
+                edgeMergeCandidates.Add(vertex);
                 elementeVereinen(geprüfteKanten[aktuelleOp], eingehenderKnoten);
             } else {
                 geprüfteKanten.Add(aktuelleOp, eingehenderKnoten);
@@ -208,7 +208,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
                 Knoten aktuellesElement = anfangselement;
                 bool relatorLeadToOtherElement = true;
                 foreach(char op in path) {
-                    aktuellesElement = kantenverwalter.kanteFolgen(aktuellesElement, op);
+                    aktuellesElement = kantenverwalter.followEdge(aktuellesElement, op);
                     if(aktuellesElement == null) {
                         relatorLeadToOtherElement = false;
                         break;
@@ -243,25 +243,25 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
         foreach(Knoten ausgehenderKnoten in kantenverwalter.GetAusgehendeKnoten(langesWort)) {
-            Kante kante = kantenverwalter.GetKante(langesWort.name, ausgehenderKnoten.name);
+            Kante edge = kantenverwalter.GetKante(langesWort.name, ausgehenderKnoten.name);
             if(kantenverwalter.ContainsKante(kurzesWort.name, ausgehenderKnoten.name)) {
-                Debug.Assert(kantenverwalter.GetKante(kurzesWort.name, ausgehenderKnoten.name).name == kante.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
+                Debug.Assert(kantenverwalter.GetKante(kurzesWort.name, ausgehenderKnoten.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
                 // Duplikat löschen
-                Destroy(kante.gameObject);
+                Destroy(edge.gameObject);
             } else {
-                kante.SetStartpunkt(kurzesWort);
-                kantenverwalter.AddKante(kante);
+                edge.SetStartpunkt(kurzesWort);
+                kantenverwalter.AddKante(edge);
             }
             kantenverwalter.RemoveKante(langesWort.name, ausgehenderKnoten.name);
         }
         foreach(Knoten eingehenderKnoten in kantenverwalter.GetEingehendeKnoten(langesWort)) {
-            Kante kante = kantenverwalter.GetKante(eingehenderKnoten.name, langesWort.name);
+            Kante edge = kantenverwalter.GetKante(eingehenderKnoten.name, langesWort.name);
             if(kantenverwalter.ContainsKante(eingehenderKnoten.name, kurzesWort.name)) {
-                Debug.Assert(kantenverwalter.GetKante(eingehenderKnoten.name, kurzesWort.name).name == kante.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
-                Destroy(kante.gameObject);
+                Debug.Assert(kantenverwalter.GetKante(eingehenderKnoten.name, kurzesWort.name).name == edge.name, "Wenn zwei gleiche Operationen zum gleichen Element führen, kann man beide Operationen gleichsetzen. Das ist aber noch nicht implementiert");
+                Destroy(edge.gameObject);
             } else {
-                kante.SetEndpunkt(kurzesWort);
-                kantenverwalter.AddKante(kante);
+                edge.SetEndpunkt(kurzesWort);
+                kantenverwalter.AddKante(edge);
             }
             kantenverwalter.RemoveKante(eingehenderKnoten.name, langesWort.name);
         }
@@ -292,13 +292,13 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
         
         foreach(char gen in generators) {
             if(takenPath == "" || char.ToUpper(gen) != takenPath[takenPath.Length-1]) {
-                Knoten nextVertex = kantenverwalter.kanteFolgen(vertex, gen);
+                Knoten nextVertex = kantenverwalter.followEdge(vertex, gen);
                 if(nextVertex != null) {
                     cycles.AddRange(FindCyclesOfLength(length-1, nextVertex, takenPath + gen));
                 }
             }
             if(takenPath == "" || gen != takenPath[takenPath.Length-1]) {
-                Knoten nextVertex = kantenverwalter.kanteFolgen(vertex, char.ToUpper(gen));
+                Knoten nextVertex = kantenverwalter.followEdge(vertex, char.ToUpper(gen));
                 if(nextVertex != null) {
                     cycles.AddRange(FindCyclesOfLength(length-1, nextVertex, takenPath + char.ToUpper(gen)));
                 }
@@ -309,14 +309,14 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
     }**/
 
     void DrawMesh() {
-        foreach(Knoten knoten in knotenverwalter.GetKnoten()) {
+        foreach(Knoten vertex in knotenverwalter.getVertex()) {
             foreach(string relator in relators) {
                 Knoten[] vertices = new Knoten[relator.Length];
-                vertices[0] = knoten;
+                vertices[0] = vertex;
 
                 bool doInitialize = true;
                 for(int i = 0; i < relator.Length-1; i++) {
-                    vertices[i+1] = kantenverwalter.kanteFolgen(vertices[i], relator[i]);
+                    vertices[i+1] = kantenverwalter.followEdge(vertices[i], relator[i]);
                     if(vertices[i+1] == null) {doInitialize = false;break;}	
                 }
                 
@@ -327,7 +327,7 @@ public class CayleyGraphMakerV2 : CayleyGraphMaker
                 }
             }
 
-            //if(knoten.name != "") {break;}
+            //if(vertex.name != "") {break;}
         }
         
     }

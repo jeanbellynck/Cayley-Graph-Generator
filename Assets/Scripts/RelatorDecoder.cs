@@ -7,8 +7,12 @@ using System.Text;
 public class RelatorDecoder
 {
     public static string decodeRelator(string symbol) {
-        return decodeOneRelator(symbol.Replace(" ", ""));
-        //return "";
+        symbol = symbol.Replace(" ", "");
+        if(symbol.Contains("=")) {
+            string[] relators = symbol.Split('=');
+            symbol = relators[0] + "(" + relators[1] + ")^-1";
+        }
+        return decodeOneRelator(symbol);
     }
     
     /**
@@ -124,7 +128,7 @@ public class RelatorDecoder
                 power = -power;
                 insideBrackets = invertSymbol(insideBrackets);
                 // Remove minus sign (this code might remove the ^ symbol instead of the minus)
-                symbol = mySubstring(symbol, 0, closingParenthesisIndex + 1) + symbol.Substring(closingParenthesisIndex + 2);
+                symbol = mySubstring(symbol, 0, closingParenthesisIndex + 2) + symbol.Substring(closingParenthesisIndex + 3);
             }
             // Repeat the inside of the brackets
             insideBrackets = string.Concat(Enumerable.Repeat(insideBrackets, power));
