@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Vertex : MonoBehaviour {
+    public float age = 0;
     public bool isActive = true; // If set inactive it will be ignored algorithms
 
     // Used by Link force algorithm
@@ -36,6 +37,7 @@ public class Vertex : MonoBehaviour {
     void Update() {
         //DrawCircle(radius);
         mr.material.color = new Color(stress, 0, 0);
+        age += Time.deltaTime;
     }
 
     /**

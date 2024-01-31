@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Edge : MonoBehaviour
 {
+    public float age = 0;
     public Vertex startPoint;
     public Vertex endPoint;
     public char generator;
@@ -16,6 +17,7 @@ public class Edge : MonoBehaviour
 
     // Start is called before the first frame update
     void Start(){}
+
 
     /**
      * This method is used to get the start Vertex of the edge.
@@ -30,25 +32,6 @@ public class Edge : MonoBehaviour
         }
     }
 
-    /**
-    public void SetStart(Vertex startPoint) {
-        if(this.startPoint != null) {
-            startPoint.removeEdge(this);
-        }
-        this.startPoint = startPoint;
-        name = this.startPoint.name + " --" + char.ToLower(generator) + "-> " + this.endPoint.name;
-        startPoint.addEdge(this);
-    }
-
-    
-    public void SetEnd(Vertex endPoint) {
-        if(this.endPoint != null) {
-            endPoint.removeEdge(this);
-        }
-        this.endPoint = endPoint;
-        name = this.startPoint.name + " --" + char.ToLower(generator) + "-> " + this.endPoint.name;
-        endPoint.addEdge(this);
-    }**/
     
     public void SetEndpoints(Vertex startPoint, Vertex endPoint, char generator) {
         if(this.startPoint != null || this.endPoint != null) {
@@ -96,6 +79,8 @@ public class Edge : MonoBehaviour
                , Vector3.Lerp(startPointWithSpacing, endPointWithSpacing, 1 - PercentHead)
                , endPointWithSpacing });
         }
+        
+        age += Time.deltaTime;
     }
 
     public char getGenerator() {

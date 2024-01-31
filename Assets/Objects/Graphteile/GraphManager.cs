@@ -75,6 +75,7 @@ public class GraphManager : MonoBehaviour {
         }
         if(vertex.Equals(neutralElement.GetComponent<Vertex>())) {
             vertex.transform.position = Vector3.zero;
+            vertex.age = 0;
         }else {
             vertices.Remove(vertex);
             vertex.Destroy();

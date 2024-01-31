@@ -96,12 +96,11 @@ public class CayleyGraphMaker : MonoBehaviour {
     */
     private Vertex CreateVertex(Vertex predecessor, char gen) {
         // Zufallsverschiebung
-        Vertex neuerKnoten;
-        
-        // Vertex is not the neutral element and an edge need to be created
         System.Random r = new System.Random();
         Vector3 elementPosition = predecessor.transform.position + 0.01f * new Vector3(r.Next(-100, 100), r.Next(-100, 100), r.Next(-100, 100));
-        neuerKnoten = graphManager.CreateVertex(elementPosition);
+
+        // Vertex is not the neutral element and an edge need to be created
+        Vertex neuerKnoten = graphManager.CreateVertex(elementPosition);
         neuerKnoten.name = predecessor.name + gen;
         neuerKnoten.distanceToNeutralElement = predecessor.distanceToNeutralElement + 1;
         AddBorderVertex(neuerKnoten);
@@ -110,6 +109,16 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         return neuerKnoten;
     }
+
+    public char ToggleCase(char c) {
+        if (char.IsUpper(c)) {
+            return char.ToLower(c);
+        }
+        else {
+            return char.ToUpper(c);
+        }
+    }
+
 
     void createEdge(Vertex startvertex, Vertex endvertex, char op) {
         // Kante erstellen

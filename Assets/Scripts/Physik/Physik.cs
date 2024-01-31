@@ -114,7 +114,8 @@ public class Physik : MonoBehaviour{
         }
         bqb.BerechneSchwerpunkt();
         foreach(Vertex vertex in vertexManager.getVertex()) {
-            vertex.repelForce = repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
+            float ageFactor = Mathf.Max(1, (10-1)*(1-vertex.age)); // Young vertices are repelled strongly
+            vertex.repelForce = ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
         }
     }
 
@@ -122,9 +123,10 @@ public class Physik : MonoBehaviour{
     private void calculateLinkForces(GraphManager graphManager) {
         for(int i = 0; i < stabilityIterations; i++) {
             foreach(Edge edge in graphManager.GetKanten()) {
+                float ageFactor = Mathf.Max(1, (10-1)*(1-edge.age)); // Young edges are strong
                 Vector3 force = calculateLinkForce(edge.startPoint, edge.endPoint) ;
-                edge.startPoint.attractForce += attractForceFactor * force;
-                edge.endPoint.attractForce -= attractForceFactor * force;
+                edge.startPoint.attractForce += ageFactor* attractForceFactor * force;
+                edge.endPoint.attractForce -= ageFactor * attractForceFactor * force;
             }
         }
     }
