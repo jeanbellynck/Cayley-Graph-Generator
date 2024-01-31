@@ -9,7 +9,6 @@ public class Kamera : MonoBehaviour
     public float pinchSensitivity = 0.05f; 
     
     public float rotationSpeed = 1;
-    public Transform target;
 
     public Vector2 turn;
 
@@ -27,7 +26,6 @@ public class Kamera : MonoBehaviour
     {
         // Get the camera object
         Camera cam = Camera.main;
-        if(target != null) transform.parent.position = target.position;
 
         // Camera movement should only be possible when the sideMenu states are closed
         foreach (GameObject sideMenu in sideMenues)

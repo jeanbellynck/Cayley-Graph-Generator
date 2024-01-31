@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class GraphManager : MonoBehaviour {
@@ -7,8 +8,8 @@ public class GraphManager : MonoBehaviour {
     public GameObject edgePrefab;
     public Color[] colourList = new Color[] { new Color(255, 0, 0), new Color(0, 0, 255), new Color(0, 255, 0), new Color(255, 255, 0) };
     IDictionary<char, Color> operationColors;
-    private int idCounter = 0;
-    private Vertex neutralElement;
+    private int idCounter; // Starts by 1 as 0 is reserved for the neutral element
+    public GameObject neutralElement;
     List<Vertex> vertices = new List<Vertex>();
     List<Edge> edges = new List<Edge>();
 
@@ -23,6 +24,7 @@ public class GraphManager : MonoBehaviour {
             }
 
         }
+        vertices.Add(neutralElement.GetComponent<Vertex>());
     }
 
     public ICollection<Vertex> getVertex() {
@@ -36,7 +38,7 @@ public class GraphManager : MonoBehaviour {
     }
 
     public Vertex getNeutral() {
-        return neutralElement;
+        return neutralElement.GetComponent<Vertex>();
     }
 
     public void ResetGraph() {
@@ -46,7 +48,7 @@ public class GraphManager : MonoBehaviour {
         }
         vertices.Clear();
         edges.Clear();
-        idCounter = 0;
+        idCounter = 1;
     }
 
 
@@ -71,8 +73,12 @@ public class GraphManager : MonoBehaviour {
                 RemoveEdge(edge);
             }
         }
-        vertices.Remove(vertex);
-        vertex.Destroy();
+        if(vertex.Equals(neutralElement.GetComponent<Vertex>())) {
+            vertex.transform.position = Vector3.zero;
+        }else {
+            vertices.Remove(vertex);
+            vertex.Destroy();
+        }
     }
 
     public void RemoveEdge(Edge edge) {
@@ -95,7 +101,7 @@ public class GraphManager : MonoBehaviour {
     public Edge CreateEdge(Vertex startvertex, Vertex endvertex, char op) {
         // If the edge already exists, no edge is created and the existing edge is returned
         foreach (Edge edge in startvertex.GetEdges(op)) {
-            if (edge.endPoint.Equals(endvertex)) {
+            if(edge.getOpposite(startvertex).Equals(endvertex)) {
                 return edge;
             }
         }

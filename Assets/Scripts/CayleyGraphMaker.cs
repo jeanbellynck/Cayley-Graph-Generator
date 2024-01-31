@@ -49,20 +49,17 @@ public class CayleyGraphMaker : MonoBehaviour {
     // Start is called before the first frame update
     public void InitializeCGMaker() {
         StopAllCoroutines();
+        
+        randKnoten = new List<List<Vertex>>();
+        relatorCandidates = new HashSet<Vertex>();
+        edgeMergeCandidates = new HashSet<Vertex>();
 
-        drawNeutralElement();
+        AddBorderVertex(graphManager.getNeutral());
         StartCoroutine(createNewElementsAndApplyRelators());
     }
 
 
-    void drawNeutralElement() {
-        // Erzeugen des symmetrischen Alphabets
-        Vertex neutral = CreateVertex(null, ' ');
-        Camera.main.GetComponent<Kamera>().target = neutral.transform;
-    }
-
-
-    public List<Vertex> borderVertices = new List<Vertex>();
+    //public List<Vertex> borderVertices = new List<Vertex>();
 
     IEnumerator createNewElementsAndApplyRelators() {
         // ToDo: So zählen, dass bis tatsächliche Anzahl an Teilchen erreicht wird und aufhören, wenn kein Rand mehr übrig blebt. 
@@ -76,11 +73,11 @@ public class CayleyGraphMaker : MonoBehaviour {
             }
 
             foreach (char gen in generators) {
-                if (!borderVertex.GetEdges().ContainsKey(gen)) {
+                if (!borderVertex.GetEdges().ContainsKey(gen) || borderVertex.GetEdges()[gen].Count == 0){
                     Vertex newVertex = CreateVertex(borderVertex, gen);
                     relatorCandidates.Add(newVertex);
                 }
-                if (!borderVertex.GetEdges().ContainsKey(char.ToUpper(gen))) {
+                if (!borderVertex.GetEdges().ContainsKey(char.ToUpper(gen)) || borderVertex.GetEdges()[char.ToUpper(gen)].Count == 0) {
                     Vertex newVertex = CreateVertex(borderVertex, char.ToUpper(gen));
                     relatorCandidates.Add(newVertex);
                 }
@@ -100,21 +97,16 @@ public class CayleyGraphMaker : MonoBehaviour {
     private Vertex CreateVertex(Vertex predecessor, char gen) {
         // Zufallsverschiebung
         Vertex neuerKnoten;
-        if (predecessor == null) {
-            // Vertex is most likely the neutral element
-            neuerKnoten = graphManager.CreateVertex(Vector3.zero);
-            AddBorderVertex(neuerKnoten, 0);
-        }
-        else {
-            // Vertex is not the neutral element and an edge need to be created
-            System.Random r = new System.Random();
-            Vector3 elementPosition = predecessor.transform.position + 0.01f * new Vector3(r.Next(-100, 100), r.Next(-100, 100), r.Next(-100, 100));
-            neuerKnoten = graphManager.CreateVertex(elementPosition);
-            neuerKnoten.name = predecessor.name + gen;
-            neuerKnoten.distanceToNeutralElement = predecessor.distanceToNeutralElement + 1;
-            AddBorderVertex(neuerKnoten, neuerKnoten.distanceToNeutralElement);
-            createEdge(predecessor, neuerKnoten, gen);
-        }
+        
+        // Vertex is not the neutral element and an edge need to be created
+        System.Random r = new System.Random();
+        Vector3 elementPosition = predecessor.transform.position + 0.01f * new Vector3(r.Next(-100, 100), r.Next(-100, 100), r.Next(-100, 100));
+        neuerKnoten = graphManager.CreateVertex(elementPosition);
+        neuerKnoten.name = predecessor.name + gen;
+        neuerKnoten.distanceToNeutralElement = predecessor.distanceToNeutralElement + 1;
+        AddBorderVertex(neuerKnoten);
+        createEdge(predecessor, neuerKnoten, gen);
+        
 
         return neuerKnoten;
     }
@@ -124,12 +116,12 @@ public class CayleyGraphMaker : MonoBehaviour {
         Edge newEdge = graphManager.CreateEdge(startvertex, endvertex, op);
     }
 
-    void AddBorderVertex(Vertex vertex, int distance) {
-        if (randKnoten.Count <= distance) {
+    void AddBorderVertex(Vertex vertex) {
+        if (randKnoten.Count <= vertex.distanceToNeutralElement) {
             randKnoten.Add(new List<Vertex>());
         }
-        vertex.distanceToNeutralElement = distance;
-        randKnoten[distance].Add(vertex);
+
+        randKnoten[vertex.distanceToNeutralElement].Add(vertex);
     }
 
     public Vertex GetNextBorderVertex() {
@@ -235,25 +227,10 @@ public class CayleyGraphMaker : MonoBehaviour {
         //Dictionary<char, List<Edge>> vertex2edges = vertex2.GetEdges();
         foreach (char op in vertex2.GetEdges().Keys) {
             List<Edge> generatorEdgesCopy = new List<Edge>(vertex2.GetEdges(op));
+            
             foreach (Edge edge in generatorEdgesCopy) {
                 graphManager.CreateEdge(vertex1, edge.getOpposite(vertex2), op);
                 graphManager.RemoveEdge(edge);
-
-                // If vertex1 has an edge leading to the same vertex then the two edges do not need to be merged.
-                /**
-                bool hasSameStartpoint = generatorEdges.Any(edge => vertex1.Equals(edge.getStartPoint(op)));
-                if (hasSameStartpoint) {
-                    graphManager.RemoveEdge(edge);
-                }
-                else {
-                    if (char.IsLower(op)) {
-                        edge.SetStart(vertex1);
-                    }
-                    else {
-                        edge.SetEnd(vertex1);
-                    }
-                    vertex1.addEdge(edge);
-                }**/
             }
         }
 

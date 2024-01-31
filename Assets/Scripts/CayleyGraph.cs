@@ -77,8 +77,8 @@ public class CayleyGraph : MonoBehaviour
         
         Debug.Log("Start Visualization");
         physik.setGenerators(generators);
-        cayleyGraphMaker.InitializeCGMaker(graphManager, meshManager, generators, relators);
         graphManager.Initialize(generators);
+        cayleyGraphMaker.InitializeCGMaker(graphManager, meshManager, generators, relators);
         hatPhysik = true;
     }
 

@@ -62,10 +62,10 @@ public class Vertex : MonoBehaviour {
     public void addEdge(Edge edge) {
         // Determine whether this the edge points to this vertex or away from it
         char op = ' ';
-        if (edge.startPoint != null && edge.startPoint.Equals(this)) {
+        if (edge.startPoint.Equals(this)) {
             op = edge.getGenerator();
         }
-        else if (edge.startPoint != null && edge.endPoint.Equals(this)) {
+        else if (edge.endPoint.Equals(this)) {
             op = char.ToUpper(edge.getGenerator());
         } else {
             // Throw exception
@@ -92,7 +92,6 @@ public class Vertex : MonoBehaviour {
         else {
             return;
         }
-
         edges[generator].Remove(edge);
     }
 
