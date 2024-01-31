@@ -56,15 +56,15 @@ public class Physik : MonoBehaviour{
 
     
 
-    public void UpdatePh(VertexManager vertexManager, EdgeManager edgeManager, float präzision) {
+    public void UpdatePh(GraphManager graphManager, float präzision) {
         this.präzision = präzision;
-        geschwindigkeitenZurücksetzen(vertexManager);
-        if(repelForceFactor != 0) calculateRepulsionForces(vertexManager);
-        if(attractForceFactor != 0) calculateLinkForces(edgeManager);
-        if(oppositeForceFactor != 0) calculateOppositionForce(vertexManager, edgeManager);
-        if(angleForceFactor != 0) calculateArrowAverageForce(vertexManager, edgeManager);
+        geschwindigkeitenZurücksetzen(graphManager);
+        if(repelForceFactor != 0) calculateRepulsionForces(graphManager);
+        if(attractForceFactor != 0) calculateLinkForces(graphManager);
+        if(oppositeForceFactor != 0) calculateOppositionForce(graphManager);
+        if(angleForceFactor != 0) calculateArrowAverageForce(graphManager);
         
-        updateVertices(vertexManager);
+        updateVertices(graphManager);
 
         //smitteKraftBerechnen(vertexManager, edgeManager); 
         //fixIdentity(vertexManager);
@@ -79,7 +79,7 @@ public class Physik : MonoBehaviour{
         }
     }
 
-    private void updateVertices(VertexManager vertexManager) {
+    private void updateVertices(GraphManager vertexManager) {
         foreach(Vertex vertex in vertexManager.getVertex()) {
             Vector3 force = vertex.repelForce + vertex.attractForce + vertex.oppositeForce + vertex.angleForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
@@ -95,7 +95,7 @@ public class Physik : MonoBehaviour{
      * Sets the speed of all vertices to 0.
      * Also bounds th force by the maximal force.
      */
-    private void geschwindigkeitenZurücksetzen(VertexManager vertexManager) {
+    private void geschwindigkeitenZurücksetzen(GraphManager vertexManager) {
         foreach(Vertex vertex in vertexManager.getVertex()) {
             vertex.attractForce = Vector3.zero;
             vertex.repelForce = Vector3.zero;
@@ -106,7 +106,7 @@ public class Physik : MonoBehaviour{
 
     public float repulsionDistance;
 
-    private void calculateRepulsionForces(VertexManager vertexManager) {
+    private void calculateRepulsionForces(GraphManager vertexManager) {
         // Abstoßung durch Knoten
         BarnesQuadbaum bqb = new BarnesQuadbaum(Vector2.zero, radius, präzision);
         foreach(Vertex vertex in vertexManager.getVertex()) {
@@ -119,9 +119,9 @@ public class Physik : MonoBehaviour{
     }
 
     public int stabilityIterations = 1;
-    private void calculateLinkForces(EdgeManager edgeManagererwalter) {
+    private void calculateLinkForces(GraphManager graphManager) {
         for(int i = 0; i < stabilityIterations; i++) {
-            foreach(Kante edge in edgeManagererwalter.GetKanten()) {
+            foreach(Edge edge in graphManager.GetKanten()) {
                 Vector3 force = calculateLinkForce(edge.startPoint, edge.endPoint) ;
                 edge.startPoint.attractForce += attractForceFactor * force;
                 edge.endPoint.attractForce -= attractForceFactor * force;
@@ -135,14 +135,14 @@ public class Physik : MonoBehaviour{
      * The force is 1 if the angle between the vertices is very small 
      * ToDO: Check, when input and output are the same. Normalize the force.
      */
-    private void calculateOppositionForce(VertexManager vertexManager, EdgeManager edgeManager) {
+    private void calculateOppositionForce(GraphManager graphManager) {
         // ToDo: Da ist noch eine Menge manueller Code drin.
-        foreach(Vertex vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in graphManager.getVertex()) {
             char[] alphabet = {'a', 'b'}; 
             
             foreach(char gen in alphabet) {
-                Vertex front = edgeManager.followEdge(vertex, gen);
-                Vertex back = edgeManager.followEdge(vertex, char.ToUpper(gen));
+                Vertex front = graphManager.followEdge(vertex, gen);
+                Vertex back = graphManager.followEdge(vertex, char.ToUpper(gen));
                 if(front != null && back != null) {
                     front.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(vertex, front, back);
                     back.oppositeForce += 0.25f * oppositeForceFactor*calculateOppositionForceBetweenTwoVertices(vertex, back, front);
@@ -170,19 +170,19 @@ public class Physik : MonoBehaviour{
     public int arrowAverageRecalculationIteration = 10;
     int currentIteration = 0;
 
-    private void calculateArrowAverageForce(VertexManager vertexManager, EdgeManager edgeManager) {
+    private void calculateArrowAverageForce(GraphManager graphManager) {
         if(currentIteration == arrowAverageRecalculationIteration) {
-            calculateAverageAngles(vertexManager, edgeManager);
+            calculateAverageAngles(graphManager);
             currentIteration = 0;
         }
         currentIteration++;
 
-        foreach(Vertex vertex in vertexManager.getVertex()) {
+        foreach(Vertex vertex in graphManager.getVertex()) {
             vertex.stress = 0;
             foreach(char gen1 in generators) {
                 foreach(char gen2 in generators) {
-                    Vertex vertex1 = edgeManager.followEdge(vertex, gen1);
-                    Vertex vertex2 = edgeManager.followEdge(vertex, gen2);
+                    Vertex vertex1 = graphManager.followEdge(vertex, gen1);
+                    Vertex vertex2 = graphManager.followEdge(vertex, gen2);
                     
                     if(gen1 != gen2 && vertex1 != null && vertex2 != null && vertex1.name != vertex2.name) {
                         Vector3 force = angleForceFactor*calculateAverageAngleForceBetweenTwoVertices(vertex, vertex1, vertex2, averageArrowAngles[gen1][gen2]);
@@ -198,16 +198,16 @@ public class Physik : MonoBehaviour{
     /**
      * Goes over each pair of angles and calculates theirs averages. This is done once per recalculationIteration to reduce the number of calculations.
      **/
-    private void calculateAverageAngles(VertexManager vertexManager, EdgeManager edgeManager) {
+    private void calculateAverageAngles(GraphManager graphManager) {
         foreach(char gen1 in generators) {
             foreach(char gen2 in generators) {
                 countedArrowAngles[gen1][gen2] = 0;
                 sumArrowAngles[gen1][gen2] = 0f;
                 averageArrowAngles[gen1][gen2] = 0f;
 
-                foreach(Vertex vertex in vertexManager.getVertex()) {
-                    Vertex vertex1 = edgeManager.followEdge(vertex, gen1);
-                    Vertex vertex2 = edgeManager.followEdge(vertex, gen2);
+                foreach(Vertex vertex in graphManager.getVertex()) {
+                    Vertex vertex1 = graphManager.followEdge(vertex, gen1);
+                    Vertex vertex2 = graphManager.followEdge(vertex, gen2);
                     
                     if(vertex1 != null && vertex2 != null && vertex1.id != vertex2.id) {
                         // Thing is calculated twice, this can be optimized
@@ -253,7 +253,7 @@ public class Physik : MonoBehaviour{
         //return diff.normalized*Mathf.Log(diff.magnitude/idealeLänge);
     }
 
-    private void fixIdentity(VertexManager vertexManager) {
+    private void fixIdentity(GraphManager vertexManager) {
         foreach(Vertex vertex in vertexManager.getVertex()) {
             if(vertex.name == "") {
                 vertex.attractForce = Vector3.zero;

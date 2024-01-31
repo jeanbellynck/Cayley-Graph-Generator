@@ -3355,20 +3355,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   physik: {fileID: 772353317}
-  cayleyGraphMaker: {fileID: 772353319}
-  knotenPrefab: {fileID: 3096654801577124718, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
-  kantenPrefab: {fileID: 3391233956122432578, guid: 085f688d473146a4e8a75c7c7c41f542, type: 3}
-  colourList:
-  - {r: 255, g: 0, b: 0, a: 1}
-  - {r: 0, g: 0, b: 255, a: 1}
-  - {r: 0, g: 255, b: 0, a: 1}
-  - {r: 255, g: 255, b: 0, a: 1}
+  graphManager: {fileID: 772353319}
+  cayleyGraphMaker: {fileID: 772353318}
   "pr\xE4zisionsfaktor": 20
   generators: 
   relators: []
   generatorInputField: {fileID: 994683909}
   relatorInputField: {fileID: 1536507749}
-  complexInputField: {fileID: 144981363}
   vertexNumberInputField: {fileID: 162340278}
 --- !u!4 &772353316
 Transform:
@@ -3400,6 +3393,7 @@ MonoBehaviour:
   idealLength: 1
   radius: 100
   "pr\xE4zision": 0
+  hyperbolicScaling: 0
   repelForceFactor: 1
   attractForceFactor: 2
   oppositeForceFactor: 0
@@ -3420,13 +3414,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 772353314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7648b3d4807ffc84aa9b9e179c304a7d, type: 3}
+  m_Script: {fileID: 11500000, guid: dc2009739170c434f866c3a455423344, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadFile: 0
-  "idealeL\xE4nge": 1
-  tiefe: 5
-  schrumpffaktor: 1
+  vertexNumber: 0
+  drawingSpeed: 100
+  meshPrefab: {fileID: 5113444650179130146, guid: 229d5f0e55e207244a23cf81194cdba9, type: 3}
+  borderVertices: []
 --- !u!114 &772353319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3436,13 +3430,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 772353314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09ac29ea45a16364185e973f72e2ead8, type: 3}
+  m_Script: {fileID: 11500000, guid: b5dab5b5975c94b45a6665a4a841979a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vertexNumber: 250
-  drawingSpeed: 100
-  meshPrefab: {fileID: 5113444650179130146, guid: 229d5f0e55e207244a23cf81194cdba9, type: 3}
-  borderVertices: []
+  vertexPrefab: {fileID: 3096654801577124718, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
+  edgePrefab: {fileID: 3391233956122432578, guid: 085f688d473146a4e8a75c7c7c41f542, type: 3}
+  colourList:
+  - {r: 255, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0, b: 255, a: 1}
+  - {r: 0, g: 255, b: 0, a: 1}
+  - {r: 255, g: 255, b: 0, a: 1}
 --- !u!1 &820962332
 GameObject:
   m_ObjectHideFlags: 0
@@ -8069,7 +8066,7 @@ MonoBehaviour:
       - m_Target: {fileID: 772353317}
         m_TargetAssemblyTypeName: Physik, Assembly-CSharp
         m_MethodName: setHyperbolicScaling
-        m_Mode: 5
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

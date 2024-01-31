@@ -11,16 +11,12 @@ public class CayleyGraph : MonoBehaviour
     public Physik physik;// = new Physik(10, 100);
 
 
-    public VertexManager vertexManagererwalter = new VertexManager();
-    public EdgeManager edgeManagererwalter = new EdgeManager();
+    public GraphManager graphManager;
     public MeshManager meshManager = new MeshManager();
 
     public CayleyGraphMaker cayleyGraphMaker;
 
     // Konfigurationen
-    public GameObject knotenPrefab;
-    public GameObject kantenPrefab;
-    public Color[] colourList = new Color[]{new Color(0,0,255), new Color(255, 0, 0), new Color(0, 255, 0), new Color(255, 255,0 )};
     bool hatPhysik = false;
     public float präzisionsfaktor = 10f;
     public char[] generators = new char[0];
@@ -38,7 +34,7 @@ public class CayleyGraph : MonoBehaviour
     // Update is called once per frame
     void Update() {
         if(hatPhysik) {
-            physik.UpdatePh(vertexManagererwalter, edgeManagererwalter, präzisionsfaktor*Time.deltaTime);
+            physik.UpdatePh(graphManager, präzisionsfaktor*Time.deltaTime);
         }
     }
 
@@ -61,7 +57,6 @@ public class CayleyGraph : MonoBehaviour
 
     public GameObject generatorInputField;
     public GameObject relatorInputField;
-    public GameObject complexInputField;
     public GameObject vertexNumberInputField;
 
     public void startVisualization() {
@@ -69,7 +64,6 @@ public class CayleyGraph : MonoBehaviour
         setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(';'));
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.setPhysics(physik);
-        int complexSize = int.Parse(complexInputField.GetComponent<UnityEngine.UI.InputField>().text);
 
         // Destroy Mesh Objects
         ICollection<MeshGenerator> meshes = meshManager.GetMeshes();
@@ -77,24 +71,14 @@ public class CayleyGraph : MonoBehaviour
             Destroy(mesh.gameObject);
         }
         meshManager.resetMeshes();
-        // Destroy edges Objects
-        ICollection<Kante> edges = edgeManagererwalter.GetKanten();
-        foreach(Kante edge in edges) {
-            Destroy(edge.gameObject);
-        }
-        edgeManagererwalter.resetKanten();
-        // Destroy vertices Objects
-        ICollection<Vertex> nodes = vertexManagererwalter.getVertex();
-        foreach(Vertex node in nodes) {
-            Destroy(node.gameObject);
-        }
-        vertexManagererwalter.resetKnoten();
+        graphManager.ResetGraph();
         physik.startUp();
 
         
         Debug.Log("Start Visualization");
         physik.setGenerators(generators);
-        cayleyGraphMaker.InitializeCGMaker(vertexManagererwalter, edgeManagererwalter, meshManager, knotenPrefab, kantenPrefab, colourList, generators, relators, complexSize);
+        cayleyGraphMaker.InitializeCGMaker(graphManager, meshManager, generators, relators);
+        graphManager.Initialize(generators);
         hatPhysik = true;
     }
 
