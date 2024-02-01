@@ -62,9 +62,16 @@ public class CayleyGraphMaker : MonoBehaviour {
     //public List<Vertex> borderVertices = new List<Vertex>();
 
     IEnumerator createNewElementsAndApplyRelators() {
+        bool firstIteration = true;
         // ToDo: So zählen, dass bis tatsächliche Anzahl an Teilchen erreicht wird und aufhören, wenn kein Rand mehr übrig blebt. 
         while (vertexNumber > graphManager.getVertex().Count) {
-            yield return new WaitForSeconds(1 / drawingSpeed);
+            // Speed is proportional to the number of vertices on the border. This makes knotting less likely
+            float waitTime = 1 / (drawingSpeed * Mathf.Max(1, GetBorderVertexCount()));
+            if(!firstIteration) {
+                yield return new WaitForSeconds(waitTime);
+            } else {
+                firstIteration = false;
+            }
 
             Vertex borderVertex = GetNextBorderVertex();
             if (borderVertex == null) {
@@ -144,6 +151,14 @@ public class CayleyGraphMaker : MonoBehaviour {
             }
         }
         return null;
+    }
+
+    public int GetBorderVertexCount() {
+        int count = 0;
+        foreach (List<Vertex> borderVertices in randKnoten) {
+            count += borderVertices.Count;
+        }
+        return count;
     }
 
     /**

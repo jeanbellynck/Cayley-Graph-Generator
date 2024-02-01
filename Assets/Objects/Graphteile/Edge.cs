@@ -35,7 +35,7 @@ public class Edge : MonoBehaviour
     
     public void SetEndpoints(Vertex startPoint, Vertex endPoint, char generator) {
         if(this.startPoint != null || this.endPoint != null) {
-            throw new Exception("The Endpoints of an Edge are final and should not be changed. Create a new Edge instead");startPoint.removeEdge(this);
+            throw new Exception("The Endpoints of an Edge are final and should not be changed. Create a new Edge instead");
         }
         if(char.IsLower(generator)) {
             this.startPoint = startPoint;
