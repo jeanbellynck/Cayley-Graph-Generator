@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Unity.VisualScripting;
+using System;
 
 public class CayleyGraphMaker : MonoBehaviour {
     private GraphManager graphManager;
@@ -14,6 +14,8 @@ public class CayleyGraphMaker : MonoBehaviour {
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
     protected char[] operators; // Like generators but with upper and lower case letters
     protected string[] relators;// = new string[]{"abAB"};
+    
+    private float hyperbolicity = 1;
 
 
     // Konfigurationen
@@ -104,17 +106,18 @@ public class CayleyGraphMaker : MonoBehaviour {
     private Vertex CreateVertex(Vertex predecessor, char gen) {
         // Zufallsverschiebung
         System.Random r = new System.Random();
-        Vector3 elementPosition = predecessor.transform.position + 0.01f * new Vector3(r.Next(-100, 100), r.Next(-100, 100), r.Next(-100, 100));
+        float hyperbolicScaling = Mathf.Pow(hyperbolicity, predecessor.distanceToNeutralElement + 1);
+        Vector3 elementPosition = predecessor.transform.position + hyperbolicScaling * UnityEngine.Random.insideUnitSphere;
 
         // Vertex is not the neutral element and an edge need to be created
-        Vertex neuerKnoten = graphManager.CreateVertex(elementPosition);
-        neuerKnoten.name = predecessor.name + gen;
-        neuerKnoten.distanceToNeutralElement = predecessor.distanceToNeutralElement + 1;
-        AddBorderVertex(neuerKnoten);
-        createEdge(predecessor, neuerKnoten, gen);
+        Vertex newVertex = graphManager.CreateVertex(elementPosition);
+        newVertex.name = predecessor.name + gen;
+        newVertex.distanceToNeutralElement = predecessor.distanceToNeutralElement + 1;
+        AddBorderVertex(newVertex);
+        createEdge(predecessor, newVertex, gen);
         
 
-        return neuerKnoten;
+        return newVertex;
     }
 
     public char ToggleCase(char c) {
@@ -130,6 +133,8 @@ public class CayleyGraphMaker : MonoBehaviour {
     void createEdge(Vertex startvertex, Vertex endvertex, char op) {
         // Kante erstellen
         Edge newEdge = graphManager.CreateEdge(startvertex, endvertex, op);
+        int distance = Math.Min(newEdge.startPoint.distanceToNeutralElement, newEdge.endPoint.distanceToNeutralElement);
+        newEdge.SetLength(Mathf.Pow(hyperbolicity, distance));
     }
 
     void AddBorderVertex(Vertex vertex) {
@@ -253,7 +258,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             List<Edge> generatorEdgesCopy = new List<Edge>(vertex2.GetEdges(op));
             
             foreach (Edge edge in generatorEdgesCopy) {
-                graphManager.CreateEdge(vertex1, edge.getOpposite(vertex2), op);
+                createEdge(vertex1, edge.getOpposite(vertex2), op);
                 graphManager.RemoveEdge(edge);
             }
         }
@@ -297,5 +302,24 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public void setVertexNumber(int v) {
         vertexNumber = v;
+    }
+
+    public void setHyperbolicity(float hyperbolicity) {
+        this.hyperbolicity = hyperbolicity;
+        recalculateHyperbolicity();
+    }
+
+    /**
+     * Recalculates the length of all edges according to the hyperbolicity.
+     */
+    private void recalculateHyperbolicity() {
+        if(graphManager == null) {
+            return;
+        }
+        List<Edge> edges = graphManager.GetEdges();
+        foreach(Edge edge in edges) {
+            int distance = Math.Min(edge.startPoint.distanceToNeutralElement, edge.endPoint.distanceToNeutralElement);
+            edge.SetLength(Mathf.Pow(hyperbolicity, distance));
+        }
     }
 }

@@ -31,10 +31,9 @@ public class RelatorDecoder
             i++;
         }
         
-
+        // Checks for = signs and transforms them into relators
         for(int j = 0; j < relators.Count; j++) {
-            relators[j] = relators[j].Replace(" ", "");
-            if(relators.Contains("=")) {
+            if(relators[j].Contains("=")) {
                 string[] sidesOfEquals = relators[j].Split('=');
                 relators[j] = sidesOfEquals[0] + "(" + sidesOfEquals[1] + ")^-1";
             }

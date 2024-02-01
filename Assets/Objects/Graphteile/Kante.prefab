@@ -51,6 +51,8 @@ LineRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -160,8 +162,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b17ec35f63f0dd478eac2d0eb110884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  age: 0
   startPoint: {fileID: 0}
   endPoint: {fileID: 0}
+  generator: 0
   lineWidth: 0.02
   arrowWidth: 0.05
   PercentHead: 0.2
+  vertexRadius: 0.1
+  length: 1

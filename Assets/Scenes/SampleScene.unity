@@ -3545,6 +3545,7 @@ MonoBehaviour:
   generatorInputField: {fileID: 994683909}
   relatorInputField: {fileID: 1536507749}
   vertexNumberInputField: {fileID: 162340278}
+  hyperbolicityInputField: {fileID: 2125541690}
 --- !u!4 &772353316
 Transform:
   m_ObjectHideFlags: 0
@@ -3573,11 +3574,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6beeb79a63b2404793fcf7ed1aafa2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idealLength: 1
   radius: 100
   "pr\xE4zision": 0
-  hyperbolicScaling: 0
-  repelForceFactor: 2
+  repelForceFactor: 0
   attractForceFactor: 2
   oppositeForceFactor: 0
   angleForceFactor: 0
@@ -4565,7 +4564,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3096654801577124718, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
       propertyPath: m_Name
-      value: ' '
+      value: n
       objectReference: {fileID: 0}
     - target: {fileID: 3276086866296139643, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
       propertyPath: m_LocalPosition.x
@@ -7260,7 +7259,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Hyp.Scaling:'
+  m_Text: 'Hyperbolicity:'
 --- !u!222 &1849168592
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8306,9 +8305,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 772353317}
-        m_TargetAssemblyTypeName: Physik, Assembly-CSharp
-        m_MethodName: setHyperbolicScaling
+      - m_Target: {fileID: 772353318}
+        m_TargetAssemblyTypeName: CayleyGraphMaker, Assembly-CSharp
+        m_MethodName: setHyperbolicity
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

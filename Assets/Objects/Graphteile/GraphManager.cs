@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
+
 
 public class GraphManager : MonoBehaviour {
 
@@ -112,5 +112,9 @@ public class GraphManager : MonoBehaviour {
         newEdge.SetEndpoints(startvertex, endvertex, op);
         AddEdge(newEdge);
         return newEdge;
+    }
+
+    public List<Edge> GetEdges() {
+        return edges;
     }
 }

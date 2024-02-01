@@ -15,6 +15,10 @@ public class Edge : MonoBehaviour
     public float PercentHead = 0.1f;
     public float vertexRadius = 0.1f;
 
+    [SerializeField]
+    private float length;
+
+
     // Start is called before the first frame update
     void Start(){}
 
@@ -99,19 +103,6 @@ public class Edge : MonoBehaviour
         }
     }
 
-    /**
-    public void SetOpposite(Vertex referenceVertex, Vertex oppositeVertex) {
-        if(referenceVertex.Equals(startPoint)) {
-            SetEnd(oppositeVertex);
-        }
-        else if(referenceVertex.Equals(endPoint)) {
-            SetStart(oppositeVertex);
-        }
-        else {
-            throw new Exception("Vertex is not part of this edge.");
-        }
-    }**/
-
     public void Destroy() {
         startPoint.removeEdge(this);
         endPoint.removeEdge(this);
@@ -122,5 +113,14 @@ public class Edge : MonoBehaviour
 
     public bool Equals(Edge other) {
         return startPoint.Equals(other.startPoint) && endPoint.Equals(other.endPoint) && generator == other.generator;
+    }
+
+
+    public void SetLength(float length) {
+        this.length = length;
+    }
+
+    public float GetLength() {
+        return length;
     }
 }

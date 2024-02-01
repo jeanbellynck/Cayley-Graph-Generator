@@ -1,14 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Unity.VisualScripting;
 
 public class Physik : MonoBehaviour{
-    public float idealLength;
     public float radius;
     public float präzision; // Used by the QuadTree. Determines the size of the smallest quad. The smaller the more precise but the more expensive. 
-    public float hyperbolicScaling = 1; // Determines how fast the hyperbolic space is scaled. 1 is no scaling. This is simulated by shortening edges the farther you go.
-
+    
     [Range(0.0f,20.0f)]
     public float repelForceFactor; 
     [Range(0.0f,20.0f)]
@@ -31,8 +28,7 @@ public class Physik : MonoBehaviour{
     Dictionary<char, Dictionary<char, float>> averageArrowAngles = new Dictionary<char, Dictionary<char, float>>();
 
     
-    public Physik(float idealeLength, float radius) {
-        this.idealLength = idealeLength;
+    public Physik(float radius) {
         this.radius = radius;
     }
 
@@ -124,7 +120,7 @@ public class Physik : MonoBehaviour{
         for(int i = 0; i < stabilityIterations; i++) {
             foreach(Edge edge in graphManager.GetKanten()) {
                 float ageFactor = Mathf.Max(1, (10-1)*(1-edge.age)); // Young edges are strong
-                Vector3 force = calculateLinkForce(edge.startPoint, edge.endPoint) ;
+                Vector3 force = calculateLinkForce(edge) ;
                 edge.startPoint.attractForce += ageFactor* attractForceFactor * force;
                 edge.endPoint.attractForce -= ageFactor * attractForceFactor * force;
             }
@@ -244,26 +240,21 @@ public class Physik : MonoBehaviour{
         return 1.0f - (k / (1.0f + k));
     }
 
-    private Vector3 calculateLinkForce(Vertex source, Vertex target) {
+    private Vector3 calculateLinkForce(Edge edge) {
+        Vertex source = edge.startPoint;
+        Vertex target = edge.endPoint;
         Vector3 diff = target.transform.position + target.velocity*Time.deltaTime - source.transform.position - source.velocity*Time.deltaTime;
+        // Wenn die zwei Knoten aufeinander liegen, dann bewege sie ein bisschen auseinander.
+        if(diff == Vector3.zero) {
+            diff = 0.05f * UnityEngine.Random.insideUnitSphere;
+        }
         float mag = diff.magnitude;
-        return (mag - idealLength) / mag * diff;
+        return (mag - edge.GetLength()) / mag * diff;
         
         
         //Vector3 diff = target.transform.position - source.transform.position; 
         //return diff.normalized*(Mathf.Min(diff.magnitude-idealeLänge, 10));
         //return diff.normalized*Mathf.Log(diff.magnitude/idealeLänge);
-    }
-
-    private void fixIdentity(GraphManager vertexManager) {
-        foreach(Vertex vertex in vertexManager.getVertex()) {
-            if(vertex.name == "") {
-                vertex.attractForce = Vector3.zero;
-                vertex.repelForce = Vector3.zero;
-                vertex.oppositeForce = Vector3.zero;
-                vertex.angleForce = Vector3.zero;
-            }
-        }
     }
 
     public void startUp() {
@@ -275,11 +266,5 @@ public class Physik : MonoBehaviour{
     */
     public void shutDown() {
         actualMaximalForce -= 0.01f;
-    }
-
-    public void setHyperbolicScaling(string scaling) {
-        print("scaling changed to:" + scaling);
-        if(float.TryParse(scaling, out float s) && s != 0) {}
-
     }
 }
