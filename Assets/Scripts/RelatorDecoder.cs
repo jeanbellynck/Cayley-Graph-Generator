@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -6,13 +7,40 @@ using System.Text;
  **/
 public class RelatorDecoder
 {
-    public static string decodeRelator(string symbol) {
-        symbol = symbol.Replace(" ", "");
-        if(symbol.Contains("=")) {
-            string[] relators = symbol.Split('=');
-            symbol = relators[0] + "(" + relators[1] + ")^-1";
+    public static string[] decodeRelators(string relatorString) {
+        string[] commaSeperatedStrings = relatorString.Replace(" ", "").Split(new char[] { ',', ';' });
+        List<string> relators = new List<string>();
+
+        // Quickly differentiates between seperator commas and commutator commas by counting square brackets
+        int i = 0;
+        string relation = "";
+        int openSquareBracketCount = 0;
+        int closeSquareBracketCount = 0;
+        while(i < commaSeperatedStrings.Length) {
+            relation = relation + commaSeperatedStrings[i];
+            openSquareBracketCount += commaSeperatedStrings[i].Count(c => c == '[');
+            closeSquareBracketCount += commaSeperatedStrings[i].Count(c => c == ']');
+            if(openSquareBracketCount == closeSquareBracketCount) {
+                relators.Add(relation);
+                relation = "";
+                openSquareBracketCount = 0;
+                closeSquareBracketCount = 0;
+            } else {
+                relation = relation + ",";
+            }
+            i++;
         }
-        return decodeOneRelator(symbol);
+        
+
+        for(int j = 0; j < relators.Count; j++) {
+            relators[j] = relators[j].Replace(" ", "");
+            if(relators.Contains("=")) {
+                string[] sidesOfEquals = relators[j].Split('=');
+                relators[j] = sidesOfEquals[0] + "(" + sidesOfEquals[1] + ")^-1";
+            }
+            relators[j] = decodeOneRelator(relators[j]);
+        }
+        return relators.ToArray();
     }
     
     /**

@@ -43,12 +43,14 @@ public class CayleyGraph : MonoBehaviour
         this.generators = string.Join("", generators).ToCharArray();
     }
 
-    public void setRelators(string[] relators) {
-        // Apply the Relotor Decoder
-        for(int i = 0; i < relators.Length; i++) {
-            relators[i] = RelatorDecoder.decodeRelator(relators[i]);
+    public void setRelators(string relators) {
+        if(relators.Equals("")) {
+            this.relators = new string[0];
+            return;
         }
-        this.relators = relators;
+        
+        // Apply the Relotor Decoder
+        this.relators = RelatorDecoder.decodeRelators(relators);
     }
 
     public void setVertexNumber(string vertexNumber) {
@@ -61,7 +63,7 @@ public class CayleyGraph : MonoBehaviour
 
     public void startVisualization() {
         setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(';'));        
-        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(';'));
+        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.setPhysics(physik);
 
@@ -83,13 +85,13 @@ public class CayleyGraph : MonoBehaviour
     }
 
 
-    public void setGroupAndStartVisualisation(string name, string[] generators, string[] relators) {
+    public void setGroupAndStartVisualisation(string name, string[] generators, string relatorString) {
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
         generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", generators);
-        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", relators);
+        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", relatorString);
         setGenerators(generators);
-        setRelators(relators);
+        setRelators(relatorString);
         startVisualization();
 
     }
