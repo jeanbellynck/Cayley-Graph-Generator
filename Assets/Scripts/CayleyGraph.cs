@@ -38,9 +38,9 @@ public class CayleyGraph : MonoBehaviour
         }
     }
 
-    public void setGenerators(string[] generators) {
-        Debug.Log("Generators: " + generators);
-        this.generators = string.Join("", generators).ToCharArray();
+    public void setGenerators(string generatorString) {
+        generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
+        generators = string.Join("", generatorString).ToCharArray();
     }
 
     public void setRelators(string relators) {
@@ -62,7 +62,7 @@ public class CayleyGraph : MonoBehaviour
     public GameObject vertexNumberInputField;
 
     public void startVisualization() {
-        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text.Replace(" ", "").Split(';'));        
+        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text);        
         setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.setPhysics(physik);
@@ -85,12 +85,12 @@ public class CayleyGraph : MonoBehaviour
     }
 
 
-    public void setGroupAndStartVisualisation(string name, string[] generators, string relatorString) {
+    public void setGroupAndStartVisualisation(string name, string generatorString, string relatorString) {
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
-        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", generators);
-        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join("; ", relatorString);
-        setGenerators(generators);
+        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", generatorString);
+        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", relatorString);
+        setGenerators(generatorString);
         setRelators(relatorString);
         startVisualization();
 
