@@ -106,13 +106,15 @@ public class CayleyGraphMaker : MonoBehaviour {
     private Vertex CreateVertex(Vertex predecessor, char gen) {
         // Zufallsverschiebung
         System.Random r = new System.Random();
-        float hyperbolicScaling = Mathf.Pow(hyperbolicity, predecessor.distanceToNeutralElement + 1);
+        int newDistance = predecessor.GetDistanceToNeutralElement() + 1;
+        float hyperbolicScaling = Mathf.Pow(hyperbolicity, newDistance);
         Vector3 elementPosition = predecessor.transform.position + hyperbolicScaling * UnityEngine.Random.insideUnitSphere;
 
         // Vertex is not the neutral element and an edge need to be created
         Vertex newVertex = graphManager.CreateVertex(elementPosition);
         newVertex.name = predecessor.name + gen;
-        newVertex.distanceToNeutralElement = predecessor.distanceToNeutralElement + 1;
+        newVertex.SetDistanceToNeutralElement(newDistance);
+        newVertex.setMass(Mathf.Pow(hyperbolicity, newDistance));
         AddBorderVertex(newVertex);
         createEdge(predecessor, newVertex, gen);
         
@@ -133,16 +135,16 @@ public class CayleyGraphMaker : MonoBehaviour {
     void createEdge(Vertex startvertex, Vertex endvertex, char op) {
         // Kante erstellen
         Edge newEdge = graphManager.CreateEdge(startvertex, endvertex, op);
-        int distance = Math.Min(newEdge.startPoint.distanceToNeutralElement, newEdge.endPoint.distanceToNeutralElement);
+        int distance = Math.Min(newEdge.startPoint.GetDistanceToNeutralElement(), newEdge.endPoint.GetDistanceToNeutralElement());
         newEdge.SetLength(Mathf.Pow(hyperbolicity, distance));
     }
 
     void AddBorderVertex(Vertex vertex) {
-        if (randKnoten.Count <= vertex.distanceToNeutralElement) {
+        if (randKnoten.Count <= vertex.GetDistanceToNeutralElement()) {
             randKnoten.Add(new List<Vertex>());
         }
 
-        randKnoten[vertex.distanceToNeutralElement].Add(vertex);
+        randKnoten[vertex.GetDistanceToNeutralElement()].Add(vertex);
     }
 
     public Vertex GetNextBorderVertex() {
@@ -243,7 +245,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         // New vertex should hav ethe shortest distance and carry the shorter name
-        int distanceToNeutralElement = Mathf.Min(vertex1.distanceToNeutralElement, vertex2.distanceToNeutralElement);
+        int distanceToNeutralElement = Mathf.Min(vertex1.GetDistanceToNeutralElement(), vertex2.GetDistanceToNeutralElement());
         string newName;
         if (vertex1.name.Length <= vertex2.name.Length) {
             newName = vertex1.name;
@@ -265,7 +267,8 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         // Update data of vertex1
         vertex1.name = newName;
-        vertex1.distanceToNeutralElement = distanceToNeutralElement;
+        vertex1.SetDistanceToNeutralElement(distanceToNeutralElement);
+        vertex1.setMass(Mathf.Pow(hyperbolicity, distanceToNeutralElement));
 
         // Delete vertex2
         graphManager.RemoveVertex(vertex2);
@@ -318,8 +321,12 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
         List<Edge> edges = graphManager.GetEdges();
         foreach(Edge edge in edges) {
-            int distance = Math.Min(edge.startPoint.distanceToNeutralElement, edge.endPoint.distanceToNeutralElement);
+            int distance = Math.Min(edge.startPoint.GetDistanceToNeutralElement(), edge.endPoint.GetDistanceToNeutralElement());
             edge.SetLength(Mathf.Pow(hyperbolicity, distance));
+        }
+        foreach(Vertex vertex in graphManager.getVertex()) {
+            int distance = vertex.GetDistanceToNeutralElement();
+            vertex.setMass(Mathf.Pow(hyperbolicity, distance));
         }
     }
 }

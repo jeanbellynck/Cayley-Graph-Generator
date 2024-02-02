@@ -95,7 +95,7 @@ public class GraphManager : MonoBehaviour {
         Vertex newVertex = Instantiate(vertexPrefab, position, Quaternion.identity, transform).GetComponent<Vertex>();
         AddVertex(newVertex);
         newVertex.name = "";
-        newVertex.distanceToNeutralElement = 0;
+        newVertex.SetDistanceToNeutralElement(0);
         return newVertex;
     }
 

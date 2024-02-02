@@ -25,8 +25,13 @@ public class Vertex : MonoBehaviour {
     public int id;
     private Dictionary<char, List<Edge>> edges = new Dictionary<char, List<Edge>>(); // This is a list-dictionary as vertices may temporarily have multiple arrows of a specific generator. If the vertex is at the border, the arrows might not have been included yet.
 
-    public int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
-    //public Knoten predecessorToNeutral = null; // This is the predecessor of the neutral element. It is used to find the path to the neutral element of the group.
+    [SerializeField]
+    private int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
+    
+    [SerializeField]
+    private float mass; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
+
+
 
     // Start is called before the first frame update
     void Start() {
@@ -167,5 +172,21 @@ public class Vertex : MonoBehaviour {
 
     public bool Equals(Vertex other) {
         return id == other.id;
+    }
+
+    public void SetDistanceToNeutralElement(int distance) {
+        distanceToNeutralElement = distance;
+    }
+
+    public int GetDistanceToNeutralElement() {
+        return distanceToNeutralElement;
+    }
+
+    public void setMass(float mass) {
+        this.mass = mass;
+    }
+
+    public float getMass() {
+        return mass;
     }
 }

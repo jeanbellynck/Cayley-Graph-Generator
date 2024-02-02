@@ -19,7 +19,7 @@ public class BarnesQuadtree {
     private BarnesQuadtree sob;
     private List<Vertex> points = new List<Vertex>();
     public Vector3 schwerpunkt;
-    public int mass;
+    public float mass; // Mass is somewhat misleading since the points repel each other.
     private float precision; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. 
     private float maximalCubeSize; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
     private bool isLeaf = true;
@@ -61,7 +61,7 @@ public class BarnesQuadtree {
                 swb.Add(punkt);
                 sob.Add(punkt);
             }
-            mass++;
+            mass += punkt.getMass();
         }
     }
 
@@ -155,7 +155,7 @@ public class BarnesQuadtree {
             // If this cube is small and far away, then the cube is not split up.
             // 
             if (2 * radius / Vector3.Distance(pointActedOn.transform.position, schwerpunkt) < precision && !punktInBounds(pointActedOn)) {
-                return mass * BerechneKraft(pointActedOn.transform.position, schwerpunkt);
+                return mass * BerechneKraft(pointActedOn);
             }
             else {
                 return not.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance) + nwt.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance)
@@ -175,15 +175,35 @@ public class BarnesQuadtree {
         foreach (Vertex point in points) {
             if (!point.Equals(pointActedOn)) {
                 // Look a step into the future to calculate the force.
-                //force += BerechneKraft(pointActedOn.transform.position + (Time.deltaTime * pointActedOn.velocity), point.transform.position);
-                force += BerechneKraft(pointActedOn.transform.position, point.transform.position);
+                force += BerechneKraft(pointActedOn, point);
             }
         }
         return force;
     }
 
-    private Vector3 BerechneKraft(Vector3 bewirkter, Vector3 wirkender) {
-        Vector3 diff = wirkender - bewirkter;
-        return -diff.normalized * Mathf.Pow(diff.magnitude, -2);
+    private Vector3 BerechneKraft(Vertex bewirkter, Vertex wirkender) {
+        Vector3 diff = wirkender.transform.position - bewirkter.transform.position;
+        float distance = diff.magnitude;
+        if (distance == 0) {
+            return Vector3.zero;
+        }
+        else {
+
+            return -diff.normalized * (bewirkter.getMass() * wirkender.getMass()) / (distance * distance);
+        }
+    }
+
+    /**
+     * Does the same as above but uses the center of mass of the cube instead of a second vertex
+     **/
+    private Vector3 BerechneKraft(Vertex bewirkter) {
+        Vector3 diff = schwerpunkt - bewirkter.transform.position;
+        float distance = diff.magnitude;
+        if (distance == 0) {
+            return Vector3.zero;
+        }
+        else {
+            return -diff.normalized * (bewirkter.getMass() * mass) / (distance * distance);
+        }
     }
 }

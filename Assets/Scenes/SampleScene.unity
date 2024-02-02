@@ -900,7 +900,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.29953852
+  m_Size: 0.42830893
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3574,7 +3574,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 100
-  precision: 0.1
+  precision: 10
   repelForceFactor: 0.5
   attractForceFactor: 0.5
   oppositeForceFactor: 0
@@ -8304,9 +8304,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 772353318}
-        m_TargetAssemblyTypeName: CayleyGraphMaker, Assembly-CSharp
-        m_MethodName: setHyperbolicity
+      - m_Target: {fileID: 772353315}
+        m_TargetAssemblyTypeName: CayleyGraph, Assembly-CSharp
+        m_MethodName: SetHyperbolicity
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
