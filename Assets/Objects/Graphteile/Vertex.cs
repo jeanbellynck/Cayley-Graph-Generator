@@ -44,12 +44,10 @@ public class Vertex : MonoBehaviour {
     * Used for debugging.
     */
     void OnDrawGizmos() {
-        /**
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(transform.position, transform.position + oppositeForce);
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(transform.position, transform.position + angleForce);
-        **/
+        //Gizmos.color = Color.green;
+        //Gizmos.DrawLine(transform.position, transform.position + repelForce);
+        //Gizmos.color = Color.cyan;
+        //Gizmos.DrawLine(transform.position, transform.position + angleForce);
     }
 
     public void SetId(int id) {

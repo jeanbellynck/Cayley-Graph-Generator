@@ -16,7 +16,6 @@ public class CayleyGraph : MonoBehaviour {
 
     // Konfigurationen
     bool hatPhysik = false;
-    public float präzisionsfaktor = 10f;
     public char[] generators = new char[0];
     public string[] relators = new string[0];
 
@@ -31,7 +30,7 @@ public class CayleyGraph : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if (hatPhysik) {
-            physik.UpdatePh(graphManager, präzisionsfaktor * Time.deltaTime);
+            physik.UpdatePh(graphManager);
         }
     }
 

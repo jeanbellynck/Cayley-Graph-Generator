@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System;
 
 public class Physik : MonoBehaviour{
-    public float radius;
-    public float präzision; // Used by the QuadTree. Determines the size of the smallest quad. The smaller the more precise but the more expensive. 
+    public float radius; // Size of the boundingBox
+    [SerializeField]
+    private float precision; // Used by the QuadTree. Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. 
+    
     
     [Range(0.0f,20.0f)]
     public float repelForceFactor; 
@@ -52,8 +54,7 @@ public class Physik : MonoBehaviour{
 
     
 
-    public void UpdatePh(GraphManager graphManager, float präzision) {
-        this.präzision = präzision;
+    public void UpdatePh(GraphManager graphManager) {
         geschwindigkeitenZurücksetzen(graphManager);
         if(repelForceFactor != 0) calculateRepulsionForces(graphManager);
         if(attractForceFactor != 0) calculateLinkForces(graphManager);
@@ -67,23 +68,23 @@ public class Physik : MonoBehaviour{
 
         
         // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
+        /**
         if(actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
-            actualMaximalForce -= usualMaximalForce*Time.deltaTime / shutDownTime;
+            actualMaximalForce = usualMaximalForce*Time.deltaTime / shutDownTime;
         }
         if(actualMaximalForce < 0) {
             actualMaximalForce = 0;
-        }
+        }**/
     }
 
     private void updateVertices(GraphManager vertexManager) {
         foreach(Vertex vertex in vertexManager.getVertex()) {
             Vector3 force = vertex.repelForce + vertex.attractForce + vertex.oppositeForce + vertex.angleForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
-
+            vertex.velocity = vertex.velocity + force;
             vertex.transform.position += vertex.velocity * Time.deltaTime;
             vertex.velocity *= velocityDecay;
-            vertex.velocity = vertex.velocity + force;
-            vertex.transform.position = Vector3.ClampMagnitude(vertex.transform.position, 100);
+            vertex.transform.position = Vector3.ClampMagnitude(vertex.transform.position, radius);
         }
     }
     
@@ -103,15 +104,16 @@ public class Physik : MonoBehaviour{
     public float repulsionDistance;
 
     private void calculateRepulsionForces(GraphManager vertexManager) {
-        // Abstoßung durch Knoten
-        BarnesQuadbaum bqb = new BarnesQuadbaum(Vector2.zero, radius, präzision);
+        // Every tick the BarnesQuadtree is recalculated. This is expensive but necessary since the vertices move.
+        BarnesQuadtree bqb = new BarnesQuadtree(Vector2.zero, radius, precision, 0.1f);
         foreach(Vertex vertex in vertexManager.getVertex()) {
-            bqb.Add(vertex.transform.position);
+            bqb.Add(vertex);
         }
         bqb.BerechneSchwerpunkt();
         foreach(Vertex vertex in vertexManager.getVertex()) {
             float ageFactor = Mathf.Max(1, (10-1)*(1-vertex.age)); // Young vertices are repelled strongly
-            vertex.repelForce = ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
+            //vertex.repelForce -= ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
+            vertex.repelForce = ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex, repulsionDistance);
         }
     }
 
