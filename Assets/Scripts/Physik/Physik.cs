@@ -68,13 +68,13 @@ public class Physik : MonoBehaviour{
 
         
         // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
-        /**
+        
         if(actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
             actualMaximalForce = usualMaximalForce*Time.deltaTime / shutDownTime;
         }
         if(actualMaximalForce < 0) {
             actualMaximalForce = 0;
-        }**/
+        }
     }
 
     private void updateVertices(GraphManager vertexManager) {
@@ -115,7 +115,6 @@ public class Physik : MonoBehaviour{
             float ageFactor = Mathf.Max(1, (10-1)*(1-vertex.age)); // Young vertices are repelled strongly
             //vertex.repelForce -= ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
             Vector3 force = ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex, repulsionDistance);
-            //if (float.IsNaN(force.x)) {throw new Exception("Force is NaN");}
             vertex.repelForce = force;
         }
     }
