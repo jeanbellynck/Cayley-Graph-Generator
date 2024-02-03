@@ -23,7 +23,8 @@ public class CayleyGraph : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-
+        setGenerators("a, b");
+        setRelators("[a, b], a^5");
     }
 
 
@@ -36,7 +37,11 @@ public class CayleyGraph : MonoBehaviour {
 
     public void setGenerators(string generatorString) {
         generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
-        generators = string.Join("", generatorString).ToCharArray();
+        char[] newGenerators = string.Join("", generatorString).ToCharArray();
+        if(!newGenerators.Equals(generators)) {
+            generators = newGenerators;
+            hyperbolicityMatrix.GetComponent<HyperbolicityMatrix>().SetMatrixSize(generators.Length);
+        }
     }
 
     public void setRelators(string relators) {
@@ -57,11 +62,11 @@ public class CayleyGraph : MonoBehaviour {
     public GameObject relatorInputField;
     public GameObject vertexNumberInputField;
     public GameObject hyperbolicityInputField;
+    public GameObject hyperbolicityMatrix;
 
     
 
     public void startVisualization() {
-        setGenerators(generatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
         setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.setPhysics(physik);
@@ -110,5 +115,10 @@ public class CayleyGraph : MonoBehaviour {
         if (float.TryParse(hyperbolicityString, out float hyperbolicity) && hyperbolicity != 0) {
             cayleyGraphMaker.setHyperbolicity(hyperbolicity);
         }
+    }
+
+
+    public void SetMatrix(float[,] matrix) {
+        cayleyGraphMaker.SetHyperbolicityMatrix(matrix);
     }
 }

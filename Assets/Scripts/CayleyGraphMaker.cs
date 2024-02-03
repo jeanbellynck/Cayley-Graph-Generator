@@ -16,6 +16,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     protected string[] relators;// = new string[]{"abAB"};
     
     private float hyperbolicity = 1;
+    private float[,] hyperbolicityMatrix = new float[0, 0];
 
 
     // Konfigurationen
@@ -310,6 +311,17 @@ public class CayleyGraphMaker : MonoBehaviour {
     public void setHyperbolicity(float hyperbolicity) {
         this.hyperbolicity = hyperbolicity;
         recalculateHyperbolicity();
+        // Set all values of the hyperbolicity matrix to the new hyperbolicity
+        hyperbolicityMatrix = new float[generators.Length, generators.Length];
+        for (int i = 0; i < generators.Length; i++) {
+            for (int j = 0; j < generators.Length; j++) {
+                hyperbolicityMatrix[i, j] = hyperbolicity;
+            }
+        }
+    }
+
+    public void SetHyperbolicityMatrix(float[,] matrix) {
+        hyperbolicityMatrix = matrix;
     }
 
     /**
@@ -329,4 +341,6 @@ public class CayleyGraphMaker : MonoBehaviour {
             vertex.setMass(Mathf.Pow(hyperbolicity, distance));
         }
     }
+
+    
 }
