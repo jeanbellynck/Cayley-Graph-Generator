@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Vertex : MonoBehaviour {
     public float age = 0;
@@ -18,7 +16,6 @@ public class Vertex : MonoBehaviour {
     public Vector3 angleForce = Vector3.zero;
     public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
 
-    public int distance = 0; // Measures the distance to the identity
     private Renderer mr;
 
     // The following is only used in v2 
@@ -27,14 +24,19 @@ public class Vertex : MonoBehaviour {
 
     [SerializeField]
     private int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
-    
     [SerializeField]
-    private float mass; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
+    public List<string> pathsToNeutralElement = new List<string>(); // The paths to the identity element. This is used to visualize the paths to the identity element.
+
+    [SerializeField]
+    private float mass = 1; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
 
 
 
     // Start is called before the first frame update
     void Start() {
+        if(mass == 0) {
+            mass = 0.1f;
+        }
         mr = GetComponent<Renderer>();
     }
 
@@ -188,5 +190,21 @@ public class Vertex : MonoBehaviour {
 
     public float getMass() {
         return mass;
+    }
+
+    public void SetPathsToNeutralElement(List<string> paths) {
+        pathsToNeutralElement = paths;
+    }
+
+    public List<string> GetPathsToNeutralElement() {
+        return pathsToNeutralElement;
+    }
+
+    public void AddPathToNeutralElement(string path) {
+        pathsToNeutralElement.Add(path);
+    }
+
+    public void AddPathsToNeutralElement(List<string> paths) {
+        pathsToNeutralElement.AddRange(paths);
     }
 }

@@ -59,7 +59,7 @@ public class Physik : MonoBehaviour {
         if (repelForceFactor != 0) calculateRepulsionForces(graphManager);
         if (attractForceFactor != 0) calculateLinkForces(graphManager);
         if (oppositeForceFactor != 0) calculateOppositionForce(graphManager);
-        if (angleForceFactor != 0) calculateArrowAverageForce(graphManager);
+        //if (angleForceFactor != 0) calculateArrowAverageForce(graphManager);
 
         updateVertices(graphManager);
 
@@ -172,6 +172,7 @@ public class Physik : MonoBehaviour {
     public int arrowAverageRecalculationIteration = 10;
     int currentIteration = 0;
 
+    /**
     private void calculateArrowAverageForce(GraphManager graphManager) {
         if (currentIteration == arrowAverageRecalculationIteration) {
             calculateAverageAngles(graphManager);
@@ -194,7 +195,7 @@ public class Physik : MonoBehaviour {
                 }
             }
         }
-    }
+    }**/
 
 
     /**

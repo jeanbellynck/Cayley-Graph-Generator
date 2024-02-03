@@ -42,6 +42,9 @@ public class BarnesQuadtree {
      * Originally this took points instead of vertices as a parameter. However, this has been changed because I wanted to compare points by id and not by value (which could shift after calculations).
      **/
     public void Add(Vertex punkt) {
+        if(punkt.getMass() <= 0) {
+            throw new System.Exception("The mass of the vertex is smaller than 0. This is not allowed.");
+        }
         if (punktInBounds(punkt)) {
             // If this cube is empty or splitting it would result in a cube smaller than maximalCubeSize, then the point is added to this cube.
             if (mass == 0 || radius < maximalCubeSize) {

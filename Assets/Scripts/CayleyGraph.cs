@@ -16,6 +16,8 @@ public class CayleyGraph : MonoBehaviour {
 
     // Konfigurationen
     bool hatPhysik = false;
+
+    // These values are probably better moved to CayleyGraphMaker entirely
     public char[] generators = new char[0];
     public string[] relators = new string[0];
 
@@ -40,6 +42,7 @@ public class CayleyGraph : MonoBehaviour {
         char[] newGenerators = string.Join("", generatorString).ToCharArray();
         if(!newGenerators.Equals(generators)) {
             generators = newGenerators;
+            cayleyGraphMaker.setGenerators(generators);
             hyperbolicityMatrix.GetComponent<HyperbolicityMatrix>().SetMatrixSize(generators.Length);
         }
     }
@@ -84,7 +87,7 @@ public class CayleyGraph : MonoBehaviour {
         Debug.Log("Start Visualization");
         physik.setGenerators(generators);
         graphManager.Initialize(generators);
-        SetHyperbolicity(hyperbolicityInputField.GetComponent<UnityEngine.UI.InputField>().text);
+        //SetHyperbolicity(hyperbolicityInputField.GetComponent<UnityEngine.UI.InputField>().text);
         cayleyGraphMaker.InitializeCGMaker(graphManager, meshManager, generators, relators);
         hatPhysik = true;
     }
@@ -95,7 +98,8 @@ public class CayleyGraph : MonoBehaviour {
         // Set the generators and relators for the input fields and for the program
         generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", generatorString);
         relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", relatorString);
-        setGenerators(generatorString);
+        // Generator is automatically updated on value change
+        //setGenerators(generatorString); 
         setRelators(relatorString);
         startVisualization();
 
@@ -118,7 +122,7 @@ public class CayleyGraph : MonoBehaviour {
     }
 
 
-    public void SetMatrix(float[,] matrix) {
+    public void SetHyperbolicityMatrix(float[,] matrix) {
         cayleyGraphMaker.SetHyperbolicityMatrix(matrix);
     }
 }

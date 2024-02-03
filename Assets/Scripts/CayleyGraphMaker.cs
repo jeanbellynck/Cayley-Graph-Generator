@@ -10,13 +10,13 @@ public class CayleyGraphMaker : MonoBehaviour {
     private Physik physik; // I wonder whether the reference to Physics is necessary? 
 
 
-    
+
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
     protected char[] operators; // Like generators but with upper and lower case letters
     protected string[] relators;// = new string[]{"abAB"};
-    
+
     private float hyperbolicity = 1;
-    private float[,] hyperbolicityMatrix = new float[0, 0];
+    private Dictionary<char, Dictionary<char, float>> hyperbolicityMatrix = new Dictionary<char, Dictionary<char, float>>();
 
 
     // Konfigurationen
@@ -52,7 +52,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     // Start is called before the first frame update
     public void InitializeCGMaker() {
         StopAllCoroutines();
-        
+
         randKnoten = new List<List<Vertex>>();
         relatorCandidates = new HashSet<Vertex>();
         edgeMergeCandidates = new HashSet<Vertex>();
@@ -70,9 +70,10 @@ public class CayleyGraphMaker : MonoBehaviour {
         while (vertexNumber > graphManager.getVertex().Count) {
             // Speed is proportional to the number of vertices on the border. This makes knotting less likely
             float waitTime = 1 / (drawingSpeed * Mathf.Max(1, GetBorderVertexCount()));
-            if(!firstIteration) {
+            if (!firstIteration) {
                 yield return new WaitForSeconds(waitTime);
-            } else {
+            }
+            else {
                 firstIteration = false;
             }
 
@@ -83,7 +84,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             }
 
             foreach (char gen in generators) {
-                if (!borderVertex.GetEdges().ContainsKey(gen) || borderVertex.GetEdges()[gen].Count == 0){
+                if (!borderVertex.GetEdges().ContainsKey(gen) || borderVertex.GetEdges()[gen].Count == 0) {
                     Vertex newVertex = CreateVertex(borderVertex, gen);
                     relatorCandidates.Add(newVertex);
                 }
@@ -109,16 +110,27 @@ public class CayleyGraphMaker : MonoBehaviour {
         System.Random r = new System.Random();
         int newDistance = predecessor.GetDistanceToNeutralElement() + 1;
         float hyperbolicScaling = Mathf.Pow(hyperbolicity, newDistance);
-        Vector3 elementPosition = predecessor.transform.position + hyperbolicScaling * UnityEngine.Random.insideUnitSphere;
+
+        
+        Vector3 elementPosition;
+        Vertex prepredecessor = predecessor.FollowEdge(ToggleCase(gen));
+        if(prepredecessor != null) {
+            elementPosition = predecessor.transform.position + (predecessor.transform.position - prepredecessor.transform.position) * hyperbolicScaling;
+        } else {
+            elementPosition = predecessor.transform.position + hyperbolicScaling * UnityEngine.Random.insideUnitSphere;
+        }
 
         // Vertex is not the neutral element and an edge need to be created
         Vertex newVertex = graphManager.CreateVertex(elementPosition);
         newVertex.name = predecessor.name + gen;
         newVertex.SetDistanceToNeutralElement(newDistance);
-        newVertex.setMass(Mathf.Pow(hyperbolicity, newDistance));
+        List<string> pathsToNeutralElement = predecessor.GetPathsToNeutralElement();
+        foreach (string path in pathsToNeutralElement) {
+            newVertex.AddPathToNeutralElement(path + gen);
+        }
+        newVertex.setMass(calculateVertexMass(newVertex.GetPathsToNeutralElement()));
         AddBorderVertex(newVertex);
         createEdge(predecessor, newVertex, gen);
-        
 
         return newVertex;
     }
@@ -136,8 +148,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     void createEdge(Vertex startvertex, Vertex endvertex, char op) {
         // Kante erstellen
         Edge newEdge = graphManager.CreateEdge(startvertex, endvertex, op);
-        int distance = Math.Min(newEdge.startPoint.GetDistanceToNeutralElement(), newEdge.endPoint.GetDistanceToNeutralElement());
-        newEdge.SetLength(Mathf.Pow(hyperbolicity, distance));
+        newEdge.SetLength(calculateEdgeLength(newEdge.startPoint, newEdge.endPoint, char.ToLower(op)));
     }
 
     void AddBorderVertex(Vertex vertex) {
@@ -247,6 +258,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         // New vertex should hav ethe shortest distance and carry the shorter name
         int distanceToNeutralElement = Mathf.Min(vertex1.GetDistanceToNeutralElement(), vertex2.GetDistanceToNeutralElement());
+
         string newName;
         if (vertex1.name.Length <= vertex2.name.Length) {
             newName = vertex1.name;
@@ -259,7 +271,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         //Dictionary<char, List<Edge>> vertex2edges = vertex2.GetEdges();
         foreach (char op in vertex2.GetEdges().Keys) {
             List<Edge> generatorEdgesCopy = new List<Edge>(vertex2.GetEdges(op));
-            
+
             foreach (Edge edge in generatorEdgesCopy) {
                 createEdge(vertex1, edge.getOpposite(vertex2), op);
                 graphManager.RemoveEdge(edge);
@@ -269,7 +281,8 @@ public class CayleyGraphMaker : MonoBehaviour {
         // Update data of vertex1
         vertex1.name = newName;
         vertex1.SetDistanceToNeutralElement(distanceToNeutralElement);
-        vertex1.setMass(Mathf.Pow(hyperbolicity, distanceToNeutralElement));
+        vertex1.SetPathsToNeutralElement(vertex2.GetPathsToNeutralElement());
+        vertex1.setMass(calculateVertexMass(vertex1.GetPathsToNeutralElement()));
 
         // Delete vertex2
         graphManager.RemoveVertex(vertex2);
@@ -277,6 +290,74 @@ public class CayleyGraphMaker : MonoBehaviour {
         // Aktuellen Knoten sicherheitshalber nochmal prüfen
         edgeMergeCandidates.Add(vertex1);
         relatorCandidates.Add(vertex1);
+    }
+
+
+    /**
+     * This is a method that would better fit into a "group element" class.
+     * Taking in paths to identity and using the hyperbolicityMatrix it calculates the mass of a vertex. 
+     * The mass is calculated using the geometric mean 
+     **/
+    public float calculateVertexMass(List<string> pathsToIdentity) {
+        /**float mass = 1;
+        int rootExponent = 0;
+        foreach (string path in pathsToIdentity) {
+            foreach (char gen in generators) {
+                mass *= calculateScalingForGenerator(gen, path);
+                rootExponent++;
+            }
+        }
+        mass = Mathf.Pow(mass, 1f / rootExponent);
+        if(mass == 0) {
+            throw new System.Exception("The mass of the vertex is 0. This is not allowed.");
+        }
+        return mass;**/
+        float mass = float.MaxValue;
+        foreach (string path in pathsToIdentity) {
+            foreach (char gen in generators) {
+                float massCandidate = calculateScalingForGenerator(gen, path);
+                if (massCandidate < mass) {
+                    mass = massCandidate;
+                }
+            }
+        }
+        return mass;
+    }
+
+    /**
+     * This is a method that would better fit into a "group generator" class.
+     * Taking in paths to identity and using the hyperbolicityMatrix it calculates the length of a path. 
+     * The mass is taken to be equal to the smalles branch of the vertex.
+     **/
+    public float calculateEdgeLength(Vertex v1, Vertex v2, char generator) {
+        List<string> pathsToIdentity1 = v1.GetPathsToNeutralElement();
+        List<string> pathsToIdentity2 = v2.GetPathsToNeutralElement();
+        float length = float.MaxValue;
+        foreach (string path in pathsToIdentity1) {
+            float lengthCandidate = calculateScalingForGenerator(generator, path);
+            if (lengthCandidate < length) {
+                length = lengthCandidate;
+            }
+        }
+        foreach (string path in pathsToIdentity2) {
+            float lengthCandidate = calculateScalingForGenerator(generator, path);
+            if (lengthCandidate < length) {
+                length = lengthCandidate;
+            }
+        }
+        return length;
+    }
+
+    /**
+     * This is a method that would better fit into a "group element" class.
+     * Taking in paths to identity and using the hyperbolicityMatrix it calculates the scaling of a generator. This give the desired length of an edge.
+     **/
+    private float calculateScalingForGenerator(char generator, string path) {
+        float scaling = 1;
+        foreach (char op in path) {
+            scaling *= hyperbolicityMatrix[op][generator];
+        }
+        return scaling;
     }
 
 
@@ -310,37 +391,57 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public void setHyperbolicity(float hyperbolicity) {
         this.hyperbolicity = hyperbolicity;
-        recalculateHyperbolicity();
         // Set all values of the hyperbolicity matrix to the new hyperbolicity
-        hyperbolicityMatrix = new float[generators.Length, generators.Length];
+        float[,] matrix = new float[generators.Length, generators.Length];
         for (int i = 0; i < generators.Length; i++) {
             for (int j = 0; j < generators.Length; j++) {
-                hyperbolicityMatrix[i, j] = hyperbolicity;
+                matrix[i, j] = hyperbolicity;
             }
         }
+        SetHyperbolicityMatrix(matrix);
     }
 
     public void SetHyperbolicityMatrix(float[,] matrix) {
-        hyperbolicityMatrix = matrix;
+        for (int i = 0; i < matrix.GetLength(0); i++) {
+            hyperbolicityMatrix[generators[i]] = new Dictionary<char, float>();
+            hyperbolicityMatrix[char.ToUpper(generators[i])] = new Dictionary<char, float>();
+            for (int j = 0; j < matrix.GetLength(1); j++) {
+                float matrixValue = matrix[i, j];
+                if (matrixValue < 0) {
+                    // For negative Values the hyperbolic scaling is done in one direction
+                    hyperbolicityMatrix[generators[i]][generators[j]] = -matrix[i, j];
+                    hyperbolicityMatrix[char.ToUpper(generators[i])][generators[j]] = -1 / matrix[i, j];
+                }
+                else {
+                    // For positive Values the hyperbolic scaling is done in both directions
+                    hyperbolicityMatrix[generators[i]][generators[j]] = matrix[i, j];
+                    hyperbolicityMatrix[char.ToUpper(generators[i])][generators[j]] = matrix[i, j];
+                }
+            }
+        }
+        recalculateHyperbolicity();
     }
 
     /**
      * Recalculates the length of all edges according to the hyperbolicity.
      */
     private void recalculateHyperbolicity() {
-        if(graphManager == null) {
+        if (graphManager == null) {
             return;
         }
         List<Edge> edges = graphManager.GetEdges();
-        foreach(Edge edge in edges) {
-            int distance = Math.Min(edge.startPoint.GetDistanceToNeutralElement(), edge.endPoint.GetDistanceToNeutralElement());
-            edge.SetLength(Mathf.Pow(hyperbolicity, distance));
+        foreach (Edge edge in edges) {
+            edge.SetLength(calculateEdgeLength(edge.startPoint, edge.endPoint, edge.getGenerator()));
         }
-        foreach(Vertex vertex in graphManager.getVertex()) {
-            int distance = vertex.GetDistanceToNeutralElement();
-            vertex.setMass(Mathf.Pow(hyperbolicity, distance));
+        foreach (Vertex vertex in graphManager.getVertex()) {
+            vertex.setMass(calculateVertexMass(vertex.GetPathsToNeutralElement()));
         }
     }
 
-    
+
+    public void setGenerators(char[] generators) {
+        this.generators = generators;
+    }
+
+
 }
