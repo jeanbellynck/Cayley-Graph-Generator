@@ -17,7 +17,7 @@ public class BarnesQuadtree {
     private BarnesQuadtree nwb;
     private BarnesQuadtree swb;
     private BarnesQuadtree sob;
-    private List<GroupElement> points = new List<GroupElement>();
+    private List<Vertex> points = new List<Vertex>();
     public Vector3 schwerpunkt;
     public float mass; // Mass is somewhat misleading since the points repel each other.
     private float precision; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. 
@@ -32,8 +32,8 @@ public class BarnesQuadtree {
         this.mass = 0;
     }
 
-    public void Add(List<GroupElement> points) {
-        foreach (GroupElement punkt in points) {
+    public void Add(List<Vertex> points) {
+        foreach (Vertex punkt in points) {
             Add(punkt);
         }
     }
@@ -41,7 +41,7 @@ public class BarnesQuadtree {
     /** 
      * Originally this took points instead of vertices as a parameter. However, this has been changed because I wanted to compare points by id and not by value (which could shift after calculations).
      **/
-    public void Add(GroupElement punkt) {
+    public void Add(Vertex punkt) {
         if(punkt.Mass <= 0) {
             throw new System.Exception("The mass of the vertex is smaller than 0. This is not allowed.");
         }
@@ -89,7 +89,7 @@ public class BarnesQuadtree {
         points = null;
     }
 
-    private bool punktInBounds(GroupElement vertex) {
+    private bool punktInBounds(Vertex vertex) {
         Vector3 punkt = vertex.transform.position;
         return punkt.x >= position.x - radius &&
         punkt.x < position.x + radius &&
@@ -109,7 +109,7 @@ public class BarnesQuadtree {
         else if (isLeaf) {
             // This cube is a leaf, the center of mass is determined by the average of the points.
             schwerpunkt = Vector3.zero;
-            foreach (GroupElement punkt in points) {
+            foreach (Vertex punkt in points) {
                 schwerpunkt += punkt.transform.position;
             }
             schwerpunkt /= mass;
@@ -138,7 +138,7 @@ public class BarnesQuadtree {
     /**
      * Calculates how all vertices inside this cube repel the given point.
      **/
-    public Vector3 calculateRepulsionForceOnVertex(GroupElement pointActedOn, float maximalRepulsionDistance) {
+    public Vector3 calculateRepulsionForceOnVertex(Vertex pointActedOn, float maximalRepulsionDistance) {
         if (mass == 0) {
             // This cube is empty. It does not repel the point.
             return Vector3.zero;
@@ -172,10 +172,10 @@ public class BarnesQuadtree {
     /**
      * Calculates how all vertices inside this cube-leaf repel the given point.
      **/
-    public Vector3 calculateRepulsionForceOnVertexInsideLeaf(GroupElement pointActedOn) {
+    public Vector3 calculateRepulsionForceOnVertexInsideLeaf(Vertex pointActedOn) {
         // If the pointActedOn is in bound, then the calculation must exclude the pointActedOn.
         Vector3 force = Vector3.zero;
-        foreach (GroupElement point in points) {
+        foreach (Vertex point in points) {
             if (!point.Equals(pointActedOn)) {
                 // Look a step into the future to calculate the force.
                 force += BerechneKraft(pointActedOn, point);
@@ -184,7 +184,7 @@ public class BarnesQuadtree {
         return force;
     }
 
-    private Vector3 BerechneKraft(GroupElement bewirkter, GroupElement wirkender) {
+    private Vector3 BerechneKraft(Vertex bewirkter, Vertex wirkender) {
         Vector3 diff = wirkender.transform.position - bewirkter.transform.position;
         float distance = diff.magnitude;
         if (distance == 0) {
@@ -199,7 +199,7 @@ public class BarnesQuadtree {
     /**
      * Does the same as above but uses the center of mass of the cube instead of a second vertex
      **/
-    private Vector3 BerechneKraft(GroupElement bewirkter) {
+    private Vector3 BerechneKraft(Vertex bewirkter) {
         Vector3 diff = schwerpunkt - bewirkter.transform.position;
         float distance = diff.magnitude;
         if (distance == 0) {

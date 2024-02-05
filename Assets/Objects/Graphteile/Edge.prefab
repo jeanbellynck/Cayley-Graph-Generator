@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3882302275355246115}
   - component: {fileID: -7557588707877001707}
   m_Layer: 0
-  m_Name: Kante
+  m_Name: Edge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

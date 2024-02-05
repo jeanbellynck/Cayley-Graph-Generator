@@ -1,17 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
     Mesh mesh;
-    GroupElement[] vertexElements = new GroupElement[0];
+    GroupVertex[] vertexElements = new GroupVertex[0];
     
-    public void Initialize(GroupElement[] vertexElements) {
+    public void Initialize(GroupVertex[] vertexElements) {
         this.vertexElements = vertexElements;
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
