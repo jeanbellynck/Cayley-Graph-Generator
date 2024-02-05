@@ -12,8 +12,6 @@ public class GroupElement : Vertex {
     // The following is used in v1 and v2
     public Vector3 repelForce = Vector3.zero;
     public Vector3 attractForce = Vector3.zero;
-    public Vector3 oppositeForce = Vector3.zero;
-    public Vector3 angleForce = Vector3.zero;
     public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
 
     private Renderer mr;

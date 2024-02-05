@@ -13,8 +13,6 @@ public class Physik : MonoBehaviour {
     [Range(0.0f, 20.0f)]
     public float attractForceFactor;
     [Range(0.0f, 20.0f)]
-    public float oppositeForceFactor;
-    [Range(0.0f, 20.0f)]
     public float angleForceFactor;
 
     public float usualMaximalForce = 10;
@@ -50,22 +48,21 @@ public class Physik : MonoBehaviour {
             countedArrowAngles[gen1] = new Dictionary<char, int>();
             averageArrowAngles[gen1] = new Dictionary<char, float>();
         }
+        currentIteration = 0;
     }
 
 
 
     public void UpdatePh(GraphManager graphManager) {
+        if(generators == null) {
+            return;
+        }
         geschwindigkeitenZurücksetzen(graphManager);
         if (repelForceFactor != 0) calculateRepulsionForces(graphManager);
         if (attractForceFactor != 0) calculateLinkForces(graphManager);
-        if (oppositeForceFactor != 0) calculateOppositionForce(graphManager);
-        //if (angleForceFactor != 0) calculateArrowAverageForce(graphManager);
+        if (angleForceFactor != 0) calculateStress(graphManager);
 
         updateVertices(graphManager);
-
-        //smitteKraftBerechnen(vertexManager, edgeManager); 
-        //fixIdentity(vertexManager);
-
 
         // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
 
@@ -79,7 +76,7 @@ public class Physik : MonoBehaviour {
 
     private void updateVertices(GraphManager vertexManager) {
         foreach (GroupElement vertex in vertexManager.getVertex()) {
-            Vector3 force = vertex.repelForce + vertex.attractForce + vertex.oppositeForce + vertex.angleForce;
+            Vector3 force = vertex.repelForce + vertex.attractForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
             vertex.velocity = vertex.velocity + force;
             vertex.transform.position += vertex.velocity * Time.deltaTime;
@@ -96,8 +93,6 @@ public class Physik : MonoBehaviour {
         foreach (GroupElement vertex in vertexManager.getVertex()) {
             vertex.attractForce = Vector3.zero;
             vertex.repelForce = Vector3.zero;
-            vertex.oppositeForce = Vector3.zero;
-            vertex.angleForce = Vector3.zero;
         }
     }
 
@@ -131,71 +126,36 @@ public class Physik : MonoBehaviour {
         }
     }
 
-    /**
-     * Calculates a force that makes two neighboring vertices opposite two each other if they can be reached with inverse elements. 
-     * The force is 0 if the vertices are opposite of if following both arrows lead to the same element
-     * The force is 1 if the angle between the vertices is very small 
-     * ToDO: Check, when input and output are the same. Normalize the force.
-     */
-    private void calculateOppositionForce(GraphManager graphManager) {
-        // ToDo: Da ist noch eine Menge manueller Code drin.
-        foreach (GroupElement vertex in graphManager.getVertex()) {
-            char[] alphabet = { 'a', 'b' };
-
-            foreach (char gen in alphabet) {
-                GroupElement front = graphManager.followEdge(vertex, gen);
-                GroupElement back = graphManager.followEdge(vertex, char.ToUpper(gen));
-                if (front != null && back != null) {
-                    front.oppositeForce += 0.25f * oppositeForceFactor * calculateOppositionForceBetweenTwoVertices(vertex, front, back);
-                    back.oppositeForce += 0.25f * oppositeForceFactor * calculateOppositionForceBetweenTwoVertices(vertex, back, front);
-                    vertex.oppositeForce += 0.5f * oppositeForceFactor * ((front.transform.position - vertex.transform.position).normalized + (back.transform.position - vertex.transform.position).normalized) / 2;
-                }
-            }
-        }
-    }
-
-    private Vector3 calculateOppositionForceBetweenTwoVertices(GroupElement vertexBase, GroupElement vertex1, GroupElement vertex2) {
-        if (vertex1.name == vertex2.name) { return Vector3.zero; }
-
-        Vector3 v = Vector3.Normalize(vertex1.transform.position - vertexBase.transform.position);
-        Vector3 w = Vector3.Normalize(vertex2.transform.position - vertexBase.transform.position);
-
-        Vector3 u = v - w;
-        Vector3.OrthoNormalize(ref v, ref u);
-
-
-
-        return (1 + Vector3.Dot(v, w)) / 2 * u;
-    }
 
 
     public int arrowAverageRecalculationIteration = 10;
     int currentIteration = 0;
 
     /**
-    private void calculateArrowAverageForce(GraphManager graphManager) {
-        if (currentIteration == arrowAverageRecalculationIteration) {
+     * Calculates the stress of a vertex. The stress is a measure of how unusual the angles of the vertex are. It is used to visualize weird spots.
+     **/
+    private void calculateStress(GraphManager graphManager) {
+        if (currentIteration == 0) {
             calculateAverageAngles(graphManager);
-            currentIteration = 0;
+            currentIteration = arrowAverageRecalculationIteration;
         }
-        currentIteration++;
+        currentIteration--;
 
-        foreach (Vertex vertex in graphManager.getVertex()) {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
             vertex.stress = 0;
             foreach (char gen1 in generators) {
                 foreach (char gen2 in generators) {
-                    Vertex vertex1 = graphManager.followEdge(vertex, gen1);
-                    Vertex vertex2 = graphManager.followEdge(vertex, gen2);
+                    GroupElement vertex1 = graphManager.followEdge(vertex, gen1);
+                    GroupElement vertex2 = graphManager.followEdge(vertex, gen2);
 
                     if (gen1 != gen2 && vertex1 != null && vertex2 != null && vertex1.name != vertex2.name) {
                         Vector3 force = angleForceFactor * calculateAverageAngleForceBetweenTwoVertices(vertex, vertex1, vertex2, averageArrowAngles[gen1][gen2]);
-                        vertex1.angleForce += 1 / (1 + vertex.distance) * force;
                         vertex.stress += force.magnitude;
                     }
                 }
             }
         }
-    }**/
+    }
 
 
     /**
@@ -234,16 +194,9 @@ public class Physik : MonoBehaviour {
 
         float angleDifference = averageAngle - Vector3.Angle(v, w);
 
-        return (angleDifference / 90) * (angleDifference / 90) * u;
+        return angleDifference / 90 * (angleDifference / 90) * u;
     }
 
-
-    public static float Sigmoid(double value) {
-        if (value > 0.9) return 0;
-
-        float k = (float)Math.Exp(value);
-        return 1.0f - (k / (1.0f + k));
-    }
 
     private Vector3 calculateLinkForce(Edge edge) {
         GroupElement source = edge.startPoint;
@@ -255,11 +208,6 @@ public class Physik : MonoBehaviour {
         }
         float mag = diff.magnitude;
         return (mag - edge.GetLength()) / mag * diff;
-
-
-        //Vector3 diff = target.transform.position - source.transform.position; 
-        //return diff.normalized*(Mathf.Min(diff.magnitude-idealeLänge, 10));
-        //return diff.normalized*Mathf.Log(diff.magnitude/idealeLänge);
     }
 
     public void startUp() {
