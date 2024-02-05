@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /**
@@ -14,8 +15,6 @@ public class CayleyGraph : MonoBehaviour {
 
     public CayleyGraphMaker cayleyGraphMaker;
 
-    // Konfigurationen
-    bool hatPhysik = false;
 
     // These values are probably better moved to CayleyGraphMaker entirely
     public char[] generators = new char[0];
@@ -27,15 +26,14 @@ public class CayleyGraph : MonoBehaviour {
     void Start() {
         setGenerators("a, b");
         setRelators("[a, b], a^5");
+        cayleyGraphMaker.setPhysics(physik);
     }
 
 
     // Update is called once per frame
     void Update() {
-        if (hatPhysik) {
-            physik.UpdatePh(graphManager);
-        }
-    }
+        physik.UpdatePh(graphManager);
+    }  
 
     public void setGenerators(string generatorString) {
         generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
@@ -67,13 +65,15 @@ public class CayleyGraph : MonoBehaviour {
     public GameObject hyperbolicityInputField;
     public GameObject hyperbolicityMatrix;
 
-    
 
-    public void startVisualization() {
+    public void generateButton() {
+        StopVisualization();
         setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
-        setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
-        cayleyGraphMaker.setPhysics(physik);
+        StartVisualization();
+    }
 
+    public void StopVisualization() {
+        cayleyGraphMaker.StopVisualization();
         // Destroy Mesh Objects
         ICollection<MeshGenerator> meshes = meshManager.GetMeshes();
         foreach (MeshGenerator mesh in meshes) {
@@ -81,19 +81,19 @@ public class CayleyGraph : MonoBehaviour {
         }
         meshManager.resetMeshes();
         graphManager.ResetGraph();
+    }
+
+    public void StartVisualization() {
+        setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         physik.startUp();
-
-
-        Debug.Log("Start Visualization");
         physik.setGenerators(generators);
         graphManager.Initialize(generators);
-        //SetHyperbolicity(hyperbolicityInputField.GetComponent<UnityEngine.UI.InputField>().text);
-        cayleyGraphMaker.InitializeCGMaker(graphManager, meshManager, generators, relators);
-        hatPhysik = true;
+        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators);
     }
 
 
-    public void setGroupAndStartVisualisation(string name, string generatorString, string relatorString) {
+    public void SelectGroupOption(string name, string generatorString, string relatorString) {
+        StopVisualization();
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
         generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", generatorString);
@@ -101,8 +101,7 @@ public class CayleyGraph : MonoBehaviour {
         // Generator is automatically updated on value change
         //setGenerators(generatorString); 
         setRelators(relatorString);
-        startVisualization();
-
+        StartVisualization();
     }
 
     public void openHelpPage() {

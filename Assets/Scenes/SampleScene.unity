@@ -689,7 +689,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &120996090
 RectTransform:
   m_ObjectHideFlags: 0
@@ -704,10 +704,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 466027878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 255, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 255, y: -25}
+  m_SizeDelta: {x: 190, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &120996091
 MonoBehaviour:
@@ -760,6 +760,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textFieldPrefab: {fileID: 6465916687982623406, guid: ab40ae3e735351f42bf4aa23e1037c9d, type: 3}
+  hyperbolicityTextField: {fileID: 2125541690}
   cayleyGraph: {fileID: 772353314}
 --- !u!1 &144981363
 GameObject:
@@ -990,7 +991,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.29953852
+  m_Size: 0.24239308
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1599,9 +1600,9 @@ RectTransform:
   - {fileID: 1154132382}
   m_Father: {fileID: 261111091}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: -50}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &244498036
@@ -1714,7 +1715,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &261111091
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2233,7 +2234,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: v. 1.1.1
+  m_Text: v. 1.2.1
 --- !u!222 &336030531
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2583,6 +2584,7 @@ RectTransform:
   m_Children:
   - {fileID: 1849168590}
   - {fileID: 120996090}
+  - {fileID: 2125541691}
   m_Father: {fileID: 999882194}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2753,7 +2755,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -25}
+  m_LocalPosition: {x: 0, y: 0, z: -200}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2778,6 +2780,169 @@ MonoBehaviour:
   sideMenues:
   - {fileID: 1066769008}
   - {fileID: 1187630293}
+--- !u!1 &561278631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 561278632}
+  - component: {fileID: 561278635}
+  - component: {fileID: 561278634}
+  - component: {fileID: 561278633}
+  m_Layer: 0
+  m_Name: Hyperbolicity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &561278632
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561278631}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 706615119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 231.5, y: 0}
+  m_SizeDelta: {x: 443, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &561278633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561278631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &561278634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561278631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: "Hyperbolicity is a parameter that can be used to restrict the exponential
+    growth a group might have. To name an example, this is useful for the free group
+    F<sub>2</sub>. The free group F<sub>2</sub> represents all words which can be
+    written from two letters \"a, b\" and their inverses \"A, B\" with the restrictions
+    that the words need to be fully cancelled. (i.e. a symbol like a and its inverse
+    A are not allowed to follow each other since then the generators can be cancelled).
+    Valid word might be \"aaba\" or \"a\" or \"aBa\" but not \"abB\".\nThe words
+    of length n are given by 4*3<sup>(n-1)</sup>, since we can choose 4 elements
+    to be the first symbol and then 3 letters for every other symbol. \nIn the graph
+    this exponential growth manifests itself by the edges becoming very long. This
+    is becaus the many vertices repel each other strongly. By choosing a hyperbolicity
+    value <1 like 0.5 we can represent F<sub>2</sub> in a different, more compact
+    way. "
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 328ac7385f0ad6944ae789056d0b31f7, type: 2}
+  m_sharedMaterial: {fileID: -8546956226551798984, guid: 328ac7385f0ad6944ae789056d0b31f7, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 23
+  m_fontSizeBase: 23
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 8
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: -20
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &561278635
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561278631}
+  m_CullTransparentMesh: 1
 --- !u!1 &614047151
 GameObject:
   m_ObjectHideFlags: 0
@@ -3155,6 +3320,8 @@ RectTransform:
   - {fileID: 1928891685}
   - {fileID: 1075363327}
   - {fileID: 1438077646}
+  - {fileID: 2001074397}
+  - {fileID: 561278632}
   - {fileID: 729390414}
   - {fileID: 1485096927}
   - {fileID: 282647026}
@@ -3679,16 +3846,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6beeb79a63b2404793fcf7ed1aafa2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 1000
+  radius: 200
   precision: 10
   repelForceFactor: 0.5
-  attractForceFactor: 0.5
+  attractForceFactor: 1
   oppositeForceFactor: 0
   angleForceFactor: 0
   usualMaximalForce: 10
   actualMaximalForce: 10
   shutDownTime: 10
-  velocityDecay: 0.6
+  velocityDecay: 0.5
   repulsionDistance: 100
   stabilityIterations: 2
   arrowAverageRecalculationIteration: 0
@@ -4319,9 +4486,9 @@ RectTransform:
   - {fileID: 2102368660}
   m_Father: {fileID: 261111091}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: -140}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &945896809
@@ -4501,7 +4668,9 @@ MonoBehaviour:
     everything on the left side and ignore the right side: \"abAB\" (The inverse
     of a generator is indicated by uppercase letters) . Words of this form are called
     <b>relator</b>.\nIt turns out that the generators \"a, b\" and the relator \"abAB\"
-    suffice to describe the group Z\xB2.\n\n"
+    suffice to describe the group Z\xB2.\n\nFor the relators the folowing syntax
+    can be used:\n- Brackets (): Defines evaluation order\n- Positive or Negative
+    Exponents (ab)^3 = ababab, (ab)^-1 = BA\n- \n\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 328ac7385f0ad6944ae789056d0b31f7, type: 2}
   m_sharedMaterial: {fileID: -8546956226551798984, guid: 328ac7385f0ad6944ae789056d0b31f7, type: 2}
@@ -4920,7 +5089,6 @@ RectTransform:
   - {fileID: 874467926}
   - {fileID: 297400349}
   - {fileID: 466027878}
-  - {fileID: 2125541691}
   - {fileID: 1026804942}
   m_Father: {fileID: 326132741}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5054,7 +5222,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 772353315}
         m_TargetAssemblyTypeName: CayleyGraph, Assembly-CSharp
-        m_MethodName: startVisualization
+        m_MethodName: generateButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5841,7 +6009,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Vertex Count:'
+  m_Text: 'Vertices:'
 --- !u!222 &1280875143
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8022,6 +8190,157 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
+--- !u!1 &2001074396
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2001074397}
+  - component: {fileID: 2001074400}
+  - component: {fileID: 2001074399}
+  - component: {fileID: 2001074398}
+  m_Layer: 0
+  m_Name: Hyperbolicity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2001074397
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001074396}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 706615119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 231.5, y: 0}
+  m_SizeDelta: {x: 443, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2001074398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001074396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &2001074399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001074396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: <b>Hyperbolicity</b>
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 328ac7385f0ad6944ae789056d0b31f7, type: 2}
+  m_sharedMaterial: {fileID: -8546956226551798984, guid: 328ac7385f0ad6944ae789056d0b31f7, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 25
+  m_fontSizeBase: 25
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 4
+  m_HorizontalAlignment: 8
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: -20
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &2001074400
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001074396}
+  m_CullTransparentMesh: 1
 --- !u!1 &2061742271
 GameObject:
   m_ObjectHideFlags: 0
@@ -8364,12 +8683,12 @@ RectTransform:
   m_Children:
   - {fileID: 1984703061}
   - {fileID: 441317616}
-  m_Father: {fileID: 999882194}
+  m_Father: {fileID: 466027878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 50}
+  m_SizeDelta: {x: 360, y: 50}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2125541692
 MonoBehaviour:
@@ -8431,10 +8750,10 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 772353315}
-        m_TargetAssemblyTypeName: CayleyGraph, Assembly-CSharp
-        m_MethodName: SetHyperbolicity
-        m_Mode: 0
+      - m_Target: {fileID: 120996093}
+        m_TargetAssemblyTypeName: HyperbolicityMatrix, Assembly-CSharp
+        m_MethodName: UpdateMatrix
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

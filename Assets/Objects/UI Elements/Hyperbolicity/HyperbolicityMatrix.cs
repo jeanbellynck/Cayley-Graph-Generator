@@ -5,6 +5,7 @@ using UnityEditor;
 
 public class HyperbolicityMatrix : MonoBehaviour {
     public GameObject textFieldPrefab;
+    public GameObject hyperbolicityTextField;
     public GameObject cayleyGraph;
 
     [SerializeField]
@@ -64,16 +65,29 @@ public class HyperbolicityMatrix : MonoBehaviour {
      * Reads the matrix out of the text fields.
      */
     public void UpdateMatrix() {
+        // Read Hyperbolicity out of hyperbolicityTextField
+        float hyperbolicity;
+        if(float.TryParse(hyperbolicityTextField.GetComponent<InputField>().text, out hyperbolicity) && hyperbolicity > 0) {
+            // continue
+        } else {
+            //exit
+            return;
+        }
+
         int matrixSize = textFields.GetLength(0);
         float[,] matrix = new float[matrixSize, matrixSize];
 
         for (int i = 0; i < matrixSize; i++) {
             for (int j = 0; j < matrixSize; j++) {
+                // Matrix is currently deactivated
+                matrix[i, j] = hyperbolicity;
+                /**
                 if(float.TryParse(textFields[i, j].GetComponent<TMP_InputField>().text, out float result) && result != 0) {
                     matrix[i, j] = float.Parse(textFields[i, j].GetComponent<TMP_InputField>().text);
                 } else {
                     matrix[i, j] = 1;
                 }
+                **/
             }
         }
         cayleyGraph.GetComponent<CayleyGraph>().SetHyperbolicityMatrix(matrix);

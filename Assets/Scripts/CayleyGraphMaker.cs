@@ -32,7 +32,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     HashSet<Vertex> relatorCandidates = new HashSet<Vertex>();
     HashSet<Vertex> edgeMergeCandidates = new HashSet<Vertex>();
 
-    public void InitializeCGMaker(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators) {
+    public void StartVisualization(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators) {
         this.graphManager = graphManager;
         this.meshManager = meshManager;
         this.generators = generators;
@@ -42,27 +42,23 @@ public class CayleyGraphMaker : MonoBehaviour {
             operators[i] = char.ToLower(generators[i]);
             operators[i + generators.Length] = char.ToUpper(generators[i]);
         }
-        InitializeCGMaker();
-    }
-
-    public void setPhysics(Physik physik) {
-        this.physik = physik;
-    }
-
-    // Start is called before the first frame update
-    public void InitializeCGMaker() {
-        StopAllCoroutines();
-
-        randKnoten = new List<List<Vertex>>();
-        relatorCandidates = new HashSet<Vertex>();
-        edgeMergeCandidates = new HashSet<Vertex>();
-
         AddBorderVertex(graphManager.getNeutral());
         StartCoroutine(createNewElementsAndApplyRelators());
     }
 
 
-    //public List<Vertex> borderVertices = new List<Vertex>();
+    public void setPhysics(Physik physik) {
+        this.physik = physik;
+    }
+
+
+    public void StopVisualization() {
+        StopAllCoroutines();
+        randKnoten = new List<List<Vertex>>();
+        relatorCandidates = new HashSet<Vertex>();
+        edgeMergeCandidates = new HashSet<Vertex>();
+    }
+
 
     IEnumerator createNewElementsAndApplyRelators() {
         bool firstIteration = true;
@@ -442,6 +438,5 @@ public class CayleyGraphMaker : MonoBehaviour {
     public void setGenerators(char[] generators) {
         this.generators = generators;
     }
-
 
 }

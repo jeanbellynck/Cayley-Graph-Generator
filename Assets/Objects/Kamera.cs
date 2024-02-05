@@ -22,6 +22,7 @@ public class Kamera : MonoBehaviour
     }
 
     // Update is called once per frame
+    bool pinching = false;
     void Update()
     {
         // Get the camera object
@@ -42,6 +43,7 @@ public class Kamera : MonoBehaviour
         // Zoom by finger pinch is broken on WebGL. Zoom will be deactived on mobile devices.
         if (Input.touchCount == 2)
         {
+            pinching = true;
             Touch touchZero = Input.GetTouch(0);
             Touch touchOne = Input.GetTouch(1);
             
@@ -57,10 +59,11 @@ public class Kamera : MonoBehaviour
                 cam.orthographicSize -= deltaMagnitudeDiff * pinchSensitivity;
                 cam.orthographicSize = Math.Max(1, cam.orthographicSize);
             }
+            
         }
         
         // If mouse or finger is down, rotate the camera
-        if (Input.GetMouseButton(0) && Input.touchCount != 2) {
+        if (Input.GetMouseButton(0) && Input.touchCount != 2 && !pinching) {
             float h = Input.GetAxis("Mouse X") * rotationSpeed * 5;
             float v = Input.GetAxis("Mouse Y") * rotationSpeed * 5;
 
@@ -68,7 +71,7 @@ public class Kamera : MonoBehaviour
             Quaternion rotation = Quaternion.Euler(-v, h, 0);
             transform.parent.rotation = transform.parent.rotation * rotation;
         }
-        if (Input.touchCount == 1) {
+        if (Input.touchCount == 1 && !pinching) {
             Touch touchZero = Input.GetTouch(0);
             if (touchZero.phase == TouchPhase.Moved) {
                 float h = touchZero.deltaPosition.x * rotationSpeed;
@@ -78,6 +81,9 @@ public class Kamera : MonoBehaviour
                 Quaternion rotation = Quaternion.Euler(-v, h, 0);
                 transform.parent.rotation = transform.parent.rotation * rotation;
             }
+        }
+        if (Input.touchCount == 0 && pinching) {
+            pinching = false;
         }
     }
 
