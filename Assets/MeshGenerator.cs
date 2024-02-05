@@ -9,9 +9,9 @@ using UnityEngine;
 public class MeshGenerator : MonoBehaviour
 {
     Mesh mesh;
-    Vertex[] vertexElements = new Vertex[0];
+    GroupElement[] vertexElements = new GroupElement[0];
     
-    public void Initialize(Vertex[] vertexElements) {
+    public void Initialize(GroupElement[] vertexElements) {
         this.vertexElements = vertexElements;
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;

@@ -10,7 +10,7 @@ public class GraphManager : MonoBehaviour {
     IDictionary<char, Color> operationColors;
     private int idCounter; // Starts by 1 as 0 is reserved for the neutral element
     public GameObject neutralElement;
-    List<Vertex> vertices = new List<Vertex>();
+    List<GroupElement> vertices = new List<GroupElement>();
     List<Edge> edges = new List<Edge>();
 
     public void Initialize(char[] generators) {
@@ -24,26 +24,26 @@ public class GraphManager : MonoBehaviour {
             }
 
         }
-        vertices.Add(neutralElement.GetComponent<Vertex>());
+        vertices.Add(neutralElement.GetComponent<GroupElement>());
     }
 
-    public ICollection<Vertex> getVertex() {
+    public ICollection<GroupElement> getVertex() {
         return vertices;
     }
 
-    public void AddVertex(Vertex vertex) {
+    public void AddVertex(GroupElement vertex) {
         vertex.id = idCounter;
         idCounter++;
         vertices.Add(vertex);
     }
 
-    public Vertex getNeutral() {
-        return neutralElement.GetComponent<Vertex>();
+    public GroupElement getNeutral() {
+        return neutralElement.GetComponent<GroupElement>();
     }
 
     public void ResetGraph() {
-        List<Vertex> verticesCopy = new List<Vertex>(vertices); 
-        foreach (Vertex vertex in verticesCopy) {
+        List<GroupElement> verticesCopy = new List<GroupElement>(vertices); 
+        foreach (GroupElement vertex in verticesCopy) {
             RemoveVertex(vertex);
         }
         vertices.Clear();
@@ -65,7 +65,7 @@ public class GraphManager : MonoBehaviour {
         edges.Add(edge);
     }
 
-    public void RemoveVertex(Vertex vertex) {
+    public void RemoveVertex(GroupElement vertex) {
         vertex.isActive = false;
         foreach (List<Edge> genEdges in vertex.GetEdges().Values) {
             List<Edge> genEdgesCopy = new List<Edge>(genEdges);
@@ -73,7 +73,7 @@ public class GraphManager : MonoBehaviour {
                 RemoveEdge(edge);
             }
         }
-        if(vertex.Equals(neutralElement.GetComponent<Vertex>())) {
+        if(vertex.Equals(neutralElement.GetComponent<GroupElement>())) {
             vertex.transform.position = Vector3.zero;
             vertex.age = 0;
         }else {
@@ -87,12 +87,12 @@ public class GraphManager : MonoBehaviour {
         edge.Destroy();
     }
 
-    public Vertex followEdge(Vertex vertex, char op) {
+    public GroupElement followEdge(GroupElement vertex, char op) {
         return vertex.FollowEdge(op);
     }
 
-    public Vertex CreateVertex(Vector3 position) {
-        Vertex newVertex = Instantiate(vertexPrefab, position, Quaternion.identity, transform).GetComponent<Vertex>();
+    public GroupElement CreateVertex(Vector3 position) {
+        GroupElement newVertex = Instantiate(vertexPrefab, position, Quaternion.identity, transform).GetComponent<GroupElement>();
         AddVertex(newVertex);
         newVertex.name = "";
         newVertex.setMass(1);
@@ -100,7 +100,7 @@ public class GraphManager : MonoBehaviour {
         return newVertex;
     }
 
-    public Edge CreateEdge(Vertex startvertex, Vertex endvertex, char op) {
+    public Edge CreateEdge(GroupElement startvertex, GroupElement endvertex, char op) {
         // If the edge already exists, no edge is created and the existing edge is returned
         foreach (Edge edge in startvertex.GetEdges(op)) {
             if(edge.getOpposite(startvertex).Equals(endvertex)) {

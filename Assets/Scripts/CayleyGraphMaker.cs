@@ -27,10 +27,10 @@ public class CayleyGraphMaker : MonoBehaviour {
 
 
     // Contains the references to all vertices on the border of the graph, sorted by distance to the center.
-    List<List<Vertex>> randKnoten = new List<List<Vertex>>();
+    List<List<GroupElement>> randKnoten = new List<List<GroupElement>>();
     // Contains the references of al vertices which need to be checked for relator application.
-    HashSet<Vertex> relatorCandidates = new HashSet<Vertex>();
-    HashSet<Vertex> edgeMergeCandidates = new HashSet<Vertex>();
+    HashSet<GroupElement> relatorCandidates = new HashSet<GroupElement>();
+    HashSet<GroupElement> edgeMergeCandidates = new HashSet<GroupElement>();
 
     public void StartVisualization(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators) {
         this.graphManager = graphManager;
@@ -54,9 +54,9 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public void StopVisualization() {
         StopAllCoroutines();
-        randKnoten = new List<List<Vertex>>();
-        relatorCandidates = new HashSet<Vertex>();
-        edgeMergeCandidates = new HashSet<Vertex>();
+        randKnoten = new List<List<GroupElement>>();
+        relatorCandidates = new HashSet<GroupElement>();
+        edgeMergeCandidates = new HashSet<GroupElement>();
     }
 
 
@@ -73,7 +73,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                 firstIteration = false;
             }
 
-            Vertex borderVertex = GetNextBorderVertex();
+            GroupElement borderVertex = GetNextBorderVertex();
             if (borderVertex == null) {
                 print("No vertices remaining. Stopping.");
                 break;
@@ -81,11 +81,11 @@ public class CayleyGraphMaker : MonoBehaviour {
 
             foreach (char gen in generators) {
                 if (!borderVertex.GetEdges().ContainsKey(gen) || borderVertex.GetEdges()[gen].Count == 0) {
-                    Vertex newVertex = CreateVertex(borderVertex, gen);
+                    GroupElement newVertex = CreateVertex(borderVertex, gen);
                     relatorCandidates.Add(newVertex);
                 }
                 if (!borderVertex.GetEdges().ContainsKey(char.ToUpper(gen)) || borderVertex.GetEdges()[char.ToUpper(gen)].Count == 0) {
-                    Vertex newVertex = CreateVertex(borderVertex, char.ToUpper(gen));
+                    GroupElement newVertex = CreateVertex(borderVertex, char.ToUpper(gen));
                     relatorCandidates.Add(newVertex);
                 }
             }
@@ -101,7 +101,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     /**
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
-    private Vertex CreateVertex(Vertex predecessor, char gen) {
+    private GroupElement CreateVertex(GroupElement predecessor, char gen) {
         // Zufallsverschiebung
         System.Random r = new System.Random();
         int newDistance = predecessor.GetDistanceToNeutralElement() + 1;
@@ -109,7 +109,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         
         Vector3 elementPosition;
-        Vertex prepredecessor = predecessor.FollowEdge(ToggleCase(gen));
+        GroupElement prepredecessor = predecessor.FollowEdge(ToggleCase(gen));
         if(prepredecessor != null) {
             elementPosition = predecessor.transform.position + (predecessor.transform.position - prepredecessor.transform.position) * hyperbolicScaling;
         } else {
@@ -117,7 +117,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         // Vertex is not the neutral element and an edge need to be created
-        Vertex newVertex = graphManager.CreateVertex(elementPosition);
+        GroupElement newVertex = graphManager.CreateVertex(elementPosition);
         newVertex.name = predecessor.name + gen;
         newVertex.SetDistanceToNeutralElement(newDistance);
         List<string> pathsToNeutralElement = predecessor.GetPathsToNeutralElement();
@@ -141,23 +141,23 @@ public class CayleyGraphMaker : MonoBehaviour {
     }
 
 
-    void createEdge(Vertex startvertex, Vertex endvertex, char op) {
+    void createEdge(GroupElement startvertex, GroupElement endvertex, char op) {
         // Kante erstellen
         Edge newEdge = graphManager.CreateEdge(startvertex, endvertex, op);
         newEdge.SetLength(calculateEdgeLength(newEdge.startPoint, newEdge.endPoint, char.ToLower(op)));
     }
 
-    void AddBorderVertex(Vertex vertex) {
+    void AddBorderVertex(GroupElement vertex) {
         if (randKnoten.Count <= vertex.GetDistanceToNeutralElement()) {
-            randKnoten.Add(new List<Vertex>());
+            randKnoten.Add(new List<GroupElement>());
         }
 
         randKnoten[vertex.GetDistanceToNeutralElement()].Add(vertex);
     }
 
-    public Vertex GetNextBorderVertex() {
-        Vertex nextVertex = null;
-        foreach (List<Vertex> borderVertices in randKnoten) {
+    public GroupElement GetNextBorderVertex() {
+        GroupElement nextVertex = null;
+        foreach (List<GroupElement> borderVertices in randKnoten) {
             borderVertices.RemoveAll(item => item == null);
             if (borderVertices.Count > 0) {
                 nextVertex = borderVertices.First();
@@ -170,7 +170,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public int GetBorderVertexCount() {
         int count = 0;
-        foreach (List<Vertex> borderVertices in randKnoten) {
+        foreach (List<GroupElement> borderVertices in randKnoten) {
             count += borderVertices.Count;
         }
         return count;
@@ -181,7 +181,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     */
     private void MergeAll() {
         while (edgeMergeCandidates.Count > 0 || relatorCandidates.Count > 0) {
-            Vertex mergeCandidate;
+            GroupElement mergeCandidate;
             // If two edges of the same generator lead to the different vertices, they need to be merged as fast as possible. Otherwise following generators is yucky.
             if (edgeMergeCandidates.Count > 0) {
                 mergeCandidate = edgeMergeCandidates.First();
@@ -201,7 +201,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
     }
 
-    void mergeEdges(Vertex vertex) {
+    void mergeEdges(GroupElement vertex) {
         foreach (KeyValuePair<char, List<Edge>> entry in vertex.GetEdges()) {
             List<Edge> generatorsEdges = entry.Value;
             if (generatorsEdges.Count > 0) {
@@ -220,14 +220,14 @@ public class CayleyGraphMaker : MonoBehaviour {
     * Applies the relator to the given groupElement. For that the relator is followed, starting at a different string index each time. 
     * If the relator leads to an other group element, the two groupElements are merged.
     */
-    void MergeByRelator(Vertex startingElement) {
+    void MergeByRelator(GroupElement startingElement) {
         // Der Code ist ein wenig unoptimiert. Nach dem Anwenden eines Relators versucht er wieder alle anzuwenden. 
         // Dadurch steigt die Komplexität im Worst-Case zu n^2 falls alle Relatoren genutzt werden. (Was natürlichunwahrscheinlich ist)
         foreach (string relator in relators) {
             for (int i = 0; i < relator.Length; i++) {
                 string path = relator[i..] + relator[..i];
 
-                Vertex currentElement = startingElement;
+                GroupElement currentElement = startingElement;
                 bool relatorLeadToOtherElement = true;
                 foreach (char op in path) {
                     currentElement = currentElement.FollowEdge(op);
@@ -247,7 +247,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     /**
     * Merges vertex2 with vertex1. The groupElement with the shorter name is deleted and all edges are redirected to the other groupElement.
     */
-    void MergesVertices(Vertex vertex1, Vertex vertex2) {
+    void MergesVertices(GroupElement vertex1, GroupElement vertex2) {
         if (vertex1.Equals(vertex2)) {
             return;
         }
@@ -325,7 +325,7 @@ public class CayleyGraphMaker : MonoBehaviour {
      * Taking in paths to identity and using the hyperbolicityMatrix it calculates the length of a path. 
      * The mass is taken to be equal to the smalles branch of the vertex.
      **/
-    public float calculateEdgeLength(Vertex v1, Vertex v2, char generator) {
+    public float calculateEdgeLength(GroupElement v1, GroupElement v2, char generator) {
         List<string> pathsToIdentity1 = v1.GetPathsToNeutralElement();
         List<string> pathsToIdentity2 = v2.GetPathsToNeutralElement();
         float length = float.MaxValue;
@@ -358,9 +358,9 @@ public class CayleyGraphMaker : MonoBehaviour {
 
 
     void DrawMesh() {
-        foreach (Vertex vertex in graphManager.getVertex()) {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
             foreach (string relator in relators) {
-                Vertex[] vertices = new Vertex[relator.Length];
+                GroupElement[] vertices = new GroupElement[relator.Length];
                 vertices[0] = vertex;
 
                 bool doInitialize = true;
@@ -429,7 +429,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         foreach (Edge edge in edges) {
             edge.SetLength(calculateEdgeLength(edge.startPoint, edge.endPoint, edge.getGenerator()));
         }
-        foreach (Vertex vertex in graphManager.getVertex()) {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
             vertex.setMass(calculateVertexMass(vertex.GetPathsToNeutralElement()));
         }
     }

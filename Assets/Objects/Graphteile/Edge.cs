@@ -6,8 +6,8 @@ using UnityEngine;
 public class Edge : MonoBehaviour
 {
     public float age = 0;
-    public Vertex startPoint;
-    public Vertex endPoint;
+    public GroupElement startPoint;
+    public GroupElement endPoint;
     public char generator;
 
     public float lineWidth = 0.1f;
@@ -27,7 +27,7 @@ public class Edge : MonoBehaviour
      * This method is used to get the start Vertex of the edge.
      * The result is dependent on whether op is upper or lower case
      */
-    public Vertex getStartPoint(char op) {
+    public GroupElement getStartPoint(char op) {
         if (char.IsLower(op)) {
             return startPoint;
         }
@@ -37,7 +37,7 @@ public class Edge : MonoBehaviour
     }
 
     
-    public void SetEndpoints(Vertex startPoint, Vertex endPoint, char generator) {
+    public void SetEndpoints(GroupElement startPoint, GroupElement endPoint, char generator) {
         if(this.startPoint != null || this.endPoint != null) {
             throw new Exception("The Endpoints of an Edge are final and should not be changed. Create a new Edge instead");
         }
@@ -91,7 +91,7 @@ public class Edge : MonoBehaviour
         return generator;
     }
 
-    public Vertex getOpposite(Vertex vertex) {
+    public GroupElement getOpposite(GroupElement vertex) {
         if(vertex.Equals(startPoint)) {
             return endPoint;
         }
