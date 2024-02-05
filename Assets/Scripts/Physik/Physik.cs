@@ -66,6 +66,8 @@ public class Physik : MonoBehaviour {
         if (angleForceFactor != 0) calculateStress();
 
         updateVertices();
+        AveragePreviousAndCurrentPosition();
+        updateVertices();
 
         // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
         if (actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
@@ -79,12 +81,22 @@ public class Physik : MonoBehaviour {
     private void updateVertices() {
         float velocityDecayForThisTomeStep = Mathf.Pow(velocityDecay, Time.deltaTime);
         foreach (GroupElement vertex in graphManager.getVertex()) {
+            vertex.PreviousPosition = vertex.transform.position;
             Vector3 force = vertex.RepelForce + vertex.LinkForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
             vertex.Velocity = vertex.Velocity + force;
             vertex.transform.position += vertex.Velocity * Time.deltaTime;
             vertex.Velocity *= velocityDecayForThisTomeStep;
             vertex.transform.position = Vector3.ClampMagnitude(vertex.transform.position, radius);
+        }
+    }
+
+    /**
+     * This method averages the previous and the current position of the vertices. This is used to calculate the forces using the improved euler method.
+     **/
+    private void AveragePreviousAndCurrentPosition() {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
+            vertex.transform.position = (vertex.transform.position + vertex.PreviousPosition) / 2;
         }
     }
 
@@ -210,8 +222,8 @@ public class Physik : MonoBehaviour {
             diff = 0.05f * UnityEngine.Random.insideUnitSphere;
         }
         float mag = diff.magnitude;
-        int vertexCount = graphManager.getVertex().Count; // The idea is the following. In a normal graph the edges of a graph grow with the number of vertices. To simulate this effekt the link force is multiplied by the number of vertices.
-        return (mag - edge.GetLength()) / mag * diff * Mathf.Sqrt(vertexCount);
+        // float vertexFactor = Mathf.Sqrt(graphManager.getVertex().Count); // The idea is the following. In a normal graph the edges of a graph grow with the number of vertices. To simulate this effekt the link force is multiplied by the number of vertices.
+        return (mag - edge.GetLength()) / mag * diff;
     }
 
     public void startUp() {

@@ -3849,12 +3849,12 @@ MonoBehaviour:
   radius: 200
   precision: 10
   repelForceFactor: 0.5
-  attractForceFactor: 0.1
+  linkForceFactor: 0.5
   angleForceFactor: 0
   usualMaximalForce: 10
   actualMaximalForce: 10
   shutDownTime: 10
-  velocityDecay: 0.5
+  velocityDecay: 0.03
   repulsionDistance: 100
   stabilityIterations: 2
   arrowAverageRecalculationIteration: 0

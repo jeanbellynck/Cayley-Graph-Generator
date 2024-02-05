@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Vertex : MonoBehaviour {
     private Vector3 previousPosition; // This is the previous position of the vertex. It is used to calculate the forces using the improved euler method.
-
     private int id;
     private float age = 0;
     [SerializeField]
@@ -17,6 +16,7 @@ public class Vertex : MonoBehaviour {
     
     private Renderer mr;
 
+    public Vector3 PreviousPosition { get => previousPosition; set => previousPosition = value; }
     public int Id { get => id; set => id = value; }
     public float Mass { get => mass; set => mass = value; }
     public float Age { get => age; set => age = value; }
