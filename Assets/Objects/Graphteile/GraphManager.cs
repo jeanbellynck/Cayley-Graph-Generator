@@ -32,7 +32,7 @@ public class GraphManager : MonoBehaviour {
     }
 
     public void AddVertex(GroupElement vertex) {
-        vertex.id = idCounter;
+        vertex.Id = idCounter;
         idCounter++;
         vertices.Add(vertex);
     }
@@ -75,7 +75,7 @@ public class GraphManager : MonoBehaviour {
         }
         if(vertex.Equals(neutralElement.GetComponent<GroupElement>())) {
             vertex.transform.position = Vector3.zero;
-            vertex.age = 0;
+            vertex.Age = 0;
         }else {
             vertices.Remove(vertex);
             vertex.Destroy();
@@ -95,8 +95,8 @@ public class GraphManager : MonoBehaviour {
         GroupElement newVertex = Instantiate(vertexPrefab, position, Quaternion.identity, transform).GetComponent<GroupElement>();
         AddVertex(newVertex);
         newVertex.name = "";
-        newVertex.setMass(1);
-        newVertex.SetDistanceToNeutralElement(0);
+        newVertex.Mass = 1;
+        newVertex.DistanceToNeutralElement = 0;
         return newVertex;
     }
 

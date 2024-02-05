@@ -42,7 +42,7 @@ public class BarnesQuadtree {
      * Originally this took points instead of vertices as a parameter. However, this has been changed because I wanted to compare points by id and not by value (which could shift after calculations).
      **/
     public void Add(GroupElement punkt) {
-        if(punkt.getMass() <= 0) {
+        if(punkt.Mass <= 0) {
             throw new System.Exception("The mass of the vertex is smaller than 0. This is not allowed.");
         }
         if (punktInBounds(punkt)) {
@@ -64,7 +64,7 @@ public class BarnesQuadtree {
                 swb.Add(punkt);
                 sob.Add(punkt);
             }
-            mass += punkt.getMass();
+            mass += punkt.Mass;
         }
     }
 
@@ -192,7 +192,7 @@ public class BarnesQuadtree {
         }
         else {
 
-            return -diff.normalized * (bewirkter.getMass() * wirkender.getMass()) / (distance * distance);
+            return -diff.normalized * (bewirkter.Mass * wirkender.Mass) / (distance * distance);
         }
     }
 
@@ -206,7 +206,7 @@ public class BarnesQuadtree {
             return Vector3.zero;
         }
         else {
-            return -diff.normalized * (bewirkter.getMass() * mass) / (distance * distance);
+            return -diff.normalized * (bewirkter.Mass * mass) / (distance * distance);
         }
     }
 }

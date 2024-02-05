@@ -3,61 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GroupElement : Vertex {
-    public float age = 0;
     public bool isActive = true; // If set inactive it will be ignored algorithms
-
-    // Used by Link force algorithm
-    public Vector3 velocity = Vector3.zero;
-
-    // The following is used in v1 and v2
-    public Vector3 repelForce = Vector3.zero;
-    public Vector3 attractForce = Vector3.zero;
-    public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
-
-    private Renderer mr;
-
-    // The following is only used in v2 
-    public int id;
-    private Dictionary<char, List<Edge>> edges = new Dictionary<char, List<Edge>>(); // This is a list-dictionary as vertices may temporarily have multiple arrows of a specific generator. If the vertex is at the border, the arrows might not have been included yet.
+    private float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
 
     [SerializeField]
     private int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
     [SerializeField]
-    public List<string> pathsToNeutralElement = new List<string>(); // The paths to the identity element. This is used to visualize the paths to the identity element.
+    private List<string> pathsToNeutralElement = new List<string>(); // The paths to the identity element. This is used to visualize the paths to the identity element.
+    private Dictionary<char, List<Edge>> labeledEdges = new Dictionary<char, List<Edge>>(); // This is a list-dictionary as vertices may temporarily have multiple arrows of a specific generator. If the vertex is at the border, the arrows might not have been included yet.
 
-    [SerializeField]
-    private float mass = 1; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
-
+    public float Stress { get => stress; set => stress = value; }
+    public int DistanceToNeutralElement { get => distanceToNeutralElement; set => distanceToNeutralElement = value; }
+    public List<string> PathsToNeutralElement { get => pathsToNeutralElement; set => pathsToNeutralElement = value; }
 
 
     // Start is called before the first frame update
-    void Start() {
-        if(mass == 0) {
-            mass = 0.1f;
-        }
-        mr = GetComponent<Renderer>();
+    public override void Start() {
+        base.Start();
     }
 
     // Update is called once per frame
-    void Update() {
-        //DrawCircle(radius);
-        mr.material.color = new Color(stress, 0, 0);
-        age += Time.deltaTime;
+    public override void Update() {
+        base.Update();
+        Mr.material.color = new Color(stress, 0, 0);
     }
 
-    /**
-    * Used for debugging.
-    */
-    void OnDrawGizmos() {
-        //Gizmos.color = Color.green;
-        //Gizmos.DrawLine(transform.position, transform.position + repelForce);
-        //Gizmos.color = Color.cyan;
-        //Gizmos.DrawLine(transform.position, transform.position + angleForce);
-    }
-
-    public void SetId(int id) {
-        this.id = id;
-    }
 
     /**
      * This method is used to add an edge to the list of edges of this vertex.
@@ -78,12 +48,11 @@ public class GroupElement : Vertex {
         }
         // Create a new list if there is no list for this generator yet
         // Also check whether an edge of this kind has already been added. If so the edge is deleted.
-        if (!edges.ContainsKey(op)) {
-            edges.Add(op, new List<Edge>());
+        if (!labeledEdges.ContainsKey(op)) {
+            labeledEdges.Add(op, new List<Edge>());
         } 
-        // 
-        
-        edges[op].Add(edge);
+        Edges.Add(edge);
+        labeledEdges[op].Add(edge);
     }
 
     public void removeEdge(Edge edge) {
@@ -97,17 +66,17 @@ public class GroupElement : Vertex {
         else {
             return;
         }
-        edges[generator].Remove(edge);
+        labeledEdges[generator].Remove(edge);
     }
 
 
     public Dictionary<char, List<Edge>> GetEdges() {
-        return edges;
+        return labeledEdges;
     }
 
     public List<Edge> GetEdges(char op) {
-        if(edges.ContainsKey(op)) {
-            return edges[op];
+        if(labeledEdges.ContainsKey(op)) {
+            return labeledEdges[op];
         }
         else {
             return new List<Edge>();
@@ -119,8 +88,8 @@ public class GroupElement : Vertex {
     * WARNING: This always returns the first edge associated to a generator. All others (if present) are ignored
     */
     public Edge GetEdge(char op) {
-        if (edges.ContainsKey(op) && edges[op].Count > 0) {
-            return edges[op][0];
+        if (labeledEdges.ContainsKey(op) && labeledEdges[op].Count > 0) {
+            return labeledEdges[op][0];
         }
         else {
             return null;
@@ -158,44 +127,12 @@ public class GroupElement : Vertex {
             return false;
         }
 
-        foreach (Edge e in edges[generator]) {
+        foreach (Edge e in labeledEdges[generator]) {
             if (e.Equals(edge)) {
                 return true;
             }
         }
         return false;
-    }
-
-    public void Destroy() {
-        Destroy(gameObject);
-    }
-
-    public bool Equals(GroupElement other) {
-        return id == other.id;
-    }
-
-    public void SetDistanceToNeutralElement(int distance) {
-        distanceToNeutralElement = distance;
-    }
-
-    public int GetDistanceToNeutralElement() {
-        return distanceToNeutralElement;
-    }
-
-    public void setMass(float mass) {
-        this.mass = mass;
-    }
-
-    public float getMass() {
-        return mass;
-    }
-
-    public void SetPathsToNeutralElement(List<string> paths) {
-        pathsToNeutralElement = paths;
-    }
-
-    public List<string> GetPathsToNeutralElement() {
-        return pathsToNeutralElement;
     }
 
     public void AddPathToNeutralElement(string path) {

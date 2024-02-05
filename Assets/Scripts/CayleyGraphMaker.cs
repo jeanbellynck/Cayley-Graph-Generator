@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using System;
 
 public class CayleyGraphMaker : MonoBehaviour {
     private GraphManager graphManager;
@@ -104,7 +103,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     private GroupElement CreateVertex(GroupElement predecessor, char gen) {
         // Zufallsverschiebung
         System.Random r = new System.Random();
-        int newDistance = predecessor.GetDistanceToNeutralElement() + 1;
+        int newDistance = predecessor.DistanceToNeutralElement + 1;
         float hyperbolicScaling = Mathf.Pow(hyperbolicity, newDistance);
 
         
@@ -119,12 +118,12 @@ public class CayleyGraphMaker : MonoBehaviour {
         // Vertex is not the neutral element and an edge need to be created
         GroupElement newVertex = graphManager.CreateVertex(elementPosition);
         newVertex.name = predecessor.name + gen;
-        newVertex.SetDistanceToNeutralElement(newDistance);
-        List<string> pathsToNeutralElement = predecessor.GetPathsToNeutralElement();
+        newVertex.DistanceToNeutralElement = newDistance;
+        List<string> pathsToNeutralElement = predecessor.PathsToNeutralElement;
         foreach (string path in pathsToNeutralElement) {
             newVertex.AddPathToNeutralElement(path + gen);
         }
-        newVertex.setMass(calculateVertexMass(newVertex.GetPathsToNeutralElement()));
+        newVertex.Mass = calculateVertexMass(newVertex.PathsToNeutralElement);
         AddBorderVertex(newVertex);
         createEdge(predecessor, newVertex, gen);
 
@@ -148,11 +147,11 @@ public class CayleyGraphMaker : MonoBehaviour {
     }
 
     void AddBorderVertex(GroupElement vertex) {
-        if (randKnoten.Count <= vertex.GetDistanceToNeutralElement()) {
+        if (randKnoten.Count <= vertex.DistanceToNeutralElement) {
             randKnoten.Add(new List<GroupElement>());
         }
 
-        randKnoten[vertex.GetDistanceToNeutralElement()].Add(vertex);
+        randKnoten[vertex.DistanceToNeutralElement].Add(vertex);
     }
 
     public GroupElement GetNextBorderVertex() {
@@ -253,7 +252,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         // New vertex should hav ethe shortest distance and carry the shorter name
-        int distanceToNeutralElement = Mathf.Min(vertex1.GetDistanceToNeutralElement(), vertex2.GetDistanceToNeutralElement());
+        int distanceToNeutralElement = Mathf.Min(vertex1.DistanceToNeutralElement, vertex2.DistanceToNeutralElement);
 
         string newName;
         if (vertex1.name.Length <= vertex2.name.Length) {
@@ -276,9 +275,9 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         // Update data of vertex1
         vertex1.name = newName;
-        vertex1.SetDistanceToNeutralElement(distanceToNeutralElement);
-        vertex1.SetPathsToNeutralElement(vertex2.GetPathsToNeutralElement());
-        vertex1.setMass(calculateVertexMass(vertex1.GetPathsToNeutralElement()));
+        vertex1.DistanceToNeutralElement = distanceToNeutralElement;
+        vertex1.PathsToNeutralElement = vertex2.PathsToNeutralElement;
+        vertex1.Mass = calculateVertexMass(vertex1.PathsToNeutralElement);
 
         // Delete vertex2
         graphManager.RemoveVertex(vertex2);
@@ -326,8 +325,8 @@ public class CayleyGraphMaker : MonoBehaviour {
      * The mass is taken to be equal to the smalles branch of the vertex.
      **/
     public float calculateEdgeLength(GroupElement v1, GroupElement v2, char generator) {
-        List<string> pathsToIdentity1 = v1.GetPathsToNeutralElement();
-        List<string> pathsToIdentity2 = v2.GetPathsToNeutralElement();
+        List<string> pathsToIdentity1 = v1.PathsToNeutralElement;
+        List<string> pathsToIdentity2 = v2.PathsToNeutralElement;
         float length = float.MaxValue;
         foreach (string path in pathsToIdentity1) {
             float lengthCandidate = calculateScalingForGenerator(generator, path);
@@ -430,7 +429,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             edge.SetLength(calculateEdgeLength(edge.startPoint, edge.endPoint, edge.getGenerator()));
         }
         foreach (GroupElement vertex in graphManager.getVertex()) {
-            vertex.setMass(calculateVertexMass(vertex.GetPathsToNeutralElement()));
+            vertex.Mass = calculateVertexMass(vertex.PathsToNeutralElement);
         }
     }
 

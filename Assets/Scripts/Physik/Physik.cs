@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Unity.VisualScripting;
 
 public class Physik : MonoBehaviour {
     public float radius; // Size of the boundingBox
@@ -11,7 +12,7 @@ public class Physik : MonoBehaviour {
     [Range(0.0f, 20.0f)]
     public float repelForceFactor;
     [Range(0.0f, 20.0f)]
-    public float attractForceFactor;
+    public float linkForceFactor;
     [Range(0.0f, 20.0f)]
     public float angleForceFactor;
 
@@ -27,6 +28,7 @@ public class Physik : MonoBehaviour {
     Dictionary<char, Dictionary<char, int>> countedArrowAngles = new Dictionary<char, Dictionary<char, int>>();
     Dictionary<char, Dictionary<char, float>> averageArrowAngles = new Dictionary<char, Dictionary<char, float>>();
 
+    GraphManager graphManager;
 
     public Physik(float radius) {
         this.radius = radius;
@@ -54,18 +56,18 @@ public class Physik : MonoBehaviour {
 
 
     public void UpdatePh(GraphManager graphManager) {
+        this.graphManager = graphManager;
         if(generators == null) {
             return;
         }
-        geschwindigkeitenZurücksetzen(graphManager);
-        if (repelForceFactor != 0) calculateRepulsionForces(graphManager);
-        if (attractForceFactor != 0) calculateLinkForces(graphManager);
-        if (angleForceFactor != 0) calculateStress(graphManager);
+        geschwindigkeitenZurücksetzen();
+        if (repelForceFactor != 0) calculateRepulsionForces();
+        if (linkForceFactor != 0) calculateLinkForces();
+        if (angleForceFactor != 0) calculateStress();
 
-        updateVertices(graphManager);
+        updateVertices();
 
         // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
-
         if (actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
             actualMaximalForce -= usualMaximalForce * Time.deltaTime / shutDownTime;
         }
@@ -74,13 +76,14 @@ public class Physik : MonoBehaviour {
         }
     }
 
-    private void updateVertices(GraphManager vertexManager) {
-        foreach (GroupElement vertex in vertexManager.getVertex()) {
-            Vector3 force = vertex.repelForce + vertex.attractForce;
+    private void updateVertices() {
+        float velocityDecayForThisTomeStep = Mathf.Pow(velocityDecay, Time.deltaTime);
+        foreach (GroupElement vertex in graphManager.getVertex()) {
+            Vector3 force = vertex.RepelForce + vertex.LinkForce;
             force = Vector3.ClampMagnitude(force, actualMaximalForce);
-            vertex.velocity = vertex.velocity + force;
-            vertex.transform.position += vertex.velocity * Time.deltaTime;
-            vertex.velocity *= velocityDecay;
+            vertex.Velocity = vertex.Velocity + force;
+            vertex.transform.position += vertex.Velocity * Time.deltaTime;
+            vertex.Velocity *= velocityDecayForThisTomeStep;
             vertex.transform.position = Vector3.ClampMagnitude(vertex.transform.position, radius);
         }
     }
@@ -89,39 +92,39 @@ public class Physik : MonoBehaviour {
      * Sets the speed of all vertices to 0.
      * Also bounds th force by the maximal force.
      */
-    private void geschwindigkeitenZurücksetzen(GraphManager vertexManager) {
-        foreach (GroupElement vertex in vertexManager.getVertex()) {
-            vertex.attractForce = Vector3.zero;
-            vertex.repelForce = Vector3.zero;
+    private void geschwindigkeitenZurücksetzen() {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
+            vertex.LinkForce = Vector3.zero;
+            vertex.RepelForce = Vector3.zero;
         }
     }
 
     public float repulsionDistance;
 
-    private void calculateRepulsionForces(GraphManager vertexManager) {
+    private void calculateRepulsionForces() {
         // Every tick the BarnesQuadtree is recalculated. This is expensive but necessary since the vertices move.
         BarnesQuadtree bqb = new BarnesQuadtree(Vector2.zero, radius, precision, 0.1f);
-        foreach (GroupElement vertex in vertexManager.getVertex()) {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
             bqb.Add(vertex);
         }
         bqb.BerechneSchwerpunkt();
-        foreach (GroupElement vertex in vertexManager.getVertex()) {
+        foreach (GroupElement vertex in graphManager.getVertex()) {
             //float hyperbolicity = 
-            float ageFactor = Mathf.Max(1, (10 - 1) * (1 - vertex.age)); // Young vertices are repelled strongly
+            float ageFactor = Mathf.Max(1, (10 - 1) * (1 - vertex.Age)); // Young vertices are repelled strongly
             //vertex.repelForce -= ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex.transform.position + vertex.velocity*Time.deltaTime, repulsionDistance);
             Vector3 force = ageFactor * repelForceFactor * bqb.calculateRepulsionForceOnVertex(vertex, repulsionDistance);
-            vertex.repelForce = force;
+            vertex.RepelForce = force;
         }
     }
 
     public int stabilityIterations = 1;
-    private void calculateLinkForces(GraphManager graphManager) {
+    private void calculateLinkForces() {
         for (int i = 0; i < stabilityIterations; i++) {
             foreach (Edge edge in graphManager.GetKanten()) {
                 float ageFactor = Mathf.Max(1, (10 - 1) * (1 - edge.age)); // Young edges are strong
                 Vector3 force = calculateLinkForce(edge);
-                edge.startPoint.attractForce += ageFactor * attractForceFactor * force;
-                edge.endPoint.attractForce -= ageFactor * attractForceFactor * force;
+                edge.startPoint.LinkForce = edge.startPoint.LinkForce + ageFactor * linkForceFactor * force;
+                edge.endPoint.LinkForce = edge.endPoint.LinkForce-ageFactor * linkForceFactor * force;
             }
         }
     }
@@ -134,15 +137,15 @@ public class Physik : MonoBehaviour {
     /**
      * Calculates the stress of a vertex. The stress is a measure of how unusual the angles of the vertex are. It is used to visualize weird spots.
      **/
-    private void calculateStress(GraphManager graphManager) {
+    private void calculateStress() {
         if (currentIteration == 0) {
-            calculateAverageAngles(graphManager);
+            calculateAverageAngles();
             currentIteration = arrowAverageRecalculationIteration;
         }
         currentIteration--;
 
         foreach (GroupElement vertex in graphManager.getVertex()) {
-            vertex.stress = 0;
+            vertex.Stress = 0;
             foreach (char gen1 in generators) {
                 foreach (char gen2 in generators) {
                     GroupElement vertex1 = graphManager.followEdge(vertex, gen1);
@@ -150,7 +153,7 @@ public class Physik : MonoBehaviour {
 
                     if (gen1 != gen2 && vertex1 != null && vertex2 != null && vertex1.name != vertex2.name) {
                         Vector3 force = angleForceFactor * calculateAverageAngleForceBetweenTwoVertices(vertex, vertex1, vertex2, averageArrowAngles[gen1][gen2]);
-                        vertex.stress += force.magnitude;
+                        vertex.Stress += force.magnitude;
                     }
                 }
             }
@@ -161,7 +164,7 @@ public class Physik : MonoBehaviour {
     /**
      * Goes over each pair of angles and calculates theirs averages. This is done once per recalculationIteration to reduce the number of calculations.
      **/
-    private void calculateAverageAngles(GraphManager graphManager) {
+    private void calculateAverageAngles() {
         foreach (char gen1 in generators) {
             foreach (char gen2 in generators) {
                 countedArrowAngles[gen1][gen2] = 0;
@@ -172,7 +175,7 @@ public class Physik : MonoBehaviour {
                     GroupElement vertex1 = graphManager.followEdge(vertex, gen1);
                     GroupElement vertex2 = graphManager.followEdge(vertex, gen2);
 
-                    if (vertex1 != null && vertex2 != null && vertex1.id != vertex2.id) {
+                    if (vertex1 != null && vertex2 != null && vertex1.Id != vertex2.Id) {
                         // Thing is calculated twice, this can be optimized
                         sumArrowAngles[gen1][gen2] += Vector3.Angle(vertex1.transform.position - vertex.transform.position, vertex2.transform.position - vertex.transform.position);
                         countedArrowAngles[gen1][gen2] += 1;
@@ -201,13 +204,14 @@ public class Physik : MonoBehaviour {
     private Vector3 calculateLinkForce(Edge edge) {
         GroupElement source = edge.startPoint;
         GroupElement target = edge.endPoint;
-        Vector3 diff = target.transform.position + target.velocity * Time.deltaTime - source.transform.position - source.velocity * Time.deltaTime;
+        Vector3 diff = target.transform.position + target.Velocity * Time.deltaTime - source.transform.position - source.Velocity * Time.deltaTime;
         // Wenn die zwei Knoten aufeinander liegen, dann bewege sie ein bisschen auseinander.
         if (diff == Vector3.zero) {
             diff = 0.05f * UnityEngine.Random.insideUnitSphere;
         }
         float mag = diff.magnitude;
-        return (mag - edge.GetLength()) / mag * diff;
+        int vertexCount = graphManager.getVertex().Count; // The idea is the following. In a normal graph the edges of a graph grow with the number of vertices. To simulate this effekt the link force is multiplied by the number of vertices.
+        return (mag - edge.GetLength()) / mag * diff * Mathf.Sqrt(vertexCount);
     }
 
     public void startUp() {

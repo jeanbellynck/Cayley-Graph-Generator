@@ -3849,8 +3849,7 @@ MonoBehaviour:
   radius: 200
   precision: 10
   repelForceFactor: 0.5
-  attractForceFactor: 1
-  oppositeForceFactor: 0
+  attractForceFactor: 0.1
   angleForceFactor: 0
   usualMaximalForce: 10
   actualMaximalForce: 10
