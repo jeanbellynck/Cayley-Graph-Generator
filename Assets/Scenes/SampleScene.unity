@@ -955,6 +955,7 @@ GameObject:
   - component: {fileID: 162340281}
   - component: {fileID: 162340280}
   - component: {fileID: 162340279}
+  - component: {fileID: 162340283}
   m_Layer: 5
   m_Name: Vertex Count Input
   m_TagString: Untagged
@@ -1089,6 +1090,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 360, y: 50}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &162340283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162340278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1 &174354380
 GameObject:
   m_ObjectHideFlags: 0
@@ -4626,6 +4640,7 @@ GameObject:
   - component: {fileID: 994683913}
   - component: {fileID: 994683912}
   - component: {fileID: 994683911}
+  - component: {fileID: 994683914}
   m_Layer: 5
   m_Name: GeneratorInput
   m_TagString: Untagged
@@ -4772,6 +4787,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 994683909}
   m_CullTransparentMesh: 1
+--- !u!114 &994683914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 994683909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1 &999882193
 GameObject:
   m_ObjectHideFlags: 0
@@ -6740,6 +6768,7 @@ GameObject:
   - component: {fileID: 1536507753}
   - component: {fileID: 1536507752}
   - component: {fileID: 1536507751}
+  - component: {fileID: 1536507754}
   m_Layer: 5
   m_Name: RelatorInput
   m_TagString: Untagged
@@ -6886,6 +6915,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536507749}
   m_CullTransparentMesh: 1
+--- !u!114 &1536507754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1536507749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1 &1628554651
 GameObject:
   m_ObjectHideFlags: 0
@@ -8241,6 +8283,7 @@ GameObject:
   - component: {fileID: 2125541694}
   - component: {fileID: 2125541693}
   - component: {fileID: 2125541692}
+  - component: {fileID: 2125541695}
   m_Layer: 5
   m_Name: Hyperbolic Scaling Input
   m_TagString: Untagged
@@ -8387,6 +8430,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2125541690}
   m_CullTransparentMesh: 1
+--- !u!114 &2125541695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125541690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1001 &5150167390910525982
 PrefabInstance:
   m_ObjectHideFlags: 0
