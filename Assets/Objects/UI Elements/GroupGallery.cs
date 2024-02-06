@@ -38,7 +38,8 @@ public class GroupGallery : MonoBehaviour
         new Group("F", "Thompson group F", "a; b", "[aB, Aba]; [aB, AABaa]"),
         new Group("²F<sub>4</sub>(2)'", "Tits group", "a; b", "a^2; b^3; (ab)^13; [a, b]^5, [a, bab]^4, ((ab)^4aB)^6"),
         //new RandomGroup(),
-        new Group("?", "???", "a; b; c", "aaa; bbb; ccc; abAbA; acab")
+        new Group("?", "???", "a; b; c", "aaa; bbb; ccc; abAbA; acab"),
+        new RandomGraphGroup(),
     };
     
     
