@@ -12,10 +12,11 @@ public class Physik : MonoBehaviour {
     [Range(0.0f, 20.0f)]
     public float angleForceFactor;
 
-    public float usualMaximalForce = 10;
     // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
-    public float actualMaximalForce = 10;
-    public float shutDownTime = 5;
+    private float alpha = 1;
+    public float alphaSetting = 1;
+    
+    public float alphaDecay = 0.1f;
 
     public float velocityDecay = 0.9f;
 
@@ -33,7 +34,7 @@ public class Physik : MonoBehaviour {
 
     public void startUp(GraphManager graphManager) {
         this.graphManager = graphManager;
-        actualMaximalForce = usualMaximalForce;
+        alpha = alphaSetting;
         //dim = 2*generators.Length + 1;
         StartCoroutine(LoopPhysics());
     }
@@ -51,18 +52,11 @@ public class Physik : MonoBehaviour {
             dim = graphManager.getDim();
             
             geschwindigkeitenZurücksetzen();
-            yield return repulsionForce.ApplyForce(graphManager, 1);
-            yield return linkForce.ApplyForce(graphManager, 1);
+            yield return repulsionForce.ApplyForce(graphManager, alpha);
+            yield return linkForce.ApplyForce(graphManager, alpha);
             updateVertices();
 
             // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
-            /**
-            if (actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
-                actualMaximalForce -= usualMaximalForce * Time.deltaTime / shutDownTime;
-            }
-            if (actualMaximalForce < 0) {
-                actualMaximalForce = 0;
-            }**/
             yield return null;
         }
     }
@@ -100,10 +94,24 @@ public class Physik : MonoBehaviour {
     /** 
     * Slowly reduces the maximal force to 0. This is used to stop the simulation.
     */
-    /**
     public void shutDown() {
-        actualMaximalForce -= 0.01f;
+        alpha -= 0.01f;
+        
+            /**
+            if (actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
+                actualMaximalForce -= usualMaximalForce * Time.deltaTime / shutDownTime;
+            }
+            if (actualMaximalForce < 0) {
+                actualMaximalForce = 0;
+            }**/
         StopAllCoroutines();
     }
-    **/
+
+    public IEnumerator decayAlpha() {
+        while(alpha > 0) {
+            alpha -= alphaDecay * Time.deltaTime;
+            yield return null;
+        }
+        alpha = 0;
+    }
 }

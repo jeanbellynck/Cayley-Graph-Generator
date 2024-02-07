@@ -28,6 +28,8 @@ public class CayleyGraphMaker : MonoBehaviour {
     public GameObject edgePrefab;
     public Color[] colourList = new Color[] { new Color(255, 0, 0), new Color(0, 0, 255), new Color(0, 255, 0), new Color(255, 255, 0) };
 
+    private int simulationDimensionality = 3;
+
 
     // Contains the references to all vertices on the border of the graph, sorted by distance to the center.
     List<List<GroupVertex>> randKnoten = new List<List<GroupVertex>>();
@@ -35,11 +37,12 @@ public class CayleyGraphMaker : MonoBehaviour {
     HashSet<GroupVertex> relatorCandidates = new HashSet<GroupVertex>();
     HashSet<GroupVertex> edgeMergeCandidates = new HashSet<GroupVertex>();
 
-    public void StartVisualization(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators) {
+    public void StartVisualization(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators, int dimension) {
         this.graphManager = graphManager;
         this.meshManager = meshManager;
         this.generators = generators;
         this.relators = relators;
+        this.simulationDimensionality = dimension;
         operators = new char[2 * generators.Length];
 
         for (int i = 0; i < generators.Length; i++) {
@@ -58,7 +61,6 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         //int simulationDimensionality = 2*generators.Length + 1;
-        int simulationDimensionality = 3;
         GroupVertex neutralElement = neutralElementGameObject.GetComponent<GroupVertex>();
         neutralElement.Position = VectorN.Zero(simulationDimensionality);
         neutralElement.Velocity = VectorN.Zero(simulationDimensionality);
@@ -125,7 +127,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         DrawMesh();
-        //physik.shutDown();
+        StartCoroutine(physik.decayAlpha());
     }
 
 
@@ -133,10 +135,10 @@ public class CayleyGraphMaker : MonoBehaviour {
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
-        
-        
-        
-        
+
+
+
+
 
         // Vertex is not the neutral element and an edge need to be created
         GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
@@ -444,5 +446,4 @@ public class CayleyGraphMaker : MonoBehaviour {
     public void setGenerators(char[] generators) {
         this.generators = generators;
     }
-
 }

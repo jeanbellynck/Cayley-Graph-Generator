@@ -42,6 +42,7 @@ public class Vertex : MonoBehaviour {
     }
 
     public void Initialize(VectorN position) {
+        age = 0;
         this.position = position;
         velocity = VectorN.Zero(position.Size());
         linkForce = VectorN.Zero(position.Size());

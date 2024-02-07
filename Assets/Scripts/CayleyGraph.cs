@@ -63,6 +63,7 @@ public class CayleyGraph : MonoBehaviour {
     public GameObject vertexNumberInputField;
     public GameObject hyperbolicityInputField;
     public GameObject hyperbolicityMatrix;
+    public GameObject dimensionInputField;
 
 
     public void generateButton() {
@@ -86,7 +87,12 @@ public class CayleyGraph : MonoBehaviour {
     public void StartVisualization() {
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
         graphManager.Initialize(generators);
-        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators);
+        string dimensionString = dimensionInputField.GetComponent<UnityEngine.UI.InputField>().text;
+        int dimension = 3;
+        if(int.TryParse(dimensionString, out int dimensionValue) && dimension > 0) {
+            dimension = dimensionValue;
+        } 
+        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, dimension);
         physik.startUp(graphManager);
     }
 
