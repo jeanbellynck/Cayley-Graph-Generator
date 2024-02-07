@@ -3847,18 +3847,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 100
-  precision: 10
-  repelForceFactor: 1
-  linkForceFactor: 1
   angleForceFactor: 0
   usualMaximalForce: 10
   actualMaximalForce: 10
   shutDownTime: 10
-  velocityDecay: 0.1
-  barnesQuadTreeMinimalCellSize: 1
-  repulsionDistance: 100
-  stabilityIterations: 2
-  arrowAverageRecalculationIteration: 0
+  velocityDecay: 0.6
+  repulsionForce:
+    repelForceFactor: 0
+    barnesQuadTreeMinimalDistance: 0
+    barnesQuadTreeMaximalDistance: 0
+    QuadTreeTheta: 0
+    radius: 0
+    maximalForce: 0
+  linkForce:
+    linkForceFactor: 0
+    stabilityIterations: 0
+  timeStep: 0.25
 --- !u!114 &772353318
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -72,6 +72,7 @@ public class CayleyGraph : MonoBehaviour {
     }
 
     public void StopVisualization() {
+        physik.StopAllCoroutines();
         cayleyGraphMaker.StopVisualization();
         // Destroy Mesh Objects
         ICollection<MeshGenerator> meshes = meshManager.GetMeshes();

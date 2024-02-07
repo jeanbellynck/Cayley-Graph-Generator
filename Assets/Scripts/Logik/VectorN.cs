@@ -161,6 +161,9 @@ public struct VectorN {
         for (int i = 0; i < dim; i++) {
             result[i] = UnityEngine.Random.Range(-radius, radius);
         }
+        if(result.MagnitudeSquared() == 0) {
+            return Random(dim, radius);
+        }
         return result;
     }
 

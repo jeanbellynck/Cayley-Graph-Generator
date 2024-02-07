@@ -4,6 +4,7 @@ using UnityEngine;
 public class Vertex : MonoBehaviour {
     [SerializeField]
     private VectorN position;
+    private VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
      private VectorN velocity; // This is the previous position of the vertex. It is used to calculate the forces using the improved euler method.
     private int id;
     private float age = 0;
@@ -42,6 +43,7 @@ public class Vertex : MonoBehaviour {
 
     public void Initialize(VectorN position) {
         this.position = position;
+        velocity = VectorN.Zero(position.Size());
         linkForce = VectorN.Zero(position.Size());
         repelForce = VectorN.Zero(position.Size());
     }
@@ -49,7 +51,6 @@ public class Vertex : MonoBehaviour {
     // Update is called once per frame
     public virtual void Update() {
         age += Time.deltaTime;
-        transform.position = VectorN.ToVector3(position);
     }
 
 

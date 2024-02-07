@@ -76,6 +76,9 @@ public class BarnesQuadtree {
 
     private bool punktInBounds(Vertex vertex) {
         VectorN punkt = vertex.Position;
+        if(float.IsNaN(punkt[0])) {
+            return false;
+        }
         for (int i = 0; i < dim; i++) {
             if (punkt[i] < position[i] - radius || punkt[i] >= position[i] + radius) {
                 return false;
@@ -167,7 +170,7 @@ public class BarnesQuadtree {
      * Does the same as above but uses the center of mass of the cube instead of a second vertex
      **/
     private VectorN CalculateForce(VectorN diff, float distanceSquared) {
-        return diff.Multiply((-1) * mass / distanceSquared);
+        return diff.Normalize().Multiply((-1) * mass / distanceSquared);
     }
 
     private VectorN quadrantToVector(int[] quadrant) {

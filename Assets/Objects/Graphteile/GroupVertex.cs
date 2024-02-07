@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UnityEngine;
 
 public class GroupVertex : Vertex {
@@ -33,10 +34,11 @@ public class GroupVertex : Vertex {
 
         GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
         if (prepredecessor != null) {
-            Position = predecessor.Position + (predecessor.Position - prepredecessor.Position + VectorN.Random(predecessor.Position.Size(), 0.1f)) * hyperbolicScaling;
+            VectorN diff = predecessor.Position - prepredecessor.Position;
+            Position = predecessor.Position + hyperbolicScaling * (diff.Normalize()*hyperbolicScaling + VectorN.Random(predecessor.Position.Size(), 0.1f));
         }
         else {
-            Position = predecessor.Position + hyperbolicScaling * VectorN.Random(predecessor.Position.Size(), 1);
+            Position = predecessor.Position +  VectorN.Random(predecessor.Position.Size(), hyperbolicScaling);
         }
         Velocity = VectorN.Zero(Position.Size());
         transform.position = VectorN.ToVector3(Position);
@@ -50,8 +52,7 @@ public class GroupVertex : Vertex {
     }
 
     public void Merge(GroupVertex vertex2) {
-        Position = (Position + vertex2.Position) / 2;
-        Velocity = VectorN.Zero(Position.Size());
+        base.Initialize((Position + vertex2.Position) / 2);
         foreach(string path in vertex2.PathsToNeutralElement) {
             AddPathToNeutralElement(path);
         }

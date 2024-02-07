@@ -7,21 +7,26 @@ using UnityEngine.Profiling;
 
 [System.Serializable]
 public class RepulsionForce : Force {
+    [SerializeField]
     public float repelForceFactor;
-    public float barnesQuadTreeMinimalDistance = 0.5f;
-    public float barnesQuadTreeMaximalDistance = 50;
-    public float QuadTreeTheta = 50; // Used by the QuadTree. Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. 
-    private float radius; // The radius of the BarnesQuadtree. This is the maximal distance between two points in the BarnesQuadtree. This is used to calculate the repulsion force.
-    public float maximalForce = 10;
+    [SerializeField]
+    public float barnesQuadTreeMinimalDistance;
+    [SerializeField]
+    public float barnesQuadTreeMaximalDistance;
+    [SerializeField]
+    public float QuadTreeTheta; // Used by the QuadTree. Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. 
+    [SerializeField]
+    public float radius; // The radius of the BarnesQuadtree. This is the maximal distance between two points in the BarnesQuadtree. This is used to calculate the repulsion force.
+    public float maximalForce;
 
-
-    public RepulsionForce(float repelForceFactor, float repulsionDistance, float radius, float maximalForce) {
+    public RepulsionForce(float radius, float repelForceFactor = 1.5f, float barnesQuadTreeMinimalDistance = 0.5f, float barnesQuadTreeMaximalDistance = 100, float QuadTreeTheta = 0.9f, float maximalForce = 10) {
         this.repelForceFactor = repelForceFactor;
-        this.barnesQuadTreeMinimalDistance = repulsionDistance;
+        this.barnesQuadTreeMinimalDistance = barnesQuadTreeMinimalDistance;
+        this.barnesQuadTreeMaximalDistance = barnesQuadTreeMaximalDistance;
+        this.QuadTreeTheta = QuadTreeTheta;
         this.radius = radius;
         this.maximalForce = maximalForce;
     }
-
 
     public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
         if(repelForceFactor == 0 || alpha == 0) yield return null;
@@ -33,16 +38,15 @@ public class RepulsionForce : Force {
         bqb.BerechneSchwerpunkt();
 
         int vertexIndex = 0;
-        int vertexPerBatch = 200;
+        int vertexPerBatch = 400;
         List<Vertex> vertices = graphManager.getVertex();
         while(vertexIndex < vertices.Count) {
             yield return null;
             vertices = graphManager.getVertex(); // Since simulation goes over multiple frames the vertices might have changed, so we have to fetch them every frame.
             for(int i = vertexIndex; i < Math.Min(vertexIndex+vertexPerBatch, vertices.Count); i++) {
                 Vertex vertex = vertices[i];
-                float ageFactor = Mathf.Max(1, (10 - 1) * (1 - vertex.Age)); // Young vertices are repelled strongly
                 Profiler.BeginSample("calculateRepulsionForceOnVertex");
-                VectorN force = vertex.Mass * ageFactor * repelForceFactor * alpha * bqb.calculateRepulsionForceOnVertex(vertex);
+                VectorN force = vertex.Mass * repelForceFactor * alpha * bqb.calculateRepulsionForceOnVertex(vertex);
                 Profiler.EndSample();
                 force = force.ClampMagnitude(maximalForce);
                 vertex.RepelForce = force;

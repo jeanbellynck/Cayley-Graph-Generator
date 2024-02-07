@@ -10,10 +10,6 @@ public class Physik : MonoBehaviour {
     private int dim;
 
     [Range(0.0f, 20.0f)]
-    public float repelForceFactor;
-    [Range(0.0f, 20.0f)]
-    public float linkForceFactor;
-    [Range(0.0f, 20.0f)]
     public float angleForceFactor;
 
     public float usualMaximalForce = 10;
@@ -31,8 +27,8 @@ public class Physik : MonoBehaviour {
     LinkForce linkForce;
 
     public void Start() {
-        repulsionForce = new RepulsionForce(repelForceFactor, 50, radius, actualMaximalForce);
-        linkForce = new LinkForce(linkForceFactor);
+        repulsionForce = new RepulsionForce(radius);
+        linkForce = new LinkForce();
     }
 
     public void startUp(GraphManager graphManager) {
@@ -40,6 +36,14 @@ public class Physik : MonoBehaviour {
         actualMaximalForce = usualMaximalForce;
         //dim = 2*generators.Length + 1;
         StartCoroutine(LoopPhysics());
+    }
+
+    public void Update() {
+        if(graphManager== null) return;
+        foreach(Vertex vertex in graphManager.getVertex()) {
+            UnityEngine.Vector3 velocity = VectorN.ToVector3(vertex.Velocity);
+            vertex.transform.position += velocity * Time.deltaTime;
+        }
     }
 
     public IEnumerator LoopPhysics() {
@@ -63,13 +67,16 @@ public class Physik : MonoBehaviour {
         }
     }
 
+    public float timeStep = 0.25f;
+
     private void updateVertices() {
+        float realVelocityDecay = Mathf.Pow(velocityDecay, timeStep);
         foreach (Vertex vertex in graphManager.getVertex()) {
-            VectorN force = vertex.RepelForce + vertex.LinkForce;
-            vertex.Position += vertex.Velocity * Time.deltaTime + 0.5f * force * Time.deltaTime * Time.deltaTime;
-            vertex.Position = vertex.Position.ClampMagnitude(radius);
-            vertex.Velocity *= Mathf.Pow(velocityDecay, Time.deltaTime);
-            vertex.Velocity += force * Time.deltaTime;
+            float ageFactor = Mathf.Max(1, (3 - 1) * (1 - vertex.Age)); // Young vertices are strong
+            VectorN force = ageFactor * (vertex.RepelForce + vertex.LinkForce); 
+            vertex.Position += vertex.Velocity * timeStep + 0.5f * force * timeStep * timeStep;
+            vertex.Velocity += force * timeStep;
+            vertex.Velocity *= realVelocityDecay;
         }
     }
 
@@ -82,6 +89,9 @@ public class Physik : MonoBehaviour {
         foreach (Vertex vertex in graphManager.getVertex()) {
             vertex.LinkForce = VectorN.Zero(dim);
             vertex.RepelForce = VectorN.Zero(dim);
+            vertex.Velocity = vertex.Velocity.ClampMagnitude(radius/10);
+            vertex.Position = vertex.Position.ClampMagnitude(radius);
+            vertex.transform.position = VectorN.ToVector3(vertex.Position);
         }
     }
 
