@@ -51,11 +51,12 @@ public class Physik : MonoBehaviour {
         while(true) {
             dim = graphManager.getDim();
             
+            if(alpha != 0) {
             geschwindigkeitenZurücksetzen();
             yield return repulsionForce.ApplyForce(graphManager, alpha);
             yield return linkForce.ApplyForce(graphManager, alpha);
             updateVertices();
-
+            }
             // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
             yield return null;
         }
