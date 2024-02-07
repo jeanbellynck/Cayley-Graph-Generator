@@ -101,34 +101,49 @@ public class Vertex : MonoBehaviour {
     public float splineDirectionFactor = 0.2f;
     public float orthogonalSplineDirectionFactor = 0.1f;
     Vector3 oldRandomDirection = Vector3.up;
-    public Vector3 CalculateSplineDirection(char generator, Vector3 @new) {
+    public Vector3 CalculateSplineDirection(char generator, Vector3 direction) {
 
         if (splineDirections.TryGetValue(generator, out var result))
             return result;
 
-        result = @new * splineDirectionFactor;
+        result = direction * splineDirectionFactor;
+        var expectedLengthSquared = result.sqrMagnitude;
         char inverseGenerator = RelatorDecoder.invertGenerator(generator);
 
         bool otherDirectionAlreadyComputed = splineDirections.TryGetValue(inverseGenerator, out var oldResult);
         if (otherDirectionAlreadyComputed)
             result = 0.5f * (result + oldResult);
 
-        if (result.sqrMagnitude < 0.01f) { 
-            // If in- and outgoing splines for this generator are exactly opposite (a^2 = 1), set direction to an orthogonal vector, so that the two edges are not exactly parallel
-            if (Vector3.Angle(@new, oldRandomDirection) is < 91f and > 89f)
-                result = oldRandomDirection;
-            else {
-                do result = Vector3.Cross(Random.onUnitSphere, @new);
-                while (result.sqrMagnitude < 0.01f);
-                oldRandomDirection = result;
-            }
+        // If in- and outgoing splines for this generator are exactly opposite (a^2 = 1), set direction to an orthogonal vector, so that the two edges are not exactly parallel
+        if (result.sqrMagnitude < 0.005f * expectedLengthSquared)
+            result = RandomOrthogonalDirection();
 
-            result = @new.magnitude * orthogonalSplineDirectionFactor * result.normalized;
-        }
         splineDirections[generator] = result;
         if (otherDirectionAlreadyComputed)
             splineDirections[inverseGenerator] = result;
         return result;
+
+        Vector3 RandomOrthogonalDirection()
+        {
+            Vector3 randVector;
+            float angle = Vector3.Angle(direction, oldRandomDirection);
+            switch (angle)
+            {
+                case < 91f and > 89f:
+                    randVector = oldRandomDirection;
+                    break;
+                case < 175f and > 5f:
+                    randVector = Vector3.ProjectOnPlane(oldRandomDirection, direction.normalized);
+                    break;
+                default:
+                    do randVector = Vector3.Cross(Random.onUnitSphere, direction);
+                    while (randVector.sqrMagnitude < 0.005f * expectedLengthSquared);
+                    oldRandomDirection = randVector;
+                    break;
+            }
+
+            return direction.magnitude * orthogonalSplineDirectionFactor * randVector.normalized;
+        }
     }
 
     public void removeEdge(Edge edge) {

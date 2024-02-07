@@ -101,20 +101,20 @@ public class Edge : MonoBehaviour
         Vector3 endDirection = endPoint.CalculateSplineDirection(RelatorDecoder.invertGenerator(generator), vector);
 
         Vector3 midDisplacementDirectionNonOrthogonal = startDirection - endDirection;
-        Vector3 midDisplacementDirection = Vector3.ProjectOnPlane( midDisplacementDirectionNonOrthogonal, vector);
+        Vector3 midDisplacementDirection = Vector3.ProjectOnPlane( midDisplacementDirectionNonOrthogonal, vector.normalized);
         float l = midDisplacementDirection.magnitude;
         float lambda = MathF.Sqrt(startDirection.sqrMagnitude + endDirection.sqrMagnitude);
         // overly complicated (and non-working) way to get a random vector orthogonal to vector and not needed bc. the midDisplacement doesn't have to be large.
         //while (l < 0.1 * lambda) {
         //    // replace by random vector (take old random vector if nothing changed)
         //    if ((vectorForOldRandomMidDisplacement - midDisplacementDirectionNonOrthogonal).sqrMagnitude > 0.01) {
-        //        oldRandomMidDisplacement = Vector3.ProjectOnPlane(Random.insideUnitSphere, vector);
+        //        oldRandomMidDisplacement = Vector3.ProjectOnPlane(Random.insideUnitSphere, vector.normalized);
         //        vectorForOldRandomMidDisplacement = vector;
         //    }
         //    midDisplacementDirection += oldRandomMidDisplacement;
         //    l = midDisplacementDirection.magnitude;
         //}
-        Vector3 midDisplacementVector = midDisplacementFactor * MidDisplacementScaling(l/lambda) / l * midDisplacementDirection;
+        Vector3 midDisplacementVector = l > 0.001f ? midDisplacementFactor * MidDisplacementScaling(l/lambda) / l * midDisplacementDirection : Vector3.zero;
         Vector3 midPosition = startPosition + 0.5f * vector + midDisplacementVector;
         Vector3 midDirection = (vector - endDirection - startDirection) * midDirectionFactor; 
         // this is approximately the vector from the "corner" of the spline after the start to the "corner" before the end
