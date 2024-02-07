@@ -3846,15 +3846,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6beeb79a63b2404793fcf7ed1aafa2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 200
+  radius: 100
   precision: 10
-  repelForceFactor: 0.5
-  linkForceFactor: 0.5
+  repelForceFactor: 1
+  linkForceFactor: 1
   angleForceFactor: 0
   usualMaximalForce: 10
   actualMaximalForce: 10
   shutDownTime: 10
-  velocityDecay: 0.001
+  velocityDecay: 0.1
+  barnesQuadTreeMinimalCellSize: 1
   repulsionDistance: 100
   stabilityIterations: 2
   arrowAverageRecalculationIteration: 0

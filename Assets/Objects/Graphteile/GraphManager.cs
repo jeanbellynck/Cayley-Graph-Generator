@@ -13,7 +13,7 @@ public class GraphManager : MonoBehaviour {
     public void Initialize(char[] generators) {
     }
 
-    public ICollection<Vertex> getVertex() {
+    public List<Vertex> getVertex() {
         return vertices;
     }
 
@@ -67,5 +67,17 @@ public class GraphManager : MonoBehaviour {
 
     public List<Edge> GetEdges() {
         return edges;
+    }
+
+    public int getDim() {
+        if(vertices.Count > 0) {
+            return vertices[0].Position.Size();
+        } else {
+            return 0;
+        }
+    }
+
+    public int GetVertexCount() {
+        return vertices.Count;
     }
 }

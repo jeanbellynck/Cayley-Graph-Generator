@@ -27,8 +27,20 @@ public class GroupVertex : Vertex {
         Mr.material.color = new Color(stress, 0, 0);
     }
 
-    public void InitializeFromPredecessor(GroupVertex predecessor, char op) {
+    public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
+        base.Initialize(predecessor.Position);
         name = predecessor.name + op;
+
+        GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
+        if (prepredecessor != null) {
+            Position = predecessor.Position + (predecessor.Position - prepredecessor.Position + VectorN.Random(predecessor.Position.Size(), 0.1f)) * hyperbolicScaling;
+        }
+        else {
+            Position = predecessor.Position + hyperbolicScaling * VectorN.Random(predecessor.Position.Size(), 1);
+        }
+        Velocity = VectorN.Zero(Position.Size());
+        transform.position = VectorN.ToVector3(Position);
+
         DistanceToNeutralElement = predecessor.DistanceToNeutralElement + 1;
         List<string> pathsToNeutralElement = predecessor.PathsToNeutralElement;
         foreach (string path in pathsToNeutralElement) {
@@ -38,6 +50,8 @@ public class GroupVertex : Vertex {
     }
 
     public void Merge(GroupVertex vertex2) {
+        Position = (Position + vertex2.Position) / 2;
+        Velocity = VectorN.Zero(Position.Size());
         foreach(string path in vertex2.PathsToNeutralElement) {
             AddPathToNeutralElement(path);
         }
@@ -87,5 +101,15 @@ public class GroupVertex : Vertex {
 
     public void AddPathsToNeutralElement(List<string> paths) {
         pathsToNeutralElement.AddRange(paths);
+    }
+
+    
+    public char ToggleCase(char c) {
+        if (char.IsUpper(c)) {
+            return char.ToLower(c);
+        }
+        else {
+            return char.ToUpper(c);
+        }
     }
 }

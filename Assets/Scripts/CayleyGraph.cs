@@ -32,8 +32,7 @@ public class CayleyGraph : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        physik.UpdatePh(graphManager);
-    }  
+    }
 
     public void setGenerators(string generatorString) {
         generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
@@ -85,10 +84,9 @@ public class CayleyGraph : MonoBehaviour {
 
     public void StartVisualization() {
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
-        physik.startUp();
-        physik.setGenerators(generators);
         graphManager.Initialize(generators);
         cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators);
+        physik.startUp(graphManager);
     }
 
 

@@ -1,35 +1,35 @@
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 
 public class BarnesQuadtree {
 
     // Konstruktorvariablen
-    private Vector3 position;
+    private VectorN position;
     private float radius; // Radius of the BarnesQuadbaum cube.
 
     // Baumvariablen
-    private BarnesQuadtree not;
-    private BarnesQuadtree nwt;
-    private BarnesQuadtree swt;
-    private BarnesQuadtree sot;
-    private BarnesQuadtree nob;
-    private BarnesQuadtree nwb;
-    private BarnesQuadtree swb;
-    private BarnesQuadtree sob;
+    private BarnesQuadtree[] subtrees;
     private List<Vertex> points = new List<Vertex>();
-    public Vector3 schwerpunkt;
+    public VectorN schwerpunkt;
     public float mass; // Mass is somewhat misleading since the points repel each other.
-    private float precision; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. 
-    private float maximalCubeSize; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
+    private float thetaSquared; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. Is apparently usually set to a value 0.9
+    private float minimalDistanceSquared; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
+    private float maximalDistanceSquared;
     private bool isLeaf = true;
+    private int dim = 3;
 
-    public BarnesQuadtree(Vector3 position, float radius, float präzision, float maximalCubeSize) {
+    public BarnesQuadtree(VectorN position, float radius, float theta, float minimalDistanceSquared, float maximalDistanceSquared) {
         this.position = position;
         this.radius = radius;
-        this.precision = präzision;
-        this.maximalCubeSize = maximalCubeSize;
+        this.thetaSquared = theta;
+        this.minimalDistanceSquared = minimalDistanceSquared;
+        this.maximalDistanceSquared = maximalDistanceSquared;
         this.mass = 0;
+        dim = position.Size();
     }
 
     public void Add(List<Vertex> points) {
@@ -42,12 +42,9 @@ public class BarnesQuadtree {
      * Originally this took points instead of vertices as a parameter. However, this has been changed because I wanted to compare points by id and not by value (which could shift after calculations).
      **/
     public void Add(Vertex punkt) {
-        if(punkt.Mass <= 0) {
-            throw new System.Exception("The mass of the vertex is smaller than 0. This is not allowed.");
-        }
         if (punktInBounds(punkt)) {
             // If this cube is empty or splitting it would result in a cube smaller than maximalCubeSize, then the point is added to this cube.
-            if (mass == 0 || radius < maximalCubeSize) {
+            if (mass == 0 || radius < minimalDistanceSquared) {
                 points.Add(punkt);
             }
             else {
@@ -55,14 +52,9 @@ public class BarnesQuadtree {
                     // This cube is a leaf. The cube is split up. All points inside this cube are added to the subcubes.
                     Teile();
                 }
-                not.Add(punkt);
-                nwt.Add(punkt);
-                swt.Add(punkt);
-                sot.Add(punkt);
-                nob.Add(punkt);
-                nwb.Add(punkt);
-                swb.Add(punkt);
-                sob.Add(punkt);
+                foreach (BarnesQuadtree subtree in subtrees) {
+                    subtree.Add(punkt);
+                }
             }
             mass += punkt.Mass;
         }
@@ -70,101 +62,76 @@ public class BarnesQuadtree {
 
     public void Teile() {
         isLeaf = false;
-        not = new BarnesQuadtree(position + radius / 2 * (Vector3.up + Vector3.right + Vector3.forward), radius / 2, precision, maximalCubeSize);
-        nwt = new BarnesQuadtree(position + radius / 2 * (Vector3.up + Vector3.left + Vector3.forward), radius / 2, precision, maximalCubeSize);
-        swt = new BarnesQuadtree(position + radius / 2 * (Vector3.down + Vector3.left + Vector3.forward), radius / 2, precision, maximalCubeSize);
-        sot = new BarnesQuadtree(position + radius / 2 * (Vector3.down + Vector3.right + Vector3.forward), radius / 2, precision, maximalCubeSize);
-        nob = new BarnesQuadtree(position + radius / 2 * (Vector3.up + Vector3.right + Vector3.back), radius / 2, precision, maximalCubeSize);
-        nwb = new BarnesQuadtree(position + radius / 2 * (Vector3.up + Vector3.left + Vector3.back), radius / 2, precision, maximalCubeSize);
-        swb = new BarnesQuadtree(position + radius / 2 * (Vector3.down + Vector3.left + Vector3.back), radius / 2, precision, maximalCubeSize);
-        sob = new BarnesQuadtree(position + radius / 2 * (Vector3.down + Vector3.right + Vector3.back), radius / 2, precision, maximalCubeSize);
-        not.Add(points);
-        nwt.Add(points);
-        swt.Add(points);
-        sot.Add(points);
-        nob.Add(points);
-        nwb.Add(points);
-        swb.Add(points);
-        sob.Add(points);
+        subtrees = new BarnesQuadtree[(int)Mathf.Pow(2, dim)];
+        for (int i = 0; i < subtrees.Length; i++) {
+            int[] quadrant = new int[dim];
+            for (int j = 0; j < dim; j++) {
+                quadrant[j] = i / (int)Mathf.Pow(2, j) % 2;
+            }
+            subtrees[i] = new BarnesQuadtree(position + radius / 2 * quadrantToVector(quadrant), radius / 2, thetaSquared, minimalDistanceSquared, maximalDistanceSquared);
+            subtrees[i].Add(points);
+        }
         points = null;
     }
 
     private bool punktInBounds(Vertex vertex) {
-        Vector3 punkt = vertex.transform.position;
-        return punkt.x >= position.x - radius &&
-        punkt.x < position.x + radius &&
-        punkt.y >= position.y - radius &&
-        punkt.y < position.y + radius &&
-        punkt.z >= position.z - radius &&
-        punkt.z < position.z + radius;
+        VectorN punkt = vertex.Position;
+        for (int i = 0; i < dim; i++) {
+            if (punkt[i] < position[i] - radius || punkt[i] >= position[i] + radius) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
      * Calculates the center of mass of this cube as well as all subcubes.
      **/
     public void BerechneSchwerpunkt() {
+        schwerpunkt = VectorN.Zero(dim);
         if (mass == 0) {
             // This cube is empty. Do nothing.
         }
         else if (isLeaf) {
             // This cube is a leaf, the center of mass is determined by the average of the points.
-            schwerpunkt = Vector3.zero;
             foreach (Vertex punkt in points) {
-                schwerpunkt += punkt.transform.position;
+                schwerpunkt += punkt.Position * punkt.Mass;
             }
             schwerpunkt /= mass;
         }
         else {
             // This cube has benn split up in subcubes. The center of mass is the weighted average of the centers of mass of the subcubes.
-            not.BerechneSchwerpunkt();
-            nwt.BerechneSchwerpunkt();
-            swt.BerechneSchwerpunkt();
-            sot.BerechneSchwerpunkt();
-            nob.BerechneSchwerpunkt();
-            nwb.BerechneSchwerpunkt();
-            swb.BerechneSchwerpunkt();
-            sob.BerechneSchwerpunkt();
-            schwerpunkt = (not.schwerpunkt * not.mass +
-                nwt.schwerpunkt * nwt.mass +
-                sot.schwerpunkt * sot.mass +
-                swt.schwerpunkt * swt.mass +
-                nob.schwerpunkt * nob.mass +
-                nwb.schwerpunkt * nwb.mass +
-                sob.schwerpunkt * sob.mass +
-                swb.schwerpunkt * swb.mass) / mass;
+            foreach (BarnesQuadtree subtree in subtrees) {
+                subtree.BerechneSchwerpunkt();
+                schwerpunkt += subtree.schwerpunkt * subtree.mass;
+            }
+            schwerpunkt /= mass;
         }
     }
 
     /**
      * Calculates how all vertices inside this cube repel the given point.
      **/
-    public Vector3 calculateRepulsionForceOnVertex(Vertex pointActedOn, float maximalRepulsionDistance) {
-        if (mass == 0) {
-            // This cube is empty. It does not repel the point.
-            return Vector3.zero;
-        }
-        else if (isLeaf) {
-            // This cube is a leaf. If this is different point, there will be repelling.
-            //return Vector3.zero;
-            return calculateRepulsionForceOnVertexInsideLeaf(pointActedOn);
+    public VectorN calculateRepulsionForceOnVertex(Vertex pointActedOn) {
+        // This cube is empty. It does not repel the point.
+        if (mass == 0) return VectorN.Zero(dim);
+
+        VectorN diff = schwerpunkt - pointActedOn.Position;
+        float distanceSquared = diff.MagnitudeSquared();
+
+        // This cube sits too far 
+        if (distanceSquared > maximalDistanceSquared) return VectorN.Zero(dim);
+
+        // If the points are far away, use the Barnes Hut approximation, else process them directly
+        if (4 * radius * radius * thetaSquared < distanceSquared) {
+            return CalculateForce(diff, distanceSquared);
         }
         else {
-            // This cube contains more than one point. The cube is split up. The repulsion force is the sum of the repulsion forces of the subcubes.
-
-            // If repulsionDistance is a positive number, Ignore points that are far away.
-            if (maximalRepulsionDistance != 0 && Vector3.Distance(pointActedOn.transform.position, schwerpunkt) > maximalRepulsionDistance) {
-                return Vector2.zero;
-            }
-            // If this cube is small and far away, then the cube is not split up.
-            // 
-            if (2 * radius / Vector3.Distance(pointActedOn.transform.position, schwerpunkt) < precision && !punktInBounds(pointActedOn)) {
-                return mass * BerechneKraft(pointActedOn);
+            if (isLeaf) {
+                return calculateRepulsionForceOnVertexInsideLeaf(pointActedOn, diff, distanceSquared);
             }
             else {
-                return not.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance) + nwt.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance)
-                    + sot.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance) + swt.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance)
-                    + nob.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance) + nwb.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance)
-                    + sob.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance) + swb.calculateRepulsionForceOnVertex(pointActedOn, maximalRepulsionDistance);
+                return calculateRepulsionForceOnVertexInsideSubtree(pointActedOn);
             }
         }
     }
@@ -172,41 +139,42 @@ public class BarnesQuadtree {
     /**
      * Calculates how all vertices inside this cube-leaf repel the given point.
      **/
-    public Vector3 calculateRepulsionForceOnVertexInsideLeaf(Vertex pointActedOn) {
-        // If the pointActedOn is in bound, then the calculation must exclude the pointActedOn.
-        Vector3 force = Vector3.zero;
-        foreach (Vertex point in points) {
-            if (!point.Equals(pointActedOn)) {
-                // Look a step into the future to calculate the force.
-                force += BerechneKraft(pointActedOn, point);
-            }
+    public VectorN calculateRepulsionForceOnVertexInsideLeaf(Vertex pointActedOn, VectorN diff, float distanceSquared) {
+        // Leaves are either of minimalSize or contain only one point
+        if (points.Count == 1) {
+            // This cube contains the point itself and can be ignored
+            if (points[0].Equals(pointActedOn)) return VectorN.Zero(dim);
+        }
+        if (distanceSquared > minimalDistanceSquared) {
+            return CalculateForce(diff, distanceSquared);
+        } else if (distanceSquared == 0) {
+            return VectorN.Random(dim, 0.05f);
+        } else {
+            return CalculateForce(diff, distanceSquared);
+        }
+    }
+
+    public VectorN calculateRepulsionForceOnVertexInsideSubtree(Vertex pointActedOn) {
+        VectorN force = VectorN.Zero(dim);
+        foreach (BarnesQuadtree subtree in subtrees) {
+            force.Add(subtree.calculateRepulsionForceOnVertex(pointActedOn));
         }
         return force;
     }
 
-    private Vector3 BerechneKraft(Vertex bewirkter, Vertex wirkender) {
-        Vector3 diff = wirkender.transform.position - bewirkter.transform.position;
-        float distance = diff.magnitude;
-        if (distance == 0) {
-            return Vector3.zero;
-        }
-        else {
-
-            return -diff.normalized * (bewirkter.Mass * wirkender.Mass) / (distance * distance);
-        }
-    }
 
     /**
      * Does the same as above but uses the center of mass of the cube instead of a second vertex
      **/
-    private Vector3 BerechneKraft(Vertex bewirkter) {
-        Vector3 diff = schwerpunkt - bewirkter.transform.position;
-        float distance = diff.magnitude;
-        if (distance == 0) {
-            return Vector3.zero;
+    private VectorN CalculateForce(VectorN diff, float distanceSquared) {
+        return diff.Multiply((-1) * mass / distanceSquared);
+    }
+
+    private VectorN quadrantToVector(int[] quadrant) {
+        VectorN result = new VectorN(dim);
+        for (int i = 0; i < dim; i++) {
+            result[i] = quadrant[i] == 0 ? -1 : 1;
         }
-        else {
-            return -diff.normalized * (bewirkter.Mass * mass) / (distance * distance);
-        }
+        return result;
     }
 }

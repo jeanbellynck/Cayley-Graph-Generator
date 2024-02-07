@@ -57,7 +57,11 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         }
 
+        //int simulationDimensionality = 2*generators.Length + 1;
+        int simulationDimensionality = 3;
         GroupVertex neutralElement = neutralElementGameObject.GetComponent<GroupVertex>();
+        neutralElement.Position = VectorN.Zero(simulationDimensionality);
+        neutralElement.Velocity = VectorN.Zero(simulationDimensionality);
         graphManager.AddVertex(neutralElement);
         AddBorderVertex(neutralElement);
 
@@ -121,7 +125,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         DrawMesh();
-        physik.shutDown();
+        //physik.shutDown();
     }
 
 
@@ -129,24 +133,14 @@ public class CayleyGraphMaker : MonoBehaviour {
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
-        // Zufallsverschiebung
-        System.Random r = new System.Random();
-        int newDistance = predecessor.DistanceToNeutralElement + 1;
-        float hyperbolicScaling = Mathf.Pow(hyperbolicity, newDistance);
-
-
-        Vector3 elementPosition;
-        GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
-        if (prepredecessor != null) {
-            elementPosition = predecessor.transform.position + (predecessor.transform.position - prepredecessor.transform.position) * hyperbolicScaling;
-        }
-        else {
-            elementPosition = predecessor.transform.position + hyperbolicScaling * UnityEngine.Random.insideUnitSphere;
-        }
+        
+        
+        
+        
 
         // Vertex is not the neutral element and an edge need to be created
-        GroupVertex newVertex = Instantiate(vertexPrefab, elementPosition, Quaternion.identity, transform).GetComponent<GroupVertex>();
-        newVertex.InitializeFromPredecessor(predecessor, op);
+        GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
+        newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
         graphManager.AddVertex(newVertex);
 
         AddBorderVertex(newVertex);
@@ -171,14 +165,6 @@ public class CayleyGraphMaker : MonoBehaviour {
         return newEdge;
     }
 
-    public char ToggleCase(char c) {
-        if (char.IsUpper(c)) {
-            return char.ToLower(c);
-        }
-        else {
-            return char.ToUpper(c);
-        }
-    }
 
     void AddBorderVertex(GroupVertex vertex) {
         if (randKnoten.Count <= vertex.DistanceToNeutralElement) {

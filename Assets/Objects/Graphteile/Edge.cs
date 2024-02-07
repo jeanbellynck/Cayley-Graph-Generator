@@ -72,7 +72,7 @@ public class Edge : MonoBehaviour {
     }
 
 
-    public Vertex getOpposite(GroupVertex vertex) {
+    public virtual Vertex getOpposite(GroupVertex vertex) {
         if (vertex.Equals(StartPoint)) {
             return EndPoint;
         }

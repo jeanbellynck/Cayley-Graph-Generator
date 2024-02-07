@@ -36,40 +36,18 @@ public class GroupEdge : Edge {
         }
     }
 
-
-    /**
-    public void SetEndpoints(Vertex startPoint, Vertex endPoint, char generator) {
-        if (this.StartPoint != null || this.EndPoint != null) {
-            throw new Exception("The Endpoints of an Edge are final and should not be changed. Create a new Edge instead");
-        }
-        if (char.IsLower(generator)) {
-            this.StartPoint = startPoint;
-            this.EndPoint = endPoint;
-        }
-        else {
-            this.StartPoint = endPoint;
-            this.EndPoint = startPoint;
-        }
-        this.Label = char.ToLower(generator);
-
-        name = StartPoint.name + " --" + Label + "-> " + EndPoint.name;
-        StartPoint.addEdge(this);
-        EndPoint.addEdge(this);
-        Update();
-    }**/
-
     public void SetFarbe(Color farbe1, Color farbe2) {
         LineRenderer lr = GetComponent<LineRenderer>();
         lr.startColor = farbe1;
         //lr.endColor = farbe2;
     }
 
-    
+
     public bool Equals(GroupEdge other) {
         return StartPoint.Equals(other.StartPoint) && EndPoint.Equals(other.EndPoint) && Label == other.Label;
     }
 
-    public GroupVertex getOpposite(GroupVertex opposite) {
+    public new GroupVertex getOpposite(GroupVertex opposite) {
         return (GroupVertex) base.getOpposite(opposite);
     }
 }
