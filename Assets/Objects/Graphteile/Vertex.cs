@@ -106,6 +106,7 @@ public class Vertex : MonoBehaviour {
         if (splineDirections.TryGetValue(generator, out var result))
             return result;
 
+
         result = direction * splineDirectionFactor;
         var expectedLengthSquared = result.sqrMagnitude;
         char inverseGenerator = RelatorDecoder.invertGenerator(generator);
@@ -118,9 +119,16 @@ public class Vertex : MonoBehaviour {
         if (result.sqrMagnitude < 0.005f * expectedLengthSquared)
             result = RandomOrthogonalDirection();
 
+        foreach (var (gen, splineDirection) in splineDirections) {
+            if (gen == generator || gen == inverseGenerator || Vector3.Angle(splineDirection, result) is > 3f and < 177f) continue;
+            result += RandomOrthogonalDirection() * 0.5f;
+            break;
+        }
+
         splineDirections[generator] = result;
         if (otherDirectionAlreadyComputed)
             splineDirections[inverseGenerator] = result;
+
         return result;
 
         Vector3 RandomOrthogonalDirection()

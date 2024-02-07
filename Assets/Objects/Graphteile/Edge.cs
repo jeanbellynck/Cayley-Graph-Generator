@@ -76,8 +76,8 @@ public class Edge : MonoBehaviour
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
 
-    const float scalingC = 1.324717957244f;
-    readonly float scalingB = 1/Mathf.Log(1+scalingC);
+    const float scalingC = 1.324717957244f; // scaling(0) = 1/3
+    readonly float scalingB = 1/Mathf.Log(1+scalingC); // scaling(1) = 1
     float MidDisplacementScaling(float x) => scalingB * Mathf.Log( scalingC + x);
 
     void Update() {
