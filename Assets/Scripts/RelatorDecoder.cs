@@ -127,17 +127,14 @@ public class RelatorDecoder
     /**
      * Takes a relator consisting of only letters and returns the inverse by big letters small, small letters big and reversing the string order
      **/
-    private static string invertSymbol(string symbol) {
-        StringBuilder result = new StringBuilder();
-        for(int i = 0; i < symbol.Length; i++) {
-            if(char.IsLower(symbol[i])) {
-                result.Append(char.ToUpper(symbol[i]));
-            } else {
-                result.Append(char.ToLower(symbol[i]));
-            }
-        }
-        return new string(result.ToString().Reverse().ToArray());
+   public static string invertSymbol(string symbol) {
+        var result = (from generator in symbol select invertGenerator(generator));
+        return new string(result.Reverse().ToArray());
     }
+
+    public static char invertGenerator(char symbol) {
+        return char.IsLower(symbol) ? char.ToUpper(symbol) : char.ToLower(symbol);
+    }   
 
     /**
      * Does logic for brackets, edits the symbol variable
