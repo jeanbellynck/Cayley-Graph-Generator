@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class Vertex : MonoBehaviour {
     public float age = 0;
@@ -17,6 +21,7 @@ public class Vertex : MonoBehaviour {
     public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
 
     private Renderer mr;
+
 
     // The following is only used in v2 
     public int id;
@@ -45,6 +50,9 @@ public class Vertex : MonoBehaviour {
         //DrawCircle(radius);
         mr.material.color = new Color(stress, 0, 0);
         age += Time.deltaTime;
+        if (Time.renderedFrameCount % 10 == 0) {
+            splineDirections.Clear(); // Recompute spline directions every 10 frames
+        }
     }
 
     /**
@@ -86,6 +94,41 @@ public class Vertex : MonoBehaviour {
         // 
         
         edges[op].Add(edge);
+    }
+
+    public readonly Dictionary<char, Vector3> splineDirections = new();
+
+    public float splineDirectionFactor = 0.2f;
+    public float orthogonalSplineDirectionFactor = 0.1f;
+    Vector3 oldRandomDirection = Vector3.up;
+    public Vector3 CalculateSplineDirection(char generator, Vector3 @new) {
+
+        if (splineDirections.TryGetValue(generator, out var result))
+            return result;
+
+        result = @new * splineDirectionFactor;
+        char inverseGenerator = RelatorDecoder.invertGenerator(generator);
+
+        bool otherDirectionAlreadyComputed = splineDirections.TryGetValue(inverseGenerator, out var oldResult);
+        if (otherDirectionAlreadyComputed)
+            result = 0.5f * (result + oldResult);
+
+        if (result.sqrMagnitude < 0.01f) { 
+            // If in- and outgoing splines for this generator are exactly opposite (a^2 = 1), set direction to an orthogonal vector, so that the two edges are not exactly parallel
+            if (Vector3.Angle(@new, oldRandomDirection) is < 91f and > 89f)
+                result = oldRandomDirection;
+            else {
+                do result = Vector3.Cross(Random.onUnitSphere, @new);
+                while (result.sqrMagnitude < 0.01f);
+                oldRandomDirection = result;
+            }
+
+            result = @new.magnitude * orthogonalSplineDirectionFactor * result.normalized;
+        }
+        splineDirections[generator] = result;
+        if (otherDirectionAlreadyComputed)
+            splineDirections[inverseGenerator] = result;
+        return result;
     }
 
     public void removeEdge(Edge edge) {
