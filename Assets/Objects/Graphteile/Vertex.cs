@@ -1,5 +1,9 @@
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class Vertex : MonoBehaviour {
     [SerializeField]
@@ -52,6 +56,9 @@ public class Vertex : MonoBehaviour {
     // Update is called once per frame
     public virtual void Update() {
         age += Time.deltaTime;
+        if (Time.renderedFrameCount % 10 == 0) {
+            splineDirections.Clear(); // Recompute spline directions every 10 frames
+        }
     }
 
 
@@ -86,9 +93,86 @@ public class Vertex : MonoBehaviour {
         return Id == other.Id;
     }
 
-    public List<Edge> GetOutgoingEdges(char op) {
-        if (labeledOutgoingEdges.ContainsKey(op)) {
-            return labeledOutgoingEdges[op];
+    public readonly Dictionary<char, Vector3> splineDirections = new();
+
+    public float splineDirectionFactor = 0.2f;
+    public float orthogonalSplineDirectionFactor = 0.1f;
+    Vector3 oldRandomDirection = Vector3.up;
+    public Vector3 CalculateSplineDirection(char generator, Vector3 direction) {
+
+        if (splineDirections.TryGetValue(generator, out var result))
+            return result;
+
+
+        result = direction * splineDirectionFactor;
+        var expectedLengthSquared = result.sqrMagnitude;
+        char inverseGenerator = RelatorDecoder.invertGenerator(generator);
+
+        bool otherDirectionAlreadyComputed = splineDirections.TryGetValue(inverseGenerator, out var oldResult);
+        if (otherDirectionAlreadyComputed)
+            result = 0.5f * (result + oldResult);
+
+        // If in- and outgoing splines for this generator are exactly opposite (a^2 = 1), set direction to an orthogonal vector, so that the two edges are not exactly parallel
+        if (result.sqrMagnitude < 0.005f * expectedLengthSquared)
+            result = RandomOrthogonalDirection();
+
+        foreach (var (gen, splineDirection) in splineDirections) {
+            if (gen == generator || gen == inverseGenerator || Vector3.Angle(splineDirection, result) is > 3f and < 177f) continue;
+            result += RandomOrthogonalDirection() * 0.5f;
+            break;
+        }
+
+        splineDirections[generator] = result;
+        if (otherDirectionAlreadyComputed)
+            splineDirections[inverseGenerator] = result;
+
+        return result;
+
+        Vector3 RandomOrthogonalDirection()
+        {
+            Vector3 randVector;
+            float angle = Vector3.Angle(direction, oldRandomDirection);
+            switch (angle)
+            {
+                case < 91f and > 89f:
+                    randVector = oldRandomDirection;
+                    break;
+                case < 175f and > 5f:
+                    randVector = Vector3.ProjectOnPlane(oldRandomDirection, direction.normalized);
+                    break;
+                default:
+                    do randVector = Vector3.Cross(Random.onUnitSphere, direction);
+                    while (randVector.sqrMagnitude < 0.005f * expectedLengthSquared);
+                    oldRandomDirection = randVector;
+                    break;
+            }
+
+            return direction.magnitude * orthogonalSplineDirectionFactor * randVector.normalized;
+        }
+    }
+
+    public void removeEdge(Edge edge) {
+        char generator;
+        if (edge.startPoint.Equals(this)) {
+            generator = edge.getGenerator();
+        }
+        else if (edge.endPoint.Equals(this)) {
+            generator = char.ToUpper(edge.getGenerator());
+        }
+        else {
+            return;
+        }
+        edges[generator].Remove(edge);
+    }
+
+
+    public Dictionary<char, List<Edge>> GetEdges() {
+        return edges;
+    }
+
+    public List<Edge> GetEdges(char op) {
+        if(edges.ContainsKey(op)) {
+            return edges[op];
         }
         else {
             return new List<Edge>();
@@ -104,6 +188,15 @@ public class Vertex : MonoBehaviour {
         }
     }
 
+
+    public List<Edge> GetOutgoingEdges(char op) {
+        if (labeledOutgoingEdges.ContainsKey(op)) {
+            return labeledOutgoingEdges[op];
+        }
+        else {
+            return new List<Edge>();
+        }
+    }
 
 
     /**
