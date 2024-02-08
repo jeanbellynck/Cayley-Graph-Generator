@@ -114,15 +114,6 @@ public class Edge : MonoBehaviour {
 
     }
 
-    public void Destroy() {
-        StartPoint.RemoveEdge(this);
-        EndPoint.RemoveEdge(this);
-        StartPoint = null;
-        EndPoint = null;
-        Destroy(gameObject);
-    }
-
-
     public virtual Vertex getOpposite(GroupVertex vertex) {
         if (vertex.Equals(StartPoint)) {
             return EndPoint;
