@@ -190,23 +190,53 @@ MonoBehaviour:
     useClippedPercent: 0
     keys: []
   _sizeModifier:
-    blend: 1
+    blend: 0.447
     useClippedPercent: 0
-    keys: []
+    keys:
+    - _featherStart: 0.8775613903999329
+      _featherEnd: 0.9865665435791016
+      _centerStart: 0.11031632125377655
+      _centerEnd: 0.033953920006752014
+      interpolation:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 1
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      blend: 1.37
+      size: 5.78
   _clipFromSample:
-    position: {x: 0, y: 0, z: 0}
-    up: {x: 0, y: 0, z: 0}
-    forward: {x: 0, y: 0, z: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    size: 0
+    position: {x: 4.1894073, y: 2.7811565, z: 8.359188}
+    up: {x: 0, y: 1, z: 0}
+    forward: {x: 0.84191394, y: -0.00975358, z: -0.5395236}
+    color: {r: 1, g: 1, b: 1, a: 1}
+    size: 1
     percent: 0
   _clipToSample:
-    position: {x: 0, y: 0, z: 0}
-    up: {x: 0, y: 0, z: 0}
-    forward: {x: 0, y: 0, z: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    size: 0
-    percent: 0
+    position: {x: 4.948459, y: 3.1140983, z: 6.954097}
+    up: {x: 0, y: 1, z: 0}
+    forward: {x: 0.18177399, y: 0.2307628, z: -0.95588005}
+    color: {r: 1, g: 1, b: 1, a: 1}
+    size: 1
+    percent: 1
   _loopSamples: 0
   _clipFrom: 0
   _clipTo: 1
@@ -218,7 +248,7 @@ MonoBehaviour:
   _baked: 0
   _markDynamic: 1
   _size: 0.03
-  _color: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 255, g: 0, b: 0, a: 1}
   _offset: {x: 0, y: 0, z: 0}
   _normalMethod: 1
   _calculateTangents: 1
