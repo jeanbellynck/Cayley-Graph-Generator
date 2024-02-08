@@ -34,7 +34,6 @@ public class CayleyGraph : MonoBehaviour {
     void Update() {
     }
 
-    public GroupColorPanel groupColorPanel;
     public void setGenerators(string generatorString) {
         generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
         char[] newGenerators = string.Join("", generatorString).ToCharArray();
@@ -44,7 +43,6 @@ public class CayleyGraph : MonoBehaviour {
             hyperbolicityMatrix.GetComponent<HyperbolicityMatrix>().SetMatrixSize(generators.Length);
         }
 
-        groupColorPanel.updateView(generators, cayleyGraphMaker.colourList );
     }
 
     public void setRelators(string relators) {
@@ -56,7 +54,6 @@ public class CayleyGraph : MonoBehaviour {
         // Apply the Relotor Decoder
         this.relators = RelatorDecoder.decodeRelators(relators);
 
-        groupColorPanel.updateView(generators, cayleyGraphMaker.colourList);
     }
 
     public void setVertexNumber(string vertexNumber) {

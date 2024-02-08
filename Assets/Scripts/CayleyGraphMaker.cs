@@ -26,6 +26,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     public GameObject meshPrefab;
     public GameObject vertexPrefab;
     public GameObject edgePrefab;
+    public GroupColorPanel groupColorPanel;
     public Color[] colourList = new Color[] { new Color(255, 0, 0), new Color(0, 0, 255), new Color(0, 255, 0), new Color(255, 255, 0) };
 
     private int simulationDimensionality = 3;
@@ -49,16 +50,19 @@ public class CayleyGraphMaker : MonoBehaviour {
             operators[i] = char.ToLower(generators[i]);
             operators[i + generators.Length] = char.ToUpper(generators[i]);
         }
-        GroupEdge.generatorColours = new Dictionary<char, Color>();
+        GroupEdge.LabelColours.Clear();
         for (int i = 0; i < generators.Length; i++) {
             if (i < colourList.Length) {
-                GroupEdge.generatorColours.Add(generators[i], colourList[i]);
+                GroupEdge.LabelColours.Add(generators[i], colourList[i]);
             }
             else {
-                GroupEdge.generatorColours.Add(generators[i], new Color(Random.Range(0, 255), Random.Range(0, 255), Random.Range(0, 255)));
+                GroupEdge.LabelColours.Add(generators[i], new Color(Random.Range(0, 255), Random.Range(0, 255), Random.Range(0, 255)));
             }
 
         }
+
+
+        groupColorPanel.updateView(GroupEdge.LabelColours);
 
         //int simulationDimensionality = 2*generators.Length + 1;
         GroupVertex neutralElement = neutralElementGameObject.GetComponent<GroupVertex>();
@@ -68,6 +72,8 @@ public class CayleyGraphMaker : MonoBehaviour {
         AddBorderVertex(neutralElement);
 
         StartCoroutine(createNewElementsAndApplyRelators());
+
+        
     }
 
 

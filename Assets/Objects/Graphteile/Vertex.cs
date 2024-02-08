@@ -151,34 +151,6 @@ public class Vertex : MonoBehaviour {
         }
     }
 
-    public void removeEdge(Edge edge) {
-        char generator;
-        if (edge.startPoint.Equals(this)) {
-            generator = edge.getGenerator();
-        }
-        else if (edge.endPoint.Equals(this)) {
-            generator = char.ToUpper(edge.getGenerator());
-        }
-        else {
-            return;
-        }
-        edges[generator].Remove(edge);
-    }
-
-
-    public Dictionary<char, List<Edge>> GetEdges() {
-        return edges;
-    }
-
-    public List<Edge> GetEdges(char op) {
-        if(edges.ContainsKey(op)) {
-            return edges[op];
-        }
-        else {
-            return new List<Edge>();
-        }
-    }
-
     public List<Edge> GetIncomingEdges(char op) {
         if (labeledIncomingEdges.ContainsKey(op)) {
             return labeledIncomingEdges[op];

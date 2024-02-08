@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4778737120442681794}
-  - component: {fileID: -7557588707877001707}
   - component: {fileID: 3310283270684842847}
   - component: {fileID: 1769113522243741999}
   - component: {fileID: 1127768246452650686}
   - component: {fileID: 5116376294159558719}
+  - component: {fileID: 913999209185785338}
   m_Layer: 0
   m_Name: Edge
   m_TagString: Untagged
@@ -36,29 +36,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-7557588707877001707
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3391233956122432578}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b17ec35f63f0dd478eac2d0eb110884, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  age: 0
-  startPoint: {fileID: 0}
-  endPoint: {fileID: 0}
-  generator: 0
-  lineWidth: 0.02
-  arrowWidth: 0.05
-  PercentHead: 0.2
-  vertexRadius: 0.1
-  length: 1
-  midDisplacementFactor: 0.18
-  midDirectionFactor: 0.3
 --- !u!114 &3310283270684842847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,3 +244,23 @@ MonoBehaviour:
   autoOrient: 1
   updateFrameInterval: 0
   _slices: 1
+--- !u!114 &913999209185785338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3391233956122432578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71a2cd62d9514c446b1f501bccddbfc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineWidth: 0.1
+  arrowWidth: 0.2
+  PercentHead: 0.1
+  vertexRadius: 0.1
+  length: 0
+  age: 0
+  midDisplacementFactor: 0.18
+  midDirectionFactor: 0.3

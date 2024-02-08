@@ -1,9 +1,12 @@
+using Dreamteck.Splines;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
+
 
 public class GroupEdge : Edge {
-    public static IDictionary<char, Color> generatorColours;
+    public static readonly IDictionary<char, Color> LabelColours = new Dictionary<char, Color>();
 
     public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation) {
         if(char.IsLower(operation)) {
@@ -11,7 +14,7 @@ public class GroupEdge : Edge {
         } else {
             base.Initialize(endVertex, startVertex, char.ToLower(operation));
         }
-        SetFarbe(generatorColours[char.ToLower(operation)], new Color(100, 100, 100));
+        SetFarbe(LabelColours[char.ToLower(operation)], new Color(100, 100, 100));
         calculateEdgeLength((GroupVertex) StartPoint, (GroupVertex) EndPoint, char.ToLower(operation));
     }
 
@@ -36,11 +39,6 @@ public class GroupEdge : Edge {
         }
     }
 
-    public void SetFarbe(Color farbe1, Color farbe2) {
-        LineRenderer lr = GetComponent<LineRenderer>();
-        lr.startColor = farbe1;
-        //lr.endColor = farbe2;
-    }
 
 
     public bool Equals(GroupEdge other) {
