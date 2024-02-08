@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4778737120442681794}
   - component: {fileID: 3882302275355246115}
-  - component: {fileID: -7557588707877001707}
+  - component: {fileID: -9062820040318352042}
   m_Layer: 0
   m_Name: Edge
   m_TagString: Untagged
@@ -150,7 +150,7 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 0
---- !u!114 &-7557588707877001707
+--- !u!114 &-9062820040318352042
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,15 +159,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3391233956122432578}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b17ec35f63f0dd478eac2d0eb110884, type: 3}
+  m_Script: {fileID: 11500000, guid: 71a2cd62d9514c446b1f501bccddbfc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  age: 0
-  startPoint: {fileID: 0}
-  endPoint: {fileID: 0}
-  generator: 0
-  lineWidth: 0.02
-  arrowWidth: 0.05
-  PercentHead: 0.2
+  lineWidth: 0.1
+  arrowWidth: 0.2
+  PercentHead: 0.1
   vertexRadius: 0.1
-  length: 1
+  length: 0
+  age: 0
