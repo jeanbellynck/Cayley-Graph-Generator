@@ -991,7 +991,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.26376167
+  m_Size: 0.26451403
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1274,7 +1274,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1474693457}
   m_HandleRect: {fileID: 1474693456}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4052,7 +4052,7 @@ MonoBehaviour:
   drawingSpeed: 1
   meshPrefab: {fileID: 5113444650179130146, guid: 229d5f0e55e207244a23cf81194cdba9, type: 3}
   vertexPrefab: {fileID: 3096654801577124718, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
-  edgePrefab: {fileID: 3391233956122432578, guid: 085f688d473146a4e8a75c7c7c41f542, type: 3}
+  edgePrefab: {fileID: 3391233956122432578, guid: ef0b13f8d0b9f39498697181c6d741eb, type: 3}
   colourList:
   - {r: 255, g: 0, b: 0, a: 1}
   - {r: 0, g: 0, b: 255, a: 1}
@@ -5012,14 +5012,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 772353316}
     m_Modifications:
-    - target: {fileID: -683696904591283663, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
-      propertyPath: pathsToNeutralElement.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -683696904591283663, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
-      propertyPath: 'pathsToNeutralElement.Array.data[0]'
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 3096654801577124718, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
       propertyPath: m_Name
       value: n
@@ -6603,8 +6595,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1339989364}
   m_HandleRect: {fileID: 1339989363}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
