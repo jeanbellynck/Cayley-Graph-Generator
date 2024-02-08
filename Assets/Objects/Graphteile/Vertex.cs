@@ -90,14 +90,14 @@ public class Vertex : MonoBehaviour {
     }
 
     public bool Equals(Vertex other) {
-        return Id == other.Id;
+        return other != null && Id == other.Id;
     }
 
     public readonly Dictionary<char, Vector3> splineDirections = new();
 
     public float splineDirectionFactor = 0.2f;
     public float orthogonalSplineDirectionFactor = 0.1f;
-    Vector3 oldRandomDirection = Vector3.up;
+    Vector3 oldRandomDirection = Vector3.zero;
     public Vector3 CalculateSplineDirection(char generator, Vector3 direction) {
 
         if (splineDirections.TryGetValue(generator, out var result))
@@ -131,20 +131,10 @@ public class Vertex : MonoBehaviour {
         Vector3 RandomOrthogonalDirection()
         {
             Vector3 randVector;
-            float angle = Vector3.Angle(direction, oldRandomDirection);
-            switch (angle)
-            {
-                case < 91f and > 89f:
-                    randVector = oldRandomDirection;
-                    break;
-                case < 175f and > 5f:
-                    randVector = Vector3.ProjectOnPlane(oldRandomDirection, direction.normalized);
-                    break;
-                default:
-                    do randVector = Vector3.Cross(Random.onUnitSphere, direction);
-                    while (randVector.sqrMagnitude < 0.005f * expectedLengthSquared);
-                    oldRandomDirection = randVector;
-                    break;
+            while (true) {
+                randVector = Vector3.ProjectOnPlane(oldRandomDirection, direction.normalized); 
+                if (randVector.sqrMagnitude > 0.005f) break;
+                    oldRandomDirection = Random.onUnitSphere;
             }
 
             return direction.magnitude * orthogonalSplineDirectionFactor * randVector.normalized;

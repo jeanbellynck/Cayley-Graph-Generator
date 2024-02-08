@@ -1,8 +1,5 @@
-using Dreamteck.Splines;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Vector3 = UnityEngine.Vector3;
 
 
 public class GroupEdge : Edge {
@@ -42,6 +39,7 @@ public class GroupEdge : Edge {
 
 
     public bool Equals(GroupEdge other) {
+        if (other == null) return false;
         return StartPoint.Equals(other.StartPoint) && EndPoint.Equals(other.EndPoint) && Label == other.Label;
     }
 
