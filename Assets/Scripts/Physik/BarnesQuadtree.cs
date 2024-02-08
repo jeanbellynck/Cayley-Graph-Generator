@@ -3,6 +3,7 @@ using System.Numerics;
 using UnityEngine;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System;
 
 
 public class BarnesQuadtree {
@@ -170,7 +171,9 @@ public class BarnesQuadtree {
      * Does the same as above but uses the center of mass of the cube instead of a second vertex
      **/
     private VectorN CalculateForce(VectorN diff, float distanceSquared) {
-        return diff.Normalize().Multiply((-1) * mass / distanceSquared);
+        int power = Math.Max(diff.Size()-1, 0);
+        float distance = Mathf.Sqrt(distanceSquared);
+        return diff.Normalize().Multiply((-1) * mass / Mathf.Pow(distance, power));
     }
 
     private VectorN quadrantToVector(int[] quadrant) {
