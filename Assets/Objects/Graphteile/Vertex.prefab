@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3276086866296139643}
   - component: {fileID: 6359415904821870375}
   - component: {fileID: 8930971666199616475}
-  - component: {fileID: -683696904591283663}
+  - component: {fileID: -7715269276983235028}
   m_Layer: 0
   m_Name: Vertex
   m_TagString: Untagged
@@ -86,7 +86,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-683696904591283663
+--- !u!114 &-7715269276983235028
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,15 +95,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 3096654801577124718}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32871a4984cc2154699728b8e1ced69a, type: 3}
+  m_Script: {fileID: 11500000, guid: ad7185056b678cd4f9934ecc0552f214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  age: 0
+  isActive: 1
   velocity: {x: 0, y: 0, z: 0}
   repelForce: {x: 0, y: 0, z: 0}
   attractForce: {x: 0, y: 0, z: 0}
   oppositeForce: {x: 0, y: 0, z: 0}
   angleForce: {x: 0, y: 0, z: 0}
   stress: 0
-  distance: 0
   id: 0
   distanceToNeutralElement: 0
+  pathsToNeutralElement: []
+  mass: 1
+  splineDirectionFactor: 0.2
+  orthogonalSplineDirectionFactor: 0.1

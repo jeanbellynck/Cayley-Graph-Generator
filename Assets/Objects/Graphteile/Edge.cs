@@ -1,126 +1,128 @@
+using Dreamteck.Splines;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Edge : MonoBehaviour
-{
-    public float age = 0;
-    public Vertex startPoint;
-    public Vertex endPoint;
-    public char generator;
 
+public class Edge : MonoBehaviour {
+    public static GameObject edgePrefab;
     public float lineWidth = 0.1f;
     public float arrowWidth = 0.2f;
     public float PercentHead = 0.1f;
     public float vertexRadius = 0.1f;
 
+
+    private char label;
+
+
     [SerializeField]
     private float length;
+    public float age = 0;
+    protected Vertex startPoint;
+    protected Vertex endPoint;
 
+    public char Label { get => label; set => label = value; }
+    public Vertex StartPoint { get => startPoint; set => startPoint = value; }
+    public Vertex EndPoint { get => endPoint; set => endPoint = value; }
+    public float Length { get => length; set => length = value; }
 
-    // Start is called before the first frame update
-    void Start(){}
-
-
-    /**
-     * This method is used to get the start Vertex of the edge.
-     * The result is dependent on whether op is upper or lower case
-     */
-    public Vertex getStartPoint(char op) {
-        if (char.IsLower(op)) {
-            return startPoint;
-        }
-        else {
-            return endPoint;
-        }
-    }
-
-    
-    public void SetEndpoints(Vertex startPoint, Vertex endPoint, char generator) {
-        if(this.startPoint != null || this.endPoint != null) {
-            throw new Exception("The Endpoints of an Edge are final and should not be changed. Create a new Edge instead");
-        }
-        if(char.IsLower(generator)) {
-            this.startPoint = startPoint;
-            this.endPoint = endPoint;
-        } else {
-            this.startPoint = endPoint;
-            this.endPoint = startPoint;
-        }
-        this.generator = char.ToLower(generator);
-        
-        name = this.startPoint.name + " --" + this.generator + "-> " + this.endPoint.name;
-        startPoint.addEdge(this);
-        endPoint.addEdge(this);
+    public void Initialize(Vertex startPoint, Vertex endPoint, char label) {
+        this.StartPoint = startPoint;
+        this.EndPoint = endPoint;
+        this.Label = label;
+        name = StartPoint.name + " --" + Label + "-> " + EndPoint.name;
+        startPoint.AddEdge(this);
+        endPoint.AddEdge(this);
+        GetComponent<SplineComputer>()?.SetPoints(new SplinePoint[] { new SplinePoint(startPoint.transform.position), new SplinePoint(endPoint.transform.position) });
         Update();
     }
 
+    public void Destroy() {
+        StartPoint.RemoveEdge(this);
+        EndPoint.RemoveEdge(this);
+        StartPoint = null;
+        EndPoint = null;
+        Destroy(gameObject);
+    }
+
+    protected virtual void Update() {
+        if (startPoint == null || endPoint == null) return;
+        age += Time.deltaTime;
+
+        Vector3 vector = endPoint.transform.position - startPoint.transform.position;
+        //Vector3 vectorNormalized = vector.normalized;
+        _ = startPoint.CalculateSplineDirection(Label, vector);
+        _ = endPoint.CalculateSplineDirection(RelatorDecoder.invertGenerator(Label), vector);
+    }
     public void SetFarbe(Color farbe1, Color farbe2) {
-        LineRenderer lr = GetComponent<LineRenderer>();
-        lr.startColor = farbe1;
+        //LineRenderer lr = GetComponent<LineRenderer>();
+        splineRenderer ??= GetComponent<SplineRenderer>();
+        splineRenderer.color = farbe1;
         //lr.endColor = farbe2;
     }
+    SplineComputer splineComputer;
+    SplineRenderer splineRenderer;
 
-    // Update is called once per frame
-    public void Update() {
-        if(startPoint != null && endPoint != null) {
-            Vector3 linienRichtung = (endPoint.transform.position - startPoint.transform.position).normalized;
-            Vector3 startPointWithSpacing = startPoint.transform.position + linienRichtung * vertexRadius;
-            Vector3 endPointWithSpacing = endPoint.transform.position - linienRichtung * vertexRadius;
+    public float midDisplacementFactor = 0.18f;
+    public float midDirectionFactor = 0.3f;
+    //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
+    //Vector3 oldRandomMidDisplacement = Vector3.zero;
 
-            LineRenderer lr = GetComponent<LineRenderer>();
-            
-            lr.widthCurve = new AnimationCurve(
-             new Keyframe(0, lineWidth)
-             , new Keyframe(0.999f - PercentHead, lineWidth)  // neck of arrow
-             , new Keyframe(1 - PercentHead, arrowWidth)  // max width of arrow head
-             , new Keyframe(1, 0f));  // tip of arrow
-            
-            lr.SetPositions(new Vector3[] {
-               startPointWithSpacing
-               , Vector3.Lerp(startPointWithSpacing, endPointWithSpacing, 0.999f - PercentHead)
-               , Vector3.Lerp(startPointWithSpacing, endPointWithSpacing, 1 - PercentHead)
-               , endPointWithSpacing });
-        }
-        
-        age += Time.deltaTime;
+    const float scalingC = 1.324717957244f; // scaling(0) = 1/3
+    readonly float scalingB = 1 / Mathf.Log(1 + scalingC); // scaling(1) = 1
+    float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
+
+
+    void LateUpdate() {
+
+
+        splineComputer ??= GetComponent<SplineComputer>();
+        // https://forum.unity.com/threads/why-does-unity-override-the-null-comparison-for-unity-objects.1294593/ Doesn't matter here
+
+        Vector3 startPosition = startPoint.transform.position;
+        Vector3 endPosition = endPoint.transform.position;
+        Vector3 vector = endPosition - startPosition;
+        //Vector3 vectorNormalized = vector.normalized;
+        Vector3 startDirection = startPoint.CalculateSplineDirection(Label, vector);
+        Vector3 endDirection = endPoint.CalculateSplineDirection(RelatorDecoder.invertGenerator(Label), vector);
+
+        Vector3 midDisplacementDirectionNonOrthogonal = startDirection - endDirection;
+        Vector3 midDisplacementDirection = Vector3.ProjectOnPlane(midDisplacementDirectionNonOrthogonal, vector.normalized);
+        float l = midDisplacementDirection.magnitude;
+        float lambda = MathF.Sqrt(startDirection.sqrMagnitude + endDirection.sqrMagnitude);
+        // overly complicated (and non-working) way to get a random vector orthogonal to vector and not needed bc. the midDisplacement doesn't have to be large.
+        //while (l < 0.1 * lambda) {
+        //    // replace by random vector (take old random vector if nothing changed)
+        //    if ((vectorForOldRandomMidDisplacement - midDisplacementDirectionNonOrthogonal).sqrMagnitude > 0.01) {
+        //        oldRandomMidDisplacement = Vector3.ProjectOnPlane(Random.insideUnitSphere, vector.normalized);
+        //        vectorForOldRandomMidDisplacement = vector;
+        //    }
+        //    midDisplacementDirection += oldRandomMidDisplacement;
+        //    l = midDisplacementDirection.magnitude;
+        //}
+        Vector3 midDisplacementVector = l > 0.001f ? midDisplacementFactor * MidDisplacementScaling(l / lambda) / l * midDisplacementDirection : Vector3.zero;
+        Vector3 midPosition = startPosition + 0.5f * vector + midDisplacementVector;
+        Vector3 midDirection = (vector - endDirection - startDirection) * midDirectionFactor;
+        // this is approximately the vector from the "corner" of the spline after the start to the "corner" before the end
+
+
+        splineComputer.SetPoints(new[] {
+            new SplinePoint(startPosition, startPosition - startDirection),
+            new SplinePoint(midPosition, midPosition - midDirection),
+            new SplinePoint(endPosition, endPosition - endDirection) 
+            // Why do we have to subtract the direction? and why from the position?
+        });
+
     }
 
-    public char getGenerator() {
-        return generator;
-    }
-
-    public Vertex getOpposite(Vertex vertex) {
-        if(vertex.Equals(startPoint)) {
-            return endPoint;
+    public virtual Vertex getOpposite(GroupVertex vertex) {
+        if (vertex.Equals(StartPoint)) {
+            return EndPoint;
         }
-        else if(vertex.Equals(endPoint)) {
-            return startPoint;
+        else if (vertex.Equals(EndPoint)) {
+            return StartPoint;
         }
         else {
             throw new Exception("Vertex is not part of this edge.");
         }
-    }
-
-    public void Destroy() {
-        startPoint.removeEdge(this);
-        endPoint.removeEdge(this);
-        startPoint = null;
-        endPoint = null;
-        Destroy(gameObject);
-    }
-
-    public bool Equals(Edge other) {
-        return startPoint.Equals(other.startPoint) && endPoint.Equals(other.endPoint) && generator == other.generator;
-    }
-
-
-    public void SetLength(float length) {
-        this.length = length;
-    }
-
-    public float GetLength() {
-        return length;
     }
 }

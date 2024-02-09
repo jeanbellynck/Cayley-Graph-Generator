@@ -1,210 +1,232 @@
-using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class Vertex : MonoBehaviour {
-    public float age = 0;
-    public bool isActive = true; // If set inactive it will be ignored algorithms
+    [SerializeField]
+    private VectorN position;
+    private VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
+     private VectorN velocity; // This is the previous position of the vertex. It is used to calculate the forces using the improved euler method.
+    private int id;
+    private float age = 0;
+    [SerializeField]
+    private float mass = 1; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
+   
+    private VectorN repelForce;
+    private VectorN linkForce;
 
-    // Used by Link force algorithm
-    public Vector3 velocity = Vector3.zero;
-
-    // The following is used in v1 and v2
-    public Vector3 repelForce = Vector3.zero;
-    public Vector3 attractForce = Vector3.zero;
-    public Vector3 oppositeForce = Vector3.zero;
-    public Vector3 angleForce = Vector3.zero;
-    public float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
+    private Dictionary<char, List<Edge>> labeledOutgoingEdges = new Dictionary<char, List<Edge>>();
+    private Dictionary<char, List<Edge>> labeledIncomingEdges = new Dictionary<char, List<Edge>>();
 
     private Renderer mr;
 
-    // The following is only used in v2 
-    public int id;
-    private Dictionary<char, List<Edge>> edges = new Dictionary<char, List<Edge>>(); // This is a list-dictionary as vertices may temporarily have multiple arrows of a specific generator. If the vertex is at the border, the arrows might not have been included yet.
 
-    [SerializeField]
-    private int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
-    [SerializeField]
-    public List<string> pathsToNeutralElement = new List<string>(); // The paths to the identity element. This is used to visualize the paths to the identity element.
-
-    [SerializeField]
-    private float mass = 1; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
-
-
+    public int Id { get => id; set => id = value; }
+    public float Mass { get => mass; set => mass = value; }
+    public float Age { get => age; set => age = value; }
+    public VectorN Velocity { get => Velocity1; set => Velocity1 = value; }
+    public VectorN RepelForce { get => repelForce; set => repelForce = value; }
+    public VectorN LinkForce { get => linkForce; set => linkForce = value; }
+    public Dictionary<char, List<Edge>> LabeledOutgoingEdges { get => labeledOutgoingEdges; set => labeledOutgoingEdges = value; }
+    public Dictionary<char, List<Edge>> LabeledIncomingEdges { get => labeledIncomingEdges; set => labeledIncomingEdges = value; }
+    public Renderer Mr { get => mr; set => mr = value; }
+    public VectorN Position { get => position; set => position = value; }
+    public VectorN Velocity1 { get => velocity; set => velocity = value; }
 
     // Start is called before the first frame update
-    void Start() {
-        if(mass == 0) {
+    public virtual void Start() {
+        if (mass == 0) {
             mass = 0.1f;
         }
         mr = GetComponent<Renderer>();
+        Update();
+    }
+
+    public void Initialize(VectorN position) {
+        age = 0;
+        this.position = position;
+        velocity = VectorN.Zero(position.Size());
+        linkForce = VectorN.Zero(position.Size());
+        repelForce = VectorN.Zero(position.Size());
     }
 
     // Update is called once per frame
-    void Update() {
-        //DrawCircle(radius);
-        mr.material.color = new Color(stress, 0, 0);
+    public virtual void Update() {
         age += Time.deltaTime;
+        if (Time.renderedFrameCount % 10 == 0) {
+            splineDirections.Clear(); // Recompute spline directions every 10 frames
+        }
     }
+
 
     /**
     * Used for debugging.
     */
     void OnDrawGizmos() {
         //Gizmos.color = Color.green;
-        //Gizmos.DrawLine(transform.position, transform.position + repelForce);
+        //Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(repelForce));
         //Gizmos.color = Color.cyan;
-        //Gizmos.DrawLine(transform.position, transform.position + angleForce);
+        //Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(linkForce));
     }
 
-    public void SetId(int id) {
-        this.id = id;
+    public void Destroy() {
+        // Destroy all edges too
+        foreach (List<Edge> genEdges in labeledIncomingEdges.Values) {
+            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
+            foreach (Edge edge in genEdgesCopy) {
+                edge.Destroy();
+            }
+        }
+        foreach (List<Edge> genEdges in labeledOutgoingEdges.Values) {
+            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
+            foreach (Edge edge in genEdgesCopy) {
+                edge.Destroy();
+            }
+        }
+        Destroy(gameObject);
     }
 
-    /**
-     * This method is used to add an edge to the list of edges of this vertex.
-     * It dynamically checks whether this vertex is the start or the end. The vertex therefore need to already be set as start or end.
-     * If an edge with the same generator and the same endpoints already exists, it is not added.
-     */
-    public void addEdge(Edge edge) {
-        // Determine whether this the edge points to this vertex or away from it
-        char op = ' ';
-        if (edge.startPoint.Equals(this)) {
-            op = edge.getGenerator();
-        }
-        else if (edge.endPoint.Equals(this)) {
-            op = char.ToUpper(edge.getGenerator());
-        } else {
-            // Throw exception
-            throw new Exception("The edge " + edge.name + " does not point to this vertex " + name);
-        }
-        // Create a new list if there is no list for this generator yet
-        // Also check whether an edge of this kind has already been added. If so the edge is deleted.
-        if (!edges.ContainsKey(op)) {
-            edges.Add(op, new List<Edge>());
-        } 
-        // 
-        
-        edges[op].Add(edge);
+    public bool Equals(Vertex other) {
+        return other != null && Id == other.Id;
     }
 
-    public void removeEdge(Edge edge) {
-        char generator;
-        if (edge.startPoint.Equals(this)) {
-            generator = edge.getGenerator();
+    public readonly Dictionary<char, Vector3> splineDirections = new();
+
+    public float splineDirectionFactor = 0.2f;
+    public float orthogonalSplineDirectionFactor = 0.1f;
+    Vector3 oldRandomDirection = Vector3.zero;
+    public Vector3 CalculateSplineDirection(char generator, Vector3 direction) {
+
+        if (splineDirections.TryGetValue(generator, out var result))
+            return result;
+
+
+        result = direction * splineDirectionFactor;
+        var expectedLengthSquared = result.sqrMagnitude;
+        char inverseGenerator = RelatorDecoder.invertGenerator(generator);
+
+        bool otherDirectionAlreadyComputed = splineDirections.TryGetValue(inverseGenerator, out var oldResult);
+        if (otherDirectionAlreadyComputed)
+            result = 0.5f * (result + oldResult);
+
+        // If in- and outgoing splines for this generator are exactly opposite (a^2 = 1), set direction to an orthogonal vector, so that the two edges are not exactly parallel
+        if (result.sqrMagnitude < 0.005f * expectedLengthSquared)
+            result = RandomOrthogonalDirection();
+
+        foreach (var (gen, splineDirection) in splineDirections) {
+            if (gen == generator || gen == inverseGenerator || Vector3.Angle(splineDirection, result) is > 3f and < 177f) continue;
+            result += RandomOrthogonalDirection() * 0.5f;
+            break;
         }
-        else if (edge.endPoint.Equals(this)) {
-            generator = char.ToUpper(edge.getGenerator());
+
+        splineDirections[generator] = result;
+        if (otherDirectionAlreadyComputed)
+            splineDirections[inverseGenerator] = result;
+
+        return result;
+
+        Vector3 RandomOrthogonalDirection()
+        {
+            Vector3 randVector;
+            while (true) {
+                randVector = Vector3.ProjectOnPlane(oldRandomDirection, direction.normalized); 
+                if (randVector.sqrMagnitude > 0.005f) break;
+                    oldRandomDirection = Random.onUnitSphere;
+            }
+
+            return direction.magnitude * orthogonalSplineDirectionFactor * randVector.normalized;
         }
-        else {
-            return;
-        }
-        edges[generator].Remove(edge);
     }
 
-
-    public Dictionary<char, List<Edge>> GetEdges() {
-        return edges;
-    }
-
-    public List<Edge> GetEdges(char op) {
-        if(edges.ContainsKey(op)) {
-            return edges[op];
+    public List<Edge> GetIncomingEdges(char op) {
+        if (labeledIncomingEdges.ContainsKey(op)) {
+            return labeledIncomingEdges[op];
         }
         else {
             return new List<Edge>();
         }
     }
 
-    /**
-    * This method is used to get the edge associated to a generator.
-    * WARNING: This always returns the first edge associated to a generator. All others (if present) are ignored
-    */
-    public Edge GetEdge(char op) {
-        if (edges.ContainsKey(op) && edges[op].Count > 0) {
-            return edges[op][0];
+
+    public List<Edge> GetOutgoingEdges(char op) {
+        if (labeledOutgoingEdges.ContainsKey(op)) {
+            return labeledOutgoingEdges[op];
         }
         else {
-            return null;
+            return new List<Edge>();
         }
     }
 
-    public Vertex FollowEdge(char op) {
-        Edge edge = GetEdge(op);
-        if (edge == null) {
-            return null;
-        }
-        else {
-            if (char.IsLower(op)) {
-                return edge.endPoint;
-            }
-            else {
-                return edge.startPoint;
-            }
-        }
-    }
 
     /**
-     * Checks whether the given edge is contained in the list of edges of this vertex.
-     * i.e. whether is has an edge with the same start point, end point and generator.
+     * This method is used to add an edge to the list of edges of this vertex. 
+     * It dynamically checks whether this vertex is the start or the end. The vertex therefore need to already be set as start or end.
+     * If an edge with the same generator and the same endpoints already exists, it is not added.
      */
-    public bool ContainsEdge(Edge edge) {
-        char generator;
-        if (edge.startPoint != null && edge.startPoint.Equals(this)) {
-            generator = edge.getGenerator();
+    public void AddEdge(Edge edge) {
+        // Determine whether this the edge points to this vertex or away from it
+        if (edge.StartPoint.Equals(this)) {
+            AddOutgoingEdge(edge);
         }
-        else if (edge.endPoint != null && edge.endPoint.Equals(this)) {
-            generator = char.ToUpper(edge.getGenerator());
+        if (edge.EndPoint.Equals(this)) {
+            AddIncomingEdge(edge);
         }
-        else {
-            return false;
+    }
+
+    public void RemoveEdge(Edge edge) {
+        if (edge.StartPoint.Equals(this)) {
+            RemoveOutgoingEdge(edge);
         }
-
-        foreach (Edge e in edges[generator]) {
-            if (e.Equals(edge)) {
-                return true;
-            }
+        if (edge.EndPoint.Equals(this)) {
+            RemoveIncomingEdge(edge);
         }
-        return false;
     }
 
-    public void Destroy() {
-        Destroy(gameObject);
+    /**
+     * To add an Edge, use the method addEdge instead
+     **/
+    private void AddOutgoingEdge(Edge edge) {
+        char generator = edge.Label;
+        if (!labeledOutgoingEdges.ContainsKey(generator)) {
+            labeledOutgoingEdges.Add(generator, new List<Edge>());
+        }
+        labeledOutgoingEdges[generator].Add(edge);
     }
 
-    public bool Equals(Vertex other) {
-        return id == other.id;
+    /**
+     * To remove an Edge, use the method removeEdge instead
+     **/
+    private void RemoveOutgoingEdge(Edge edge) {
+        char label = edge.Label;
+        if (labeledOutgoingEdges.ContainsKey(label)) {
+            labeledOutgoingEdges[label].Remove(edge);
+        }
     }
 
-    public void SetDistanceToNeutralElement(int distance) {
-        distanceToNeutralElement = distance;
+    /**
+     * To add an Edge, use the method addEdge instead
+     **/
+    private void AddIncomingEdge(Edge edge) {
+        char label = edge.Label;
+        if (!labeledIncomingEdges.ContainsKey(label)) {
+            labeledIncomingEdges.Add(label, new List<Edge>());
+        }
+        labeledIncomingEdges[label].Add(edge);
     }
 
-    public int GetDistanceToNeutralElement() {
-        return distanceToNeutralElement;
+    /**
+     * To remove an Edge, use the method removeEdge instead
+     **/
+    private void RemoveIncomingEdge(Edge edge) {
+        char label = edge.Label;
+        if (labeledIncomingEdges.ContainsKey(label)) {
+            labeledIncomingEdges[label].Remove(edge);
+        }
     }
 
-    public void setMass(float mass) {
-        this.mass = mass;
-    }
 
-    public float getMass() {
-        return mass;
-    }
 
-    public void SetPathsToNeutralElement(List<string> paths) {
-        pathsToNeutralElement = paths;
-    }
-
-    public List<string> GetPathsToNeutralElement() {
-        return pathsToNeutralElement;
-    }
-
-    public void AddPathToNeutralElement(string path) {
-        pathsToNeutralElement.Add(path);
-    }
-
-    public void AddPathsToNeutralElement(List<string> paths) {
-        pathsToNeutralElement.AddRange(paths);
-    }
 }

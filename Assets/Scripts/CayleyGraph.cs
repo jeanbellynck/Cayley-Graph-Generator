@@ -32,8 +32,7 @@ public class CayleyGraph : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        physik.UpdatePh(graphManager);
-    }  
+    }
 
     public void setGenerators(string generatorString) {
         generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
@@ -43,6 +42,7 @@ public class CayleyGraph : MonoBehaviour {
             cayleyGraphMaker.setGenerators(generators);
             hyperbolicityMatrix.GetComponent<HyperbolicityMatrix>().SetMatrixSize(generators.Length);
         }
+
     }
 
     public void setRelators(string relators) {
@@ -53,6 +53,7 @@ public class CayleyGraph : MonoBehaviour {
 
         // Apply the Relotor Decoder
         this.relators = RelatorDecoder.decodeRelators(relators);
+
     }
 
     public void setVertexNumber(string vertexNumber) {
@@ -64,6 +65,7 @@ public class CayleyGraph : MonoBehaviour {
     public GameObject vertexNumberInputField;
     public GameObject hyperbolicityInputField;
     public GameObject hyperbolicityMatrix;
+    public GameObject dimensionInputField;
 
 
     public void generateButton() {
@@ -73,6 +75,7 @@ public class CayleyGraph : MonoBehaviour {
     }
 
     public void StopVisualization() {
+        physik.StopAllCoroutines();
         cayleyGraphMaker.StopVisualization();
         // Destroy Mesh Objects
         ICollection<MeshGenerator> meshes = meshManager.GetMeshes();
@@ -85,10 +88,14 @@ public class CayleyGraph : MonoBehaviour {
 
     public void StartVisualization() {
         setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
-        physik.startUp();
-        physik.setGenerators(generators);
         graphManager.Initialize(generators);
-        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators);
+        string dimensionString = dimensionInputField.GetComponent<UnityEngine.UI.InputField>().text;
+        int dimension = 3;
+        if(int.TryParse(dimensionString, out int dimensionValue) && dimension > 0) {
+            dimension = dimensionValue;
+        } 
+        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, dimension);
+        physik.startUp(graphManager);
     }
 
 
