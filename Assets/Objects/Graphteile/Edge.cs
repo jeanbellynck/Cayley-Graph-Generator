@@ -24,6 +24,7 @@ public class Edge : MonoBehaviour {
     public Vertex StartPoint { get => startPoint; set => startPoint = value; }
     public Vertex EndPoint { get => endPoint; set => endPoint = value; }
     public float Length { get => length; set => length = value; }
+    public Vector3 direction => endPoint.transform.position - startPoint.transform.position;
 
     public void Initialize(Vertex startPoint, Vertex endPoint, char label) {
         this.StartPoint = startPoint;
@@ -48,10 +49,6 @@ public class Edge : MonoBehaviour {
         if (startPoint == null || endPoint == null) return;
         age += Time.deltaTime;
 
-        Vector3 vector = endPoint.transform.position - startPoint.transform.position;
-        //Vector3 vectorNormalized = vector.normalized;
-        _ = startPoint.CalculateSplineDirection(Label, vector);
-        _ = endPoint.CalculateSplineDirection(RelatorDecoder.invertGenerator(Label), vector);
     }
     public void SetFarbe(Color farbe1, Color farbe2) {
         //LineRenderer lr = GetComponent<LineRenderer>();
@@ -73,7 +70,7 @@ public class Edge : MonoBehaviour {
 
 
     void LateUpdate() {
-
+        if (startPoint == null || endPoint == null) return;
 
         splineComputer ??= GetComponent<SplineComputer>();
         // https://forum.unity.com/threads/why-does-unity-override-the-null-comparison-for-unity-objects.1294593/ Doesn't matter here
@@ -82,8 +79,13 @@ public class Edge : MonoBehaviour {
         Vector3 endPosition = endPoint.transform.position;
         Vector3 vector = endPosition - startPosition;
         //Vector3 vectorNormalized = vector.normalized;
-        Vector3 startDirection = startPoint.CalculateSplineDirection(Label, vector);
-        Vector3 endDirection = endPoint.CalculateSplineDirection(RelatorDecoder.invertGenerator(Label), vector);
+
+        if (!startPoint.splineDirections.ContainsKey(Label))
+            startPoint.RecalculateSplineDirections();
+        if (!endPoint.splineDirections.ContainsKey(Label))
+            endPoint.RecalculateSplineDirections();
+        Vector3 startDirection = startPoint.splineDirections[Label];
+        Vector3 endDirection = endPoint.splineDirections[Label];
 
         Vector3 midDisplacementDirectionNonOrthogonal = startDirection - endDirection;
         Vector3 midDisplacementDirection = Vector3.ProjectOnPlane(midDisplacementDirectionNonOrthogonal, vector.normalized);

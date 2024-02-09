@@ -1,4 +1,8 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Numerics;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,6 +24,15 @@ public class Vertex : MonoBehaviour {
 
     private Dictionary<char, List<Edge>> labeledOutgoingEdges = new Dictionary<char, List<Edge>>();
     private Dictionary<char, List<Edge>> labeledIncomingEdges = new Dictionary<char, List<Edge>>();
+
+    public readonly Dictionary<char, Vector3> splineDirections = new();
+    private readonly int SplineDirectionUpdateFrame = 10;
+    public float splineDirectionFactor = 0.2f;
+    public float orthogonalSplineDirectionFactor = 0.1f;
+
+    Dictionary<char, Vector3> preferredRandomDirections = new ();
+    readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
+    public bool preferEights = false;
 
     private Renderer mr;
 
@@ -51,6 +64,7 @@ public class Vertex : MonoBehaviour {
         velocity = VectorN.Zero(position.Size());
         linkForce = VectorN.Zero(position.Size());
         repelForce = VectorN.Zero(position.Size());
+        StartCoroutine(CalculateSplineDirections());
     }
 
     // Update is called once per frame
@@ -86,6 +100,7 @@ public class Vertex : MonoBehaviour {
                 edge.Destroy();
             }
         }
+        StopAllCoroutines();
         Destroy(gameObject);
     }
 
@@ -93,51 +108,107 @@ public class Vertex : MonoBehaviour {
         return other != null && Id == other.Id;
     }
 
-    public readonly Dictionary<char, Vector3> splineDirections = new();
+    public void Reset() {
+        age = 0;
+        repelForce = VectorN.Zero(position.Size());
+        linkForce = VectorN.Zero(position.Size());
+        splineDirections.Clear();
+        preferredRandomDirections.Clear();
+        fallbackRandomDirections.Clear();
+    }
 
-    public float splineDirectionFactor = 0.2f;
-    public float orthogonalSplineDirectionFactor = 0.1f;
-    Vector3 oldRandomDirection = Vector3.zero;
-    public Vector3 CalculateSplineDirection(char generator, Vector3 direction) {
-
-        if (splineDirections.TryGetValue(generator, out var result))
-            return result;
-
-
-        result = direction * splineDirectionFactor;
-        var expectedLengthSquared = result.sqrMagnitude;
-        char inverseGenerator = RelatorDecoder.invertGenerator(generator);
-
-        bool otherDirectionAlreadyComputed = splineDirections.TryGetValue(inverseGenerator, out var oldResult);
-        if (otherDirectionAlreadyComputed)
-            result = 0.5f * (result + oldResult);
-
-        // If in- and outgoing splines for this generator are exactly opposite (a^2 = 1), set direction to an orthogonal vector, so that the two edges are not exactly parallel
-        if (result.sqrMagnitude < 0.005f * expectedLengthSquared)
-            result = RandomOrthogonalDirection();
-
-        foreach (var (gen, splineDirection) in splineDirections) {
-            if (gen == generator || gen == inverseGenerator || Vector3.Angle(splineDirection, result) is > 3f and < 177f) continue;
-            result += RandomOrthogonalDirection() * 0.5f;
-            break;
+    IEnumerator<int> CalculateSplineDirections() {
+        var r = Random.Range(0, SplineDirectionUpdateFrame);
+        while (true) {
+            if (Time.frameCount % SplineDirectionUpdateFrame != r) yield return 0;
+            RecalculateSplineDirections();
+            yield return 1;
         }
+    }
 
-        splineDirections[generator] = result;
-        if (otherDirectionAlreadyComputed)
-            splineDirections[inverseGenerator] = result;
+    public void RecalculateSplineDirections(){
+        var labels = LabeledIncomingEdges.Keys.Union(LabeledOutgoingEdges.Keys);
+        List<char> randomLabels = new();
 
-        return result;
+        var incomingAverages = new Dictionary<char, Vector3>();
+        var outgoingAverages = new Dictionary<char, Vector3>();
 
-        Vector3 RandomOrthogonalDirection()
-        {
-            Vector3 randVector;
-            while (true) {
-                randVector = Vector3.ProjectOnPlane(oldRandomDirection, direction.normalized); 
-                if (randVector.sqrMagnitude > 0.005f) break;
-                    oldRandomDirection = Random.onUnitSphere;
+
+        foreach (var label in labels) {
+            var inAvg = incomingAverages[label] = Helpers.Average(from edge in GetIncomingEdges(label)
+                select edge.direction);
+            var outAvg = outgoingAverages[label] = Helpers.Average(from edge in GetOutgoingEdges(label)
+                select edge.direction);
+            var res = 0.5f * splineDirectionFactor * (inAvg + outAvg);
+            if (res.sqrMagnitude < 0.005f * splineDirectionFactor * splineDirectionFactor *
+                (inAvg.sqrMagnitude + outAvg.sqrMagnitude)) {
+                randomLabels.Add(label);
             }
 
-            return direction.magnitude * orthogonalSplineDirectionFactor * randVector.normalized;
+            splineDirections[label] = res;
+        }
+
+        randomLabels.Sort();
+        if (!randomLabels.SequenceEqual(preferredRandomDirections.Keys)) {
+            var l = randomLabels.Count;
+            preferredRandomDirections = new (
+                from labelIndexTuple in randomLabels.Zip(
+                    Enumerable.Range(0, l),
+                    (c, i) => (c, i)
+                )
+                select new KeyValuePair<char, Vector3>(
+                    labelIndexTuple.c, 
+                    Helpers.distributedVectors[l][labelIndexTuple.i]
+                )
+            );
+        }
+        foreach (var label in randomLabels) 
+            splineDirections[label] = RandomOrthogonalDirection(label, (incomingAverages[label] - outgoingAverages[label]) * 0.5f); // actually, this is just incomingAverages[label] again
+
+        foreach (List<char> similarLabels in Helpers.GroupVectorsByAngle(splineDirections)) {
+            if (similarLabels.Count <= 1) continue;
+            var middle = similarLabels.Count / 2f;
+            var label = similarLabels[0];
+            var displacementDirection = RandomOrthogonalDirection(label, splineDirections[label]);
+            for (int i = 0; i < similarLabels.Count; i++) 
+                splineDirections[similarLabels[i]] += 0.5f * (i - middle) * displacementDirection;
+        }
+
+        return;
+
+        bool InPositiveHalfSpace(Vector3 v) {
+            if (v.x > 0) return true;
+            if (v.x < 0) return false;
+            if (v.y > 0) return true;
+            if (v.y < 0) return false;
+            if (v.z > 0) return true;
+            return false;
+        }
+
+        Vector3 RandomOrthogonalDirection(char label, Vector3 direction) {
+            if (!preferredRandomDirections.TryGetValue(label, out var preferredRandomDirection))
+            {
+                // should not happen anymore!
+               preferredRandomDirection = preferredRandomDirections[label] = Random.onUnitSphere;
+                // TODOne: choose this so that it preferredRandomDirections contains vectors that are maximally spread (in RP2), i.e. the dot product of any two is minimal
+            }
+            var randomDirection = Vector3.ProjectOnPlane(preferredRandomDirection, direction.normalized);
+
+            if (randomDirection.sqrMagnitude < 0.005f) {
+                Vector3 fallbackRandomDirection;
+                while (!fallbackRandomDirections.TryGetValue(label, out  fallbackRandomDirection) || preferredRandomDirection.sqrMagnitude < 0.005f) {
+                  fallbackRandomDirections[label] =  preferredRandomDirection = Vector3.Cross(Random.onUnitSphere, preferredRandomDirection);
+                }
+
+                randomDirection = Vector3.ProjectOnPlane(fallbackRandomDirection, direction.normalized);
+            }
+
+
+            if (!preferEights && !InPositiveHalfSpace(direction)) {
+                randomDirection = -randomDirection;
+            }
+
+            return direction.magnitude * orthogonalSplineDirectionFactor * randomDirection.normalized;
         }
     }
 
