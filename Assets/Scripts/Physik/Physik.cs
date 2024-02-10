@@ -13,12 +13,13 @@ public class Physik : MonoBehaviour {
     public float angleForceFactor;
 
     // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
-    private float alpha = 1;
+    public float alpha { get; private set; }
     public float alphaSetting = 1;
     
     public float alphaDecay = 0.1f;
 
     public float velocityDecay = 0.9f;
+
 
     GraphManager graphManager;
 

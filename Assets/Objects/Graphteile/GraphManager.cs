@@ -17,6 +17,10 @@ public class GraphManager : MonoBehaviour {
         return vertices;
     }
 
+    public void SetSplinificationMode(int t) {
+        Edge.splinificationType = (Edge.SplinificationType) t;
+    }
+
     public void AddVertex(Vertex vertex) {
         vertex.Id = idCounter;
         idCounter++;

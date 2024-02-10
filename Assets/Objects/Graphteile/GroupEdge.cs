@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GroupEdge : Edge {
     public static readonly IDictionary<char, Color> LabelColours = new Dictionary<char, Color>();
+    public override float Activity => (StartPoint is GroupVertex sp) ? sp.Activity : (EndPoint is GroupVertex ep) ? ep.Activity : 1;
 
     public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation) {
         if(char.IsLower(operation)) {

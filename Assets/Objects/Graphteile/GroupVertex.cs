@@ -15,6 +15,9 @@ public class GroupVertex : Vertex {
         private set => distanceToNeutralElement = value; }
     public List<string> PathsToNeutralElement { get => pathsToNeutralElement; set => pathsToNeutralElement = value; }
 
+    [SerializeField] CayleyGraph cayleyGraph;
+    public float Activity => cayleyGraph.Activity;
+
 
     // Start is called before the first frame update
     protected override void Start() {
@@ -34,6 +37,7 @@ public class GroupVertex : Vertex {
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
         base.Initialize(predecessor.Position);
+        cayleyGraph = predecessor.cayleyGraph;
         name = predecessor.name + op;
 
         GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));

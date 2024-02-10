@@ -25,6 +25,12 @@ public class Edge : MonoBehaviour {
     public float Length { get => length; protected set => length = value; }
     public Vector3 Direction => EndPoint.transform.position - StartPoint.transform.position;
 
+    public enum SplinificationType {
+        Never,
+        Always,
+        AtTheEnd
+    }
+    public static SplinificationType splinificationType = SplinificationType.AtTheEnd;
 
     SplineComputer splineComputer;
     SplineRenderer splineRenderer;
@@ -36,6 +42,7 @@ public class Edge : MonoBehaviour {
     protected float midDirectionFactor = 0.3f;
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
+    public virtual float Activity => 1f;
 
     void Start() {
         creationTime = Time.time;
@@ -52,6 +59,8 @@ public class Edge : MonoBehaviour {
         splineComputer = GetComponent<SplineComputer>();
         splineRenderer = GetComponent<SplineRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
+
+        useSplines = splinificationType == SplinificationType.Always;
 
         Update();
     }
@@ -76,14 +85,17 @@ public class Edge : MonoBehaviour {
     float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
 
 
-    void Update() {
+    protected virtual void Update() {
         if (startPoint == null || endPoint == null) return;
+        if (splinificationType == SplinificationType.AtTheEnd && !useSplines && Activity < 1 && Mathf.SmoothStep(0, 1, Age) > Activity)
+            useSplines = true;
 
         if (useSplines)
             UpdateSpline();
         else 
             UpdateLine();
     }
+
 
     void UpdateLine() {
         lineRenderer.enabled = true;
@@ -153,9 +165,9 @@ public class Edge : MonoBehaviour {
         });
 }
 
-public virtual Vertex getOpposite(GroupVertex vertex) {
-if (vertex.Equals(StartPoint)) return EndPoint;
-if (vertex.Equals(EndPoint)) return StartPoint;
-throw new Exception("Vertex is not part of this edge.");
-}
+    public virtual Vertex getOpposite(GroupVertex vertex) {
+        if (vertex.Equals(StartPoint)) return EndPoint;
+        if (vertex.Equals(EndPoint)) return StartPoint;
+        throw new Exception("Vertex is not part of this edge.");
+    }
 }

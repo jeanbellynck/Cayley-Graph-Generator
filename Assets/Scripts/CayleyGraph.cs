@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 /**
  * This class is both the main class for the graph and the interface for the UI.
@@ -21,6 +23,7 @@ public class CayleyGraph : MonoBehaviour {
     public string[] relators = new string[0];
 
 
+    public float Activity => Math.Clamp(physik.alpha, 0f, 1f);
 
     // Start is called before the first frame update
     void Start() {
@@ -40,7 +43,7 @@ public class CayleyGraph : MonoBehaviour {
         if(!newGenerators.Equals(generators)) {
             generators = newGenerators;
             cayleyGraphMaker.setGenerators(generators);
-            hyperbolicityMatrix.GetComponent<HyperbolicityMatrix>().SetMatrixSize(generators.Length);
+            hyperbolicityMatrix.SetMatrixSize(generators.Length);
         }
 
     }
@@ -60,17 +63,17 @@ public class CayleyGraph : MonoBehaviour {
         cayleyGraphMaker.setVertexNumber(int.Parse(vertexNumber));
     }
 
-    public GameObject generatorInputField;
-    public GameObject relatorInputField;
-    public GameObject vertexNumberInputField;
-    public GameObject hyperbolicityInputField;
-    public GameObject hyperbolicityMatrix;
-    public GameObject dimensionInputField;
+    public InputField generatorInputField;
+    public InputField relatorInputField;
+    public InputField vertexNumberInputField;
+    public InputField hyperbolicityInputField;
+    public HyperbolicityMatrix hyperbolicityMatrix;
+    public InputField dimensionInputField;
 
 
     public void generateButton() {
         StopVisualization();
-        setRelators(relatorInputField.GetComponent<UnityEngine.UI.InputField>().text);
+        setRelators(relatorInputField.text);
         StartVisualization();
     }
 
@@ -87,15 +90,15 @@ public class CayleyGraph : MonoBehaviour {
     }
 
     public void StartVisualization() {
-        setVertexNumber(vertexNumberInputField.GetComponent<UnityEngine.UI.InputField>().text);
+        setVertexNumber(vertexNumberInputField.text);
         graphManager.Initialize(generators);
-        string dimensionString = dimensionInputField.GetComponent<UnityEngine.UI.InputField>().text;
+        physik.startUp(graphManager);
+        string dimensionString = dimensionInputField.text;
         int dimension = 3;
         if(int.TryParse(dimensionString, out int dimensionValue) && dimension > 0) {
             dimension = dimensionValue;
         } 
         cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, dimension);
-        physik.startUp(graphManager);
     }
 
 
@@ -103,8 +106,8 @@ public class CayleyGraph : MonoBehaviour {
         StopVisualization();
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
-        generatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", generatorString);
-        relatorInputField.GetComponent<UnityEngine.UI.InputField>().text = string.Join(", ", relatorString);
+        generatorInputField.text = string.Join(", ", generatorString);
+        relatorInputField.text = string.Join(", ", relatorString);
         // Generator is automatically updated on value change
         //setGenerators(generatorString); 
         setRelators(relatorString);
