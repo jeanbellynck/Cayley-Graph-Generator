@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Numerics;
 using UnityEngine;
 
@@ -46,6 +47,8 @@ public struct VectorN {
             values[index] = value;
         }
     }
+
+    public bool IsNaN => (from v in values select float.IsNaN(v)).Any();
 
     public int Size() {
         return size;
@@ -157,6 +160,8 @@ public struct VectorN {
 
 
     public static VectorN Random(int dim, float radius) {
+        if (dim == 0) 
+            return Zero(0); // TODO?
         VectorN result = new VectorN(dim);
         for (int i = 0; i < dim; i++) {
             result[i] = UnityEngine.Random.Range(-radius, radius);

@@ -77,7 +77,7 @@ public class BarnesQuadtree {
 
     private bool punktInBounds(Vertex vertex) {
         VectorN punkt = vertex.Position;
-        if(float.IsNaN(punkt[0])) {
+        if(punkt.IsNaN) {
             return false;
         }
         for (int i = 0; i < dim; i++) {

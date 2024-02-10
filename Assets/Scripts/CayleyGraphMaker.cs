@@ -66,9 +66,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         //int simulationDimensionality = 2*generators.Length + 1;
         GroupVertex neutralElement = neutralElementGameObject.GetComponent<GroupVertex>();
-        neutralElement.Position = VectorN.Zero(simulationDimensionality);
-        neutralElement.Velocity = VectorN.Zero(simulationDimensionality);
-        neutralElement.Reset();
+        neutralElement.Reset(simulationDimensionality);
         graphManager.AddVertex(neutralElement);
         AddBorderVertex(neutralElement);
 
