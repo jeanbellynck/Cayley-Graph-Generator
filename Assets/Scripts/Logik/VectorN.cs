@@ -48,7 +48,7 @@ public struct VectorN {
         }
     }
 
-    public bool IsNaN => (from v in values select float.IsNaN(v)).Any();
+    public bool IsNaN => values.Any( float.IsNaN );
 
     public int Size() {
         return size;
