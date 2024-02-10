@@ -196,8 +196,8 @@ public class Vertex : MonoBehaviour {
 
             if (randomDirection.sqrMagnitude < 0.005f) {
                 Vector3 fallbackRandomDirection;
-                while (!fallbackRandomDirections.TryGetValue(label, out  fallbackRandomDirection) || preferredRandomDirection.sqrMagnitude < 0.005f) {
-                  fallbackRandomDirections[label] =  preferredRandomDirection = Vector3.Cross(Random.onUnitSphere, preferredRandomDirection);
+                while (!fallbackRandomDirections.TryGetValue(label, out fallbackRandomDirection) || preferredRandomDirection.sqrMagnitude < 0.005f) {
+                  fallbackRandomDirections[label] = Vector3.Cross(Random.onUnitSphere, preferredRandomDirection);
                 }
 
                 randomDirection = Vector3.ProjectOnPlane(fallbackRandomDirection, direction.normalized);
