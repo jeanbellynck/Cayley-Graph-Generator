@@ -1,31 +1,35 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 public class GroupVertex : Vertex {
-    private float stress; // Measures how unusual the angles of the vertex are. It is used to visualize weird spots.
-
     [SerializeField]
     private int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
     [SerializeField]
     private List<string> pathsToNeutralElement = new List<string>(); // The paths to the identity element. This is used to visualize the paths to the identity element.
 
-    public float Stress { get => stress; set => stress = value; }
-    public int DistanceToNeutralElement { get => distanceToNeutralElement; set => distanceToNeutralElement = value; }
+    public float Stress { get; private set; }
+
+    public int DistanceToNeutralElement { get => distanceToNeutralElement;
+        private set => distanceToNeutralElement = value; }
     public List<string> PathsToNeutralElement { get => pathsToNeutralElement; set => pathsToNeutralElement = value; }
 
 
     // Start is called before the first frame update
-    public override void Start() {
+    protected override void Start() {
         base.Start();
     }
 
     // Update is called once per frame
-    public override void Update() {
+    protected override void Update() {
         base.Update();
-        Mr.material.color = new Color(stress, 0, 0);
+        Stress = (from generator in LabeledOutgoingEdges.Keys
+            let inEdge = GetIncomingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
+            let outEdge = GetOutgoingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
+            select Vector3.Angle(inEdge, outEdge) / 180
+        ).DefaultIfEmpty(0).Max();
+        Mr.material.color = new Color(Stress, 0, 0);
     }
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {

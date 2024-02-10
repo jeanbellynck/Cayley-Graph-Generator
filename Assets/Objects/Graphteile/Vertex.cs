@@ -1,102 +1,79 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
 public class Vertex : MonoBehaviour {
-    [SerializeField]
-    private VectorN position;
-    private VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
-     private VectorN velocity; // This is the previous position of the vertex. It is used to calculate the forces using the improved euler method.
-    private int id;
-    private float age = 0;
-    [SerializeField]
-    private float mass = 1; // The mass of the vertex. This is used to calculate the repulsion force. It depends on the hyperbolicity and the distance to the neutral element.
-   
-    private VectorN repelForce;
-    private VectorN linkForce;
 
-    private Dictionary<char, List<Edge>> labeledOutgoingEdges = new Dictionary<char, List<Edge>>();
-    private Dictionary<char, List<Edge>> labeledIncomingEdges = new Dictionary<char, List<Edge>>();
 
     public readonly Dictionary<char, Vector3> splineDirections = new();
-    private readonly int SplineDirectionUpdateFrame = 10;
-    public float splineDirectionFactor = 0.2f;
-    public float orthogonalSplineDirectionFactor = 0.1f;
+    const int SplineDirectionUpdateFrameInterval = 15;
+    [SerializeField] float splineDirectionFactor = 0.2f; // actually I would like to see these in the inspector AND have them be static
+    [SerializeField] float orthogonalSplineDirectionFactor = 0.1f;
+    [SerializeField] bool preferEights = false;
+    [SerializeField] float equalDirectionDisplacementFactor = 0.3f;
+
 
     Dictionary<char, Vector3> preferredRandomDirections = new ();
     Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
-    public bool preferEights = false;
-
-    private Renderer mr;
-    public float equalDirectionDisplacementFactor = 0.3f;
 
 
-    public int Id { get => id; set => id = value; }
-    public float Mass { get => mass; set => mass = value; }
-    public float Age { get => age; set => age = value; }
+    public int Id { get; set; }
+
+    [SerializeField] float mass = 1;
+    public float Mass { get => mass; protected set => mass = value; }
+
     public VectorN Velocity { get => Velocity1; set => Velocity1 = value; }
-    public VectorN RepelForce { get => repelForce; set => repelForce = value; }
-    public VectorN LinkForce { get => linkForce; set => linkForce = value; }
-    public Dictionary<char, List<Edge>> LabeledOutgoingEdges { get => labeledOutgoingEdges; set => labeledOutgoingEdges = value; }
-    public Dictionary<char, List<Edge>> LabeledIncomingEdges { get => labeledIncomingEdges; set => labeledIncomingEdges = value; }
-    public Renderer Mr { get => mr; set => mr = value; }
+    public VectorN RepelForce { get; set; }
+
+    public VectorN LinkForce { get; set; }
+
+    public Dictionary<char, List<Edge>> LabeledOutgoingEdges { get; set; } = new();
+    public Dictionary<char, List<Edge>> LabeledIncomingEdges { get; set; } = new();
+    protected Renderer Mr { get; private set; }
+
+    [SerializeField] VectorN position;
+    VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
+
+    float creationTime; // = Time.time;
+    public float Age => Time.time - creationTime;
+
     public VectorN Position { get => position; set => position = value; }
-    public VectorN Velocity1 { get => velocity; set => velocity = value; }
+    VectorN Velocity1 { get; set; }
 
     // Start is called before the first frame update
-    public virtual void Start() {
-        if (mass == 0) {
-            mass = 0.1f;
+    protected virtual void Start() {
+        creationTime = Time.time;
+        if (Mass == 0) {
+            Mass = 0.1f;
         }
-        mr = GetComponent<Renderer>();
+        Mr = GetComponent<Renderer>();
         Update();
     }
 
-    public void Initialize(VectorN position) {
-        age = 0;
+    protected void Initialize(VectorN position) {
         this.position = position;
-        velocity = VectorN.Zero(position.Size());
-        linkForce = VectorN.Zero(position.Size());
-        repelForce = VectorN.Zero(position.Size());
+        VectorN zero = VectorN.Zero(position.Size());
+        Velocity1 = zero;
+        LinkForce = zero;
+        RepelForce = zero;
         StartCoroutine(CalculateSplineDirections());
     }
 
-    // Update is called once per frame
-    public virtual void Update() {
-        age += Time.deltaTime;
-        if (Time.renderedFrameCount % 10 == 0) {
-            splineDirections.Clear(); // Recompute spline directions every 10 frames
-        }
-    }
+    protected virtual void Update() {}
 
-
-    /**
-    * Used for debugging.
-    */
-    void OnDrawGizmos() {
-        //Gizmos.color = Color.green;
-        //Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(repelForce));
-        //Gizmos.color = Color.cyan;
-        //Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(linkForce));
-    }
 
     public void Destroy() {
         // Destroy all edges too
-        foreach (List<Edge> genEdges in labeledIncomingEdges.Values) {
+        foreach (List<Edge> genEdges in LabeledIncomingEdges.Values) {
             List<Edge> genEdgesCopy = new List<Edge>(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 edge.Destroy();
             }
         }
-        foreach (List<Edge> genEdges in labeledOutgoingEdges.Values) {
+        foreach (List<Edge> genEdges in LabeledOutgoingEdges.Values) {
             List<Edge> genEdgesCopy = new List<Edge>(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 edge.Destroy();
@@ -110,19 +87,22 @@ public class Vertex : MonoBehaviour {
         return other != null && Id == other.Id;
     }
 
-    public void Reset() {
-        age = 0;
-        repelForce = VectorN.Zero(position.Size());
-        linkForce = VectorN.Zero(position.Size());
+    public void Reset(int dimension) {
+        creationTime = Time.time;
+        VectorN zero = VectorN.Zero(dimension);
+        RepelForce = zero;
+        LinkForce = zero;
+        Position = zero;
+        Velocity = zero;
         splineDirections.Clear();
         preferredRandomDirections.Clear();
         fallbackRandomDirections.Clear();
     }
 
     IEnumerator<int> CalculateSplineDirections() {
-        var r = Random.Range(0, SplineDirectionUpdateFrame);
+        var r = Random.Range(0, SplineDirectionUpdateFrameInterval);
         while (true) {
-            if (Time.frameCount % SplineDirectionUpdateFrame != r) {
+            if (Time.frameCount % SplineDirectionUpdateFrameInterval != r) {
                 yield return 0;
                 continue;
             }
@@ -142,9 +122,9 @@ public class Vertex : MonoBehaviour {
 
         foreach (var label in labels) {
             var inAvg = incomingAverages[label] = Helpers.Average(from edge in GetIncomingEdges(label)
-                select edge.direction);
+                select edge.Direction);
             var outAvg = outgoingAverages[label] = Helpers.Average(from edge in GetOutgoingEdges(label)
-                select edge.direction);
+                select edge.Direction);
             var res = 0.5f * splineDirectionFactor * (inAvg + outAvg);
             if (res.sqrMagnitude < 0.005f * splineDirectionFactor * splineDirectionFactor *
                 (inAvg.sqrMagnitude + outAvg.sqrMagnitude)) {
@@ -243,8 +223,8 @@ public class Vertex : MonoBehaviour {
     }
 
     public List<Edge> GetIncomingEdges(char op) {
-        if (labeledIncomingEdges.ContainsKey(op)) {
-            return labeledIncomingEdges[op];
+        if (LabeledIncomingEdges.ContainsKey(op)) {
+            return LabeledIncomingEdges[op];
         }
         else {
             return new List<Edge>();
@@ -253,8 +233,8 @@ public class Vertex : MonoBehaviour {
 
 
     public List<Edge> GetOutgoingEdges(char op) {
-        if (labeledOutgoingEdges.ContainsKey(op)) {
-            return labeledOutgoingEdges[op];
+        if (LabeledOutgoingEdges.ContainsKey(op)) {
+            return LabeledOutgoingEdges[op];
         }
         else {
             return new List<Edge>();
@@ -289,42 +269,42 @@ public class Vertex : MonoBehaviour {
     /**
      * To add an Edge, use the method addEdge instead
      **/
-    private void AddOutgoingEdge(Edge edge) {
+    void AddOutgoingEdge(Edge edge) {
         char generator = edge.Label;
-        if (!labeledOutgoingEdges.ContainsKey(generator)) {
-            labeledOutgoingEdges.Add(generator, new List<Edge>());
+        if (!LabeledOutgoingEdges.ContainsKey(generator)) {
+            LabeledOutgoingEdges.Add(generator, new List<Edge>());
         }
-        labeledOutgoingEdges[generator].Add(edge);
+        LabeledOutgoingEdges[generator].Add(edge);
     }
 
     /**
      * To remove an Edge, use the method removeEdge instead
      **/
-    private void RemoveOutgoingEdge(Edge edge) {
+    void RemoveOutgoingEdge(Edge edge) {
         char label = edge.Label;
-        if (labeledOutgoingEdges.ContainsKey(label)) {
-            labeledOutgoingEdges[label].Remove(edge);
+        if (LabeledOutgoingEdges.ContainsKey(label)) {
+            LabeledOutgoingEdges[label].Remove(edge);
         }
     }
 
     /**
      * To add an Edge, use the method addEdge instead
      **/
-    private void AddIncomingEdge(Edge edge) {
+    void AddIncomingEdge(Edge edge) {
         char label = edge.Label;
-        if (!labeledIncomingEdges.ContainsKey(label)) {
-            labeledIncomingEdges.Add(label, new List<Edge>());
+        if (!LabeledIncomingEdges.ContainsKey(label)) {
+            LabeledIncomingEdges.Add(label, new List<Edge>());
         }
-        labeledIncomingEdges[label].Add(edge);
+        LabeledIncomingEdges[label].Add(edge);
     }
 
     /**
      * To remove an Edge, use the method removeEdge instead
      **/
-    private void RemoveIncomingEdge(Edge edge) {
+    void RemoveIncomingEdge(Edge edge) {
         char label = edge.Label;
-        if (labeledIncomingEdges.ContainsKey(label)) {
-            labeledIncomingEdges[label].Remove(edge);
+        if (LabeledIncomingEdges.ContainsKey(label)) {
+            LabeledIncomingEdges[label].Remove(edge);
         }
     }
 
