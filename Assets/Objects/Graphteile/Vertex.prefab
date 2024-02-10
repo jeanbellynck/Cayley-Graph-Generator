@@ -98,17 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad7185056b678cd4f9934ecc0552f214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  age: 0
-  isActive: 1
-  velocity: {x: 0, y: 0, z: 0}
-  repelForce: {x: 0, y: 0, z: 0}
-  attractForce: {x: 0, y: 0, z: 0}
-  oppositeForce: {x: 0, y: 0, z: 0}
-  angleForce: {x: 0, y: 0, z: 0}
-  stress: 0
-  id: 0
-  distanceToNeutralElement: 0
-  pathsToNeutralElement: []
   mass: 1
   splineDirectionFactor: 0.2
   orthogonalSplineDirectionFactor: 0.1
+  preferEights: 0
+  equalDirectionDisplacementFactor: 0.1
+  distanceToNeutralElement: 0
+  pathsToNeutralElement: []

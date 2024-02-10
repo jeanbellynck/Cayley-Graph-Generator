@@ -31,10 +31,12 @@ public class Vertex : MonoBehaviour {
     public float orthogonalSplineDirectionFactor = 0.1f;
 
     Dictionary<char, Vector3> preferredRandomDirections = new ();
+    Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
     public bool preferEights = false;
 
     private Renderer mr;
+    public float equalDirectionDisplacementFactor = 0.3f;
 
 
     public int Id { get => id; set => id = value; }
@@ -120,14 +122,18 @@ public class Vertex : MonoBehaviour {
     IEnumerator<int> CalculateSplineDirections() {
         var r = Random.Range(0, SplineDirectionUpdateFrame);
         while (true) {
-            if (Time.frameCount % SplineDirectionUpdateFrame != r) yield return 0;
+            if (Time.frameCount % SplineDirectionUpdateFrame != r) {
+                yield return 0;
+                continue;
+            }
             RecalculateSplineDirections();
             yield return 1;
         }
     }
 
     public void RecalculateSplineDirections(){
-        var labels = LabeledIncomingEdges.Keys.Union(LabeledOutgoingEdges.Keys);
+        var labels = LabeledIncomingEdges.Keys.Union(LabeledOutgoingEdges.Keys).ToList();
+        labels.Sort();
         List<char> randomLabels = new();
 
         var incomingAverages = new Dictionary<char, Vector3>();
@@ -148,30 +154,49 @@ public class Vertex : MonoBehaviour {
             splineDirections[label] = res;
         }
 
-        randomLabels.Sort();
+        // assert: randomLabels.Sort() is unnecessary
         if (!randomLabels.SequenceEqual(preferredRandomDirections.Keys)) {
             var l = randomLabels.Count;
-            preferredRandomDirections = new (
-                from labelIndexTuple in randomLabels.Zip(
-                    Enumerable.Range(0, l),
-                    (c, i) => (c, i)
-                )
+            preferredRandomDirections = new Dictionary<char, Vector3>(
+                from i in Enumerable.Range(0, l)
                 select new KeyValuePair<char, Vector3>(
-                    labelIndexTuple.c, 
-                    Helpers.distributedVectors[l][labelIndexTuple.i]
+                    randomLabels[i], 
+                    Helpers.distributedVectors[l][i]
                 )
             );
         }
+
+        if (!labels.SequenceEqual(fixedPreferredRandomDirections.Keys)) {
+            var l = labels.Count;
+            fixedPreferredRandomDirections = new Dictionary<char, Vector3>(
+                from i in Enumerable.Range(0, l)
+                select new KeyValuePair<char, Vector3>(
+                    labels[i],
+                    Helpers.distributedVectors[l][i]
+                )
+            );
+        }
+
         foreach (var label in randomLabels) 
-            splineDirections[label] = RandomOrthogonalDirection(label, (incomingAverages[label] - outgoingAverages[label]) * 0.5f); // actually, this is just incomingAverages[label] again
+            splineDirections[label] = RandomOrthogonalDirection(label, incomingAverages[label] - outgoingAverages[label], false ) * orthogonalSplineDirectionFactor; // actually, this is just 2*incomingAverages[label]
 
         foreach (List<char> similarLabels in Helpers.GroupVectorsByAngle(splineDirections)) {
-            if (similarLabels.Count <= 1) continue;
-            var middle = similarLabels.Count / 2f;
-            var label = similarLabels[0];
-            var displacementDirection = RandomOrthogonalDirection(label, splineDirections[label]);
-            for (int i = 0; i < similarLabels.Count; i++) 
-                splineDirections[similarLabels[i]] += 0.5f * (i - middle) * displacementDirection;
+            int similarLabelsCount = similarLabels.Count;
+            if (similarLabelsCount <= 1) continue;
+            var factor = equalDirectionDisplacementFactor / Mathf.Sqrt(  similarLabelsCount );
+            var middle = (similarLabelsCount - 1) / 2f;
+
+            var label = similarLabels[Mathf.RoundToInt(middle)];
+            var displacementDirection = RandomOrthogonalDirection(label, incomingAverages[label] - outgoingAverages[label], true);
+
+            //similarLabels.Sort();
+
+            for (int i = 0; i < similarLabelsCount; i++) {
+                var localFactor = factor * (i - middle);
+                if (!InPositiveHalfSpace(splineDirections[similarLabels[i]]))
+                    localFactor = -localFactor;
+                splineDirections[similarLabels[i]] += localFactor * displacementDirection;
+            }
         }
 
         return;
@@ -185,20 +210,25 @@ public class Vertex : MonoBehaviour {
             return false;
         }
 
-        Vector3 RandomOrthogonalDirection(char label, Vector3 direction) {
-            if (!preferredRandomDirections.TryGetValue(label, out var preferredRandomDirection))
+        Vector3 RandomOrthogonalDirection(char label, Vector3 direction, bool @fixed) {
+            var localPreferredRandomDirections = @fixed ? fixedPreferredRandomDirections : preferredRandomDirections;
+            if (!localPreferredRandomDirections.TryGetValue(label, out var preferredRandomDirection))
             {
                 // should not happen anymore!
-               preferredRandomDirection = preferredRandomDirections[label] = Random.onUnitSphere;
+               preferredRandomDirection = localPreferredRandomDirections[label] = Random.onUnitSphere;
                 // TODOne: choose this so that it preferredRandomDirections contains vectors that are maximally spread (in RP2), i.e. the dot product of any two is minimal
             }
             var randomDirection = Vector3.ProjectOnPlane(preferredRandomDirection, direction.normalized);
+            //assert: preferredRandomDirection has norm 1
 
             if (randomDirection.sqrMagnitude < 0.005f) {
-                Vector3 fallbackRandomDirection;
-                while (!fallbackRandomDirections.TryGetValue(label, out fallbackRandomDirection) || preferredRandomDirection.sqrMagnitude < 0.005f) {
-                  fallbackRandomDirections[label] = Vector3.Cross(Random.onUnitSphere, preferredRandomDirection);
-                }
+                if (!fallbackRandomDirections.TryGetValue(label, out var fallbackRandomDirection))
+                    while(true){
+                        fallbackRandomDirection = Vector3.Cross(Random.onUnitSphere, preferredRandomDirection);
+                        if( fallbackRandomDirection.sqrMagnitude < 0.005f) continue;
+                        fallbackRandomDirections[label] = fallbackRandomDirection = fallbackRandomDirection.normalized;
+                        break;
+                    }
 
                 randomDirection = Vector3.ProjectOnPlane(fallbackRandomDirection, direction.normalized);
             }
@@ -208,7 +238,7 @@ public class Vertex : MonoBehaviour {
                 randomDirection = -randomDirection;
             }
 
-            return direction.magnitude * orthogonalSplineDirectionFactor * randomDirection.normalized;
+            return direction.magnitude * randomDirection.normalized;
         }
     }
 
