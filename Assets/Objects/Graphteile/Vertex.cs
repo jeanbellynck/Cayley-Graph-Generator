@@ -59,7 +59,7 @@ public class Vertex : MonoBehaviour {
         Velocity1 = zero;
         LinkForce = zero;
         RepelForce = zero;
-        StartCoroutine(CalculateSplineDirections());
+        //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
     }
 
     protected virtual void Update() {}
@@ -99,17 +99,17 @@ public class Vertex : MonoBehaviour {
         fallbackRandomDirections.Clear();
     }
 
-    IEnumerator<int> CalculateSplineDirections() {
-        var r = Random.Range(0, SplineDirectionUpdateFrameInterval);
-        while (true) {
-            if (Time.frameCount % SplineDirectionUpdateFrameInterval != r) {
-                yield return 0;
-                continue;
-            }
-            RecalculateSplineDirections();
-            yield return 1;
-        }
-    }
+    //IEnumerator<int> CalculateSplineDirections() {
+    //    var r = Random.Range(0, SplineDirectionUpdateFrameInterval);
+    //    while (true) {
+    //        if (Time.frameCount % SplineDirectionUpdateFrameInterval != r) {
+    //            yield return 0;
+    //            continue;
+    //        }
+    //        RecalculateSplineDirections();
+    //        yield return 1;
+    //    }
+    //}
 
     public void RecalculateSplineDirections(){
         var labels = LabeledIncomingEdges.Keys.Union(LabeledOutgoingEdges.Keys).ToList();
@@ -135,7 +135,10 @@ public class Vertex : MonoBehaviour {
         }
 
         // assert: randomLabels.Sort() is unnecessary
-        if (!randomLabels.SequenceEqual(preferredRandomDirections.Keys)) {
+
+        var preferredRandomDirectionsKeys = preferredRandomDirections.Keys.ToList();
+        preferredRandomDirectionsKeys.Sort(); // should be unnecessary as the dict is never changed (overwritten), thus the ordering 'should' be preserved
+        if (!randomLabels.SequenceEqual(preferredRandomDirectionsKeys)) {
             var l = randomLabels.Count;
             preferredRandomDirections = new Dictionary<char, Vector3>(
                 from i in Enumerable.Range(0, l)
@@ -146,7 +149,9 @@ public class Vertex : MonoBehaviour {
             );
         }
 
-        if (!labels.SequenceEqual(fixedPreferredRandomDirections.Keys)) {
+        var fixedPreferredRandomDirectionsKeys = fixedPreferredRandomDirections.Keys.ToList();
+        fixedPreferredRandomDirectionsKeys.Sort(); // should be unnecessary as the dict is never changed (overwritten), thus the ordering 'should' be preserved
+        if (!labels.SequenceEqual(fixedPreferredRandomDirectionsKeys)) {
             var l = labels.Count;
             fixedPreferredRandomDirections = new Dictionary<char, Vector3>(
                 from i in Enumerable.Range(0, l)
@@ -166,6 +171,7 @@ public class Vertex : MonoBehaviour {
             var factor = equalDirectionDisplacementFactor / Mathf.Sqrt(  similarLabelsCount );
             var middle = (similarLabelsCount - 1) / 2f;
 
+            similarLabels.Sort(); // the order of splineDirections' keys is not guaranteed to be preserved
             var label = similarLabels[Mathf.RoundToInt(middle)];
             var displacementDirection = RandomOrthogonalDirection(label, incomingAverages[label] - outgoingAverages[label], true);
 

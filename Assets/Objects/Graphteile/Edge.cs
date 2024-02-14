@@ -28,12 +28,15 @@ public class Edge : MonoBehaviour {
     public enum SplinificationType {
         Never,
         Always,
-        AtTheEnd
+        WhenSimulationSlowsDown,
+        WhenSimulationHasStopped
     }
-    public static SplinificationType splinificationType = SplinificationType.AtTheEnd;
+    public static SplinificationType splinificationType = SplinificationType.WhenSimulationSlowsDown;
+    SplinificationType? lastSplinificationType = null;
 
     SplineComputer splineComputer;
     SplineRenderer splineRenderer;
+    MeshRenderer meshRenderer;
     LineRenderer lineRenderer;
 
     [SerializeField]
@@ -58,6 +61,7 @@ public class Edge : MonoBehaviour {
 
         splineComputer = GetComponent<SplineComputer>();
         splineRenderer = GetComponent<SplineRenderer>();
+        meshRenderer = GetComponent<MeshRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
 
         useSplines = splinificationType == SplinificationType.Always;
@@ -85,10 +89,29 @@ public class Edge : MonoBehaviour {
     float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
 
 
+    bool finished;
     protected virtual void Update() {
         if (startPoint == null || endPoint == null) return;
-        if (splinificationType == SplinificationType.AtTheEnd && !useSplines && Activity < 1 && Mathf.SmoothStep(0, 1, Age) > Activity)
-            useSplines = true;
+        if (splinificationType != lastSplinificationType) {
+            lastSplinificationType = splinificationType;
+            finished = false;
+        }
+        if (finished) return;
+
+        switch (splinificationType) {
+            case SplinificationType.Never:
+                useSplines = false;
+                break;
+            case SplinificationType.Always:
+            case SplinificationType.WhenSimulationSlowsDown 
+                when Activity < 1 && Mathf.SmoothStep(0, 1, Age) > Activity:
+            case SplinificationType.WhenSimulationHasStopped 
+                when Activity == 0:
+                useSplines = true;
+                break;
+            default: break;
+        }
+        if (Activity == 0) finished = true;
 
         if (useSplines)
             UpdateSpline();
@@ -99,7 +122,7 @@ public class Edge : MonoBehaviour {
 
     void UpdateLine() {
         lineRenderer.enabled = true;
-        splineRenderer.enabled = false;
+        meshRenderer.enabled = false;
         Vector3 startPosition = StartPoint.transform.position;
         Vector3 endPosition = EndPoint.transform.position;
         Vector3 lineDirection = (endPosition - startPosition).normalized;
@@ -122,16 +145,16 @@ public class Edge : MonoBehaviour {
 
     void UpdateSpline() {
         lineRenderer.enabled = false;
-        splineRenderer.enabled = true;
+        meshRenderer.enabled = true;
         var startPoint = StartPoint;
         var endPoint = EndPoint; // in case we update how the property works
         Vector3 startPosition = startPoint.transform.position;
         Vector3 endPosition = endPoint.transform.position;
         Vector3 vector = endPosition - startPosition;
 
-        if (!startPoint.splineDirections.ContainsKey(Label))
+        //if (!startPoint.splineDirections.ContainsKey(Label))
             startPoint.RecalculateSplineDirections();
-        if (!endPoint.splineDirections.ContainsKey(Label))
+        //if (!endPoint.splineDirections.ContainsKey(Label))
             endPoint.RecalculateSplineDirections();
         Vector3 startDirection = startPoint.splineDirections[Label];
         Vector3 endDirection = endPoint.splineDirections[Label];
