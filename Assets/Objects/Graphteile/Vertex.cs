@@ -26,9 +26,7 @@ public class Vertex : MonoBehaviour {
     public float Mass { get => mass; protected set => mass = value; }
 
     public VectorN Velocity { get => Velocity1; set => Velocity1 = value; }
-    public VectorN RepelForce { get; set; }
-
-    public VectorN LinkForce { get; set; }
+    public VectorN Force { get; set; }
 
     public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; set; } = new();
     public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; set; } = new();
@@ -57,8 +55,7 @@ public class Vertex : MonoBehaviour {
         this.position = position;
         VectorN zero = VectorN.Zero(position.Size());
         Velocity1 = zero;
-        LinkForce = zero;
-        RepelForce = zero;
+        Force = zero;
         //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
     }
 
@@ -68,8 +65,6 @@ public class Vertex : MonoBehaviour {
 
     public void OnDrawGizmos() {
         // Draw a line pointing in the direction of the force
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(LinkForce) + VectorN.ToVector3(RepelForce));
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(Velocity));
         // Draw a sphere at the current position
@@ -102,8 +97,7 @@ public class Vertex : MonoBehaviour {
     public void Reset(int dimension) {
         creationTime = Time.time;
         VectorN zero = VectorN.Zero(dimension);
-        RepelForce = zero;
-        LinkForce = zero;
+        Force = zero;
         Position = zero;
         Velocity = zero;
         splineDirections.Clear();

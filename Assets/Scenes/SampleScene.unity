@@ -4996,7 +4996,7 @@ MonoBehaviour:
     linkForceFactor: 0
     stabilityIterations: 0
   physicsDeltaTime: 0
-  timeStep: 0.2
+  timeStep: 0.15
 --- !u!114 &772353318
 MonoBehaviour:
   m_ObjectHideFlags: 0
