@@ -109,6 +109,10 @@ public class Edge : MonoBehaviour {
                 when Activity == 0:
                 useSplines = true;
                 break;
+            case SplinificationType.WhenSimulationHasStopped:
+            case SplinificationType.WhenSimulationSlowsDown:
+                useSplines = false;
+                break;
             default: break;
         }
         if (Activity == 0) finished = true;
@@ -186,7 +190,7 @@ public class Edge : MonoBehaviour {
             new SplinePoint(endPosition, endPosition - endDirection) 
             // Why do we have to subtract the direction? and why from the position?
         });
-}
+    }
 
     public virtual Vertex getOpposite(GroupVertex vertex) {
         if (vertex.Equals(StartPoint)) return EndPoint;
