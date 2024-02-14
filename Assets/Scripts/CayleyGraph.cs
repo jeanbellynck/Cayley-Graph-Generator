@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -68,7 +69,7 @@ public class CayleyGraph : MonoBehaviour {
     public InputField vertexNumberInputField;
     public InputField hyperbolicityInputField;
     public HyperbolicityMatrix hyperbolicityMatrix;
-    public InputField dimensionInputField;
+    public TMP_Dropdown dimensionInputDD;
 
 
     public void generateButton() {
@@ -92,13 +93,10 @@ public class CayleyGraph : MonoBehaviour {
     public void StartVisualization() {
         setVertexNumber(vertexNumberInputField.text);
         graphManager.Initialize(generators);
-        physik.startUp(graphManager);
-        string dimensionString = dimensionInputField.text;
-        int dimension = 3;
-        if(int.TryParse(dimensionString, out int dimensionValue) && dimension > 0) {
-            dimension = dimensionValue;
-        } 
-        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, dimension);
+        int projectionDimension = dimensionInputDD.value + 2;
+        physik.startUp(graphManager, projectionDimension);
+        int actualDimension = projectionDimension + 0;
+        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, actualDimension);
     }
 
 

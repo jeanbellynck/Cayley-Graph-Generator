@@ -19,6 +19,7 @@ public class Physik : MonoBehaviour {
     public float alphaDecay = 0.1f;
 
     public float velocityDecay = 0.9f;
+    private int dimension = 3; // Describes the dimension of the projection. The default is always 4D.
 
 
     GraphManager graphManager;
@@ -27,17 +28,20 @@ public class Physik : MonoBehaviour {
     RepulsionForce repulsionForce;
     [SerializeField]
     LinkForce linkForce;
+    [SerializeField]
     ProjectionForce projectionForce;
 
     public void Start() {
-        repulsionForce = new RepulsionForce(radius);
-        linkForce = new LinkForce();
-        projectionForce = new ProjectionForce();
     }
 
-    public void startUp(GraphManager graphManager) {
+    public void startUp(GraphManager graphManager, int dimension) {
         this.graphManager = graphManager;
         alpha = alphaSetting;
+        this.dimension = dimension;
+        
+        repulsionForce = new RepulsionForce(radius);
+        linkForce = new LinkForce();
+        projectionForce = new ProjectionForce(0.5f, dimension);
         //dim = 2*generators.Length + 1;
         StartCoroutine(LoopPhysics());
     }
