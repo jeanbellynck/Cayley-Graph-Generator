@@ -51,10 +51,10 @@ public class Physik : MonoBehaviour {
         }
     }
 
-    public float physicsDeltaTime = 0f;
+    public float physicsDeltaTime = 1f;
 
     public IEnumerator LoopPhysics() {
-        float startTime = Time.time;
+        float startTime = Time.time - 1; // Reduce on to prevent physicsDeltaTime from being 0
         while(true) {
             // Measures the time of a physics step
             physicsDeltaTime = Time.time - startTime;
@@ -82,8 +82,6 @@ public class Physik : MonoBehaviour {
             vertex.Position += vertex.Velocity * timeStep + 0.5f * force * timeStep * timeStep;
             vertex.Velocity += force * timeStep;
             vertex.Velocity *= realVelocityDecay;
-
-            vertex.ForceForInterpolation = VectorN.ToVector3(force);
         }
     }
 
