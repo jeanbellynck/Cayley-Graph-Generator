@@ -503,7 +503,23 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      EmojiOne_0: -5808494448098210720
+      EmojiOne_1: 5809591606527854514
+      EmojiOne_10: 2364779998980427918
+      EmojiOne_11: 7512734304020417274
+      EmojiOne_12: -3895366958653414396
+      EmojiOne_13: -7174898199296445581
+      EmojiOne_14: 6820766471845492667
+      EmojiOne_15: 6857870083248498349
+      EmojiOne_2: 7835686581805841452
+      EmojiOne_3: -2632011386569831178
+      EmojiOne_4: -820337123816873145
+      EmojiOne_5: -1693817957857621958
+      EmojiOne_6: 3410751109949786290
+      EmojiOne_7: -3799401067550073031
+      EmojiOne_8: -3115430251934431812
+      EmojiOne_9: 8812233978909280060
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

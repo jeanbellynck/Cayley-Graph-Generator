@@ -191,7 +191,10 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Hamburger Menu_0: 4389152374187283646
+      Hamburger Menu_1: -6647629970488891758
+      Hamburger Menu_2: -6650686551263931698
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

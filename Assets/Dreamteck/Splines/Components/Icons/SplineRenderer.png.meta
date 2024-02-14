@@ -143,7 +143,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      SplineRenderer_0: -6416096721871086003
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
