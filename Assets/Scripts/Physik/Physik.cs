@@ -42,6 +42,7 @@ public class Physik : MonoBehaviour {
 
     public void Update() {
         if(graphManager== null) return;
+        if (alpha == 0) return;
         foreach(Vertex vertex in graphManager.getVertex()) {
             UnityEngine.Vector3 velocity = VectorN.ToVector3(vertex.Velocity);
             vertex.transform.position += velocity * Time.deltaTime;
