@@ -213,7 +213,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                 mergeCandidate = edgeMergeCandidates.First();
                 edgeMergeCandidates.Remove(mergeCandidate);
                 if (mergeCandidate != null) { // Might not be necessary
-                    mergeEdges(mergeCandidate);
+                    MergeEdges(mergeCandidate);
                 }
             }
             else {
@@ -227,7 +227,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
     }
 
-    void mergeEdges(GroupVertex vertex) {
+    void MergeEdges(GroupVertex vertex) {
         foreach (char op in operators) {
             List<GroupEdge> generatorEdges = vertex.GetEdges(op);
             if (generatorEdges.Count > 1) {

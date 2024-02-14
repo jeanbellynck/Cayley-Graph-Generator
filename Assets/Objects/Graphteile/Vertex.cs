@@ -30,8 +30,8 @@ public class Vertex : MonoBehaviour {
 
     public VectorN LinkForce { get; set; }
 
-    public Dictionary<char, List<Edge>> LabeledOutgoingEdges { get; set; } = new();
-    public Dictionary<char, List<Edge>> LabeledIncomingEdges { get; set; } = new();
+    public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; set; } = new();
+    public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; set; } = new();
     protected Renderer Mr { get; private set; }
 
     [SerializeField] VectorN position;
@@ -67,13 +67,13 @@ public class Vertex : MonoBehaviour {
 
     public void Destroy() {
         // Destroy all edges too
-        foreach (List<Edge> genEdges in LabeledIncomingEdges.Values) {
+        foreach (HashSet<Edge> genEdges in LabeledIncomingEdges.Values) {
             List<Edge> genEdgesCopy = new List<Edge>(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 edge.Destroy();
             }
         }
-        foreach (List<Edge> genEdges in LabeledOutgoingEdges.Values) {
+        foreach (HashSet<Edge> genEdges in LabeledOutgoingEdges.Values) {
             List<Edge> genEdgesCopy = new List<Edge>(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 edge.Destroy();
@@ -229,22 +229,22 @@ public class Vertex : MonoBehaviour {
         }
     }
 
-    public List<Edge> GetIncomingEdges(char op) {
+    public HashSet<Edge> GetIncomingEdges(char op) {
         if (LabeledIncomingEdges.ContainsKey(op)) {
             return LabeledIncomingEdges[op];
         }
         else {
-            return new List<Edge>();
+            return new HashSet<Edge>();
         }
     }
 
 
-    public List<Edge> GetOutgoingEdges(char op) {
+    public HashSet<Edge> GetOutgoingEdges(char op) {
         if (LabeledOutgoingEdges.ContainsKey(op)) {
             return LabeledOutgoingEdges[op];
         }
         else {
-            return new List<Edge>();
+            return new HashSet<Edge>();
         }
     }
 
@@ -279,7 +279,7 @@ public class Vertex : MonoBehaviour {
     void AddOutgoingEdge(Edge edge) {
         char generator = edge.Label;
         if (!LabeledOutgoingEdges.ContainsKey(generator)) {
-            LabeledOutgoingEdges.Add(generator, new List<Edge>());
+            LabeledOutgoingEdges.Add(generator, new HashSet<Edge>());
         }
         LabeledOutgoingEdges[generator].Add(edge);
     }
@@ -300,7 +300,7 @@ public class Vertex : MonoBehaviour {
     void AddIncomingEdge(Edge edge) {
         char label = edge.Label;
         if (!LabeledIncomingEdges.ContainsKey(label)) {
-            LabeledIncomingEdges.Add(label, new List<Edge>());
+            LabeledIncomingEdges.Add(label, new HashSet<Edge>());
         }
         LabeledIncomingEdges[label].Add(edge);
     }

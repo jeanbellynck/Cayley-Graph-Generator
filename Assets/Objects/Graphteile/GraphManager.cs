@@ -49,14 +49,14 @@ public class GraphManager : MonoBehaviour {
      * ToDo: Only remove the edge, delete will be done from cayleyGraphMaker it 
      **/
     public void RemoveVertex(Vertex vertex) {
-        foreach (List<Edge> genEdges in vertex.LabeledIncomingEdges.Values) {
-            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
+        foreach (HashSet<Edge> genEdges in vertex.LabeledIncomingEdges.Values) {
+            HashSet<Edge> genEdgesCopy = new HashSet<Edge>(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 RemoveEdge(edge);
             }
         }
-        foreach (List<Edge> genEdges in vertex.LabeledOutgoingEdges.Values) {
-            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
+        foreach (HashSet<Edge> genEdges in vertex.LabeledOutgoingEdges.Values) {
+            HashSet<Edge> genEdgesCopy = new HashSet<Edge>(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 RemoveEdge(edge);
             }
