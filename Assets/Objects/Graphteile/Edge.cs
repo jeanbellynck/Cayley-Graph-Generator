@@ -66,7 +66,7 @@ public class Edge : MonoBehaviour {
 
         useSplines = splinificationType == SplinificationType.Always;
 
-        Update();
+        LateUpdate();
     }
 
     public void Destroy() {
@@ -90,7 +90,7 @@ public class Edge : MonoBehaviour {
 
 
     bool finished;
-    protected virtual void Update() {
+    protected virtual void LateUpdate() {
         if (startPoint == null || endPoint == null) return;
         if (splinificationType != lastSplinificationType) {
             lastSplinificationType = splinificationType;
