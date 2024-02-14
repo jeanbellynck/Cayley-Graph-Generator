@@ -63,10 +63,7 @@ public class Vertex : MonoBehaviour {
     }
 
     protected virtual void Update() {
-        if(Id == 0) {
-            position = VectorN.Zero(position.Size());
-            transform.position = VectorN.ToVector3(position);
-        }
+        
     }
 
     public void OnDrawGizmos() {
