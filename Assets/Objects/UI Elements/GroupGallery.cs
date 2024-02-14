@@ -29,7 +29,7 @@ public class GroupGallery : MonoBehaviour
         new LatticeGroup(),
         new Group("D<sub>∞</sub>", "The infinite dihedral group", "r; f", "f^2; (rf)^2"),
         new Group("SL(2, ℤ)", "The special linear group of 2-matrices", "a; b", "abaBAB; (aba)^4"),
-        new Group("PSL(2, ℤ)", "The projective special linear group of 2-matrices", "a; b", "aa^2; b^3"),
+        new Group("PSL(2, ℤ)", "The projective special linear group of 2-matrices", "a; b", "a^2; b^3"),
         new Group("GL(2, ℤ)", "The general linear group of 2-matrices", "a; b; j", "abaBAB; (aba)^4; j^2; (ja)^2; (jb)^2"),
         new BraidGroup(),
         new Group("ℍ²", "A simple hyperbolic group", "a; b", "abab; a^5; b^5"),
