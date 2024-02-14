@@ -56,20 +56,45 @@ public class GroupVertex : Vertex {
         foreach (string path in pathsToNeutralElement) {
             AddPathToNeutralElement(path + op);
         }
-        calculateVertexMass();
+        calculateVertexMass(hyperbolicScaling);
     }
 
-    public void Merge(GroupVertex vertex2) {
+    public void Merge(GroupVertex vertex2, float hyperbolicity) {
         base.Initialize((Position + vertex2.Position) / 2);
         foreach(string path in vertex2.PathsToNeutralElement) {
             AddPathToNeutralElement(path);
         }
-        calculateVertexMass();
+        calculateVertexMass(hyperbolicity);
     }
 
-    public void calculateVertexMass() {
-        // Temporary implementation
-        Mass =  1;
+    public void calculateVertexMass(float hyperbolicity) {
+        Mass =  Mathf.Pow(hyperbolicity, DistanceToNeutralElement);
+
+
+        /**float mass = 1;
+        int rootExponent = 0;
+        foreach (string path in pathsToIdentity) {
+            foreach (char gen in generators) {
+                mass *= calculateScalingForGenerator(gen, path);
+                rootExponent++;
+            }
+        }
+        mass = Mathf.Pow(mass, 1f / rootExponent);
+        if(mass == 0) {
+            throw new System.Exception("The mass of the vertex is 0. This is not allowed.");
+        }
+        return mass;**/
+        /**
+        float mass = float.MaxValue;
+        foreach (string path in pathsToIdentity) {
+            foreach (char gen in generators) {
+                float massCandidate = calculateScalingForGenerator(gen, path);
+                if (massCandidate < mass) {
+                    mass = massCandidate;
+                }
+            }
+        }
+        return mass;**/
     }
 
     public Dictionary<char, List<GroupEdge>> GetEdges() {

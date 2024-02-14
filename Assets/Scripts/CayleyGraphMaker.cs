@@ -61,7 +61,6 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         }
 
-
         groupColorPanel.updateView(GroupEdge.LabelColours);
 
         //int simulationDimensionality = 2*generators.Length + 1;
@@ -71,8 +70,6 @@ public class CayleyGraphMaker : MonoBehaviour {
         AddBorderVertex(neutralElement);
 
         StartCoroutine(createNewElementsAndApplyRelators());
-
-        
     }
 
 
@@ -140,11 +137,6 @@ public class CayleyGraphMaker : MonoBehaviour {
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
-
-
-
-
-
         // Vertex is not the neutral element and an edge need to be created
         GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
         newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
@@ -166,7 +158,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         GroupEdge newEdge = Instantiate(edgePrefab, transform).GetComponent<GroupEdge>();
-        newEdge.Initialize(startvertex, endvertex, op);
+        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity);
 
         graphManager.AddEdge(newEdge);
         return newEdge;
@@ -294,7 +286,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             vertex2 = temp;
         }
 
-        vertex1.Merge(vertex2);
+        vertex1.Merge(vertex2, hyperbolicity);
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
         foreach (char op in vertex2.GetEdges().Keys) {
@@ -313,61 +305,6 @@ public class CayleyGraphMaker : MonoBehaviour {
         relatorCandidates.Add(vertex1);
     }
 
-
-    /**
-     * This is a method that would better fit into a "group element" class.
-     * Taking in paths to identity and using the hyperbolicityMatrix it calculates the mass of a vertex. 
-     * The mass is calculated using the geometric mean 
-     **/
-    public float calculateVertexMass(List<string> pathsToIdentity) {
-        /**float mass = 1;
-        int rootExponent = 0;
-        foreach (string path in pathsToIdentity) {
-            foreach (char gen in generators) {
-                mass *= calculateScalingForGenerator(gen, path);
-                rootExponent++;
-            }
-        }
-        mass = Mathf.Pow(mass, 1f / rootExponent);
-        if(mass == 0) {
-            throw new System.Exception("The mass of the vertex is 0. This is not allowed.");
-        }
-        return mass;**/
-        float mass = float.MaxValue;
-        foreach (string path in pathsToIdentity) {
-            foreach (char gen in generators) {
-                float massCandidate = calculateScalingForGenerator(gen, path);
-                if (massCandidate < mass) {
-                    mass = massCandidate;
-                }
-            }
-        }
-        return mass;
-    }
-
-    /**
-     * This is a method that would better fit into a "group generator" class.
-     * Taking in paths to identity and using the hyperbolicityMatrix it calculates the length of a path. 
-     * The mass is taken to be equal to the smalles branch of the vertex.
-     **/
-    public float calculateEdgeLength(GroupVertex v1, GroupVertex v2, char generator) {
-        List<string> pathsToIdentity1 = v1.PathsToNeutralElement;
-        List<string> pathsToIdentity2 = v2.PathsToNeutralElement;
-        float length = float.MaxValue;
-        foreach (string path in pathsToIdentity1) {
-            float lengthCandidate = calculateScalingForGenerator(generator, path);
-            if (lengthCandidate < length) {
-                length = lengthCandidate;
-            }
-        }
-        foreach (string path in pathsToIdentity2) {
-            float lengthCandidate = calculateScalingForGenerator(generator, path);
-            if (lengthCandidate < length) {
-                length = lengthCandidate;
-            }
-        }
-        return length;
-    }
 
     /**
      * This is a method that would better fit into a "group element" class.
@@ -450,14 +387,13 @@ public class CayleyGraphMaker : MonoBehaviour {
         if (graphManager == null) {
             return;
         }
-        /**
-        List<GroupEdge> edges = graphManager.GetEdges();
+        List<GroupEdge> edges = graphManager.GetEdges().Cast<GroupEdge>().ToList();
         foreach (GroupEdge edge in edges) {
-            edge.Length = calculateEdgeLength(edge.StartPoint, edge.EndPoint, edge.getGenerator());
+            edge.calculateEdgeLength(hyperbolicity);
         }
         foreach (GroupVertex vertex in graphManager.getVertex()) {
-            vertex.Mass = calculateVertexMass(vertex.PathsToNeutralElement);
-        }**/
+            vertex.calculateVertexMass(hyperbolicity);
+        }
     }
 
 
