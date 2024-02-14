@@ -31,7 +31,7 @@ public class Edge : MonoBehaviour {
         WhenSimulationSlowsDown,
         WhenSimulationHasStopped
     }
-    public static SplinificationType splinificationType = SplinificationType.WhenSimulationSlowsDown;
+    public static SplinificationType splinificationType = SplinificationType.WhenSimulationHasStopped;
     SplinificationType? lastSplinificationType = null;
 
     SplineComputer splineComputer;
