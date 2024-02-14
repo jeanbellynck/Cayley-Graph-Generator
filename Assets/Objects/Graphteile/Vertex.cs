@@ -62,8 +62,23 @@ public class Vertex : MonoBehaviour {
         //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
     }
 
-    protected virtual void Update() {}
+    protected virtual void Update() {
+        if(Id == 0) {
+            position = VectorN.Zero(position.Size());
+            transform.position = VectorN.ToVector3(position);
+        }
+    }
 
+    public void OnDrawGizmos() {
+        // Draw a line pointing in the direction of the force
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(LinkForce) + VectorN.ToVector3(RepelForce));
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(Velocity));
+        // Draw a sphere at the current position
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(VectorN.ToVector3(position), 0.1f);
+    }
 
     public void Destroy() {
         // Destroy all edges too
