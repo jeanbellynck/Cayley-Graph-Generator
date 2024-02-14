@@ -42,25 +42,33 @@ public class Physik : MonoBehaviour {
 
     public void Update() {
         if(graphManager== null) return;
+        // The following code interpolate the vertices between the physics steps. This makes the animation smoother.
         if (alpha == 0) return;
         foreach(Vertex vertex in graphManager.getVertex()) {
-            UnityEngine.Vector3 velocity = VectorN.ToVector3(vertex.Velocity);
+            // The velocity of the pysics engine translated to real velocity (The physics engine is running at a different speed than the game engine)
+            UnityEngine.Vector3 velocity = VectorN.ToVector3(vertex.Velocity) * timeStep / physicsDeltaTime;
             vertex.transform.position += velocity * Time.deltaTime;
         }
     }
 
+    public float physicsDeltaTime = 0f;
+
     public IEnumerator LoopPhysics() {
+        float startTime = Time.time;
         while(true) {
+            // Measures the time of a physics step
+            physicsDeltaTime = Time.time - startTime;
+            startTime = Time.time;
+
             dim = graphManager.getDim();
             
-            if(alpha != 0) {
+            if(alpha == 0) {break;}
             geschwindigkeitenZurücksetzen();
             yield return repulsionForce.ApplyForce(graphManager, alpha);
             yield return linkForce.ApplyForce(graphManager, alpha);
             updateVertices();
-            }
+            
             // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
-            yield return null;
         }
     }
 
@@ -74,6 +82,8 @@ public class Physik : MonoBehaviour {
             vertex.Position += vertex.Velocity * timeStep + 0.5f * force * timeStep * timeStep;
             vertex.Velocity += force * timeStep;
             vertex.Velocity *= realVelocityDecay;
+
+            vertex.ForceForInterpolation = VectorN.ToVector3(force);
         }
     }
 
