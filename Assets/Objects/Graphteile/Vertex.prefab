@@ -98,10 +98,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad7185056b678cd4f9934ecc0552f214, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1
   splineDirectionFactor: 0.2
-  orthogonalSplineDirectionFactor: 0.1
+  orthogonalSplineDirectionFactor: 0.07
   preferEights: 0
   equalDirectionDisplacementFactor: 0.1
+  mass: 1
   distanceToNeutralElement: 0
   pathsToNeutralElement: []
+  cayleyGraph: {fileID: 0}

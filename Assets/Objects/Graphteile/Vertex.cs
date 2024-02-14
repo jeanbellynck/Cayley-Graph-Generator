@@ -206,12 +206,13 @@ public class Vertex : MonoBehaviour {
             }
             var randomDirection = Vector3.ProjectOnPlane(preferredRandomDirection, direction.normalized);
             //assert: preferredRandomDirection has norm 1
+            const float minimalLengthOfProjection = 0.01f;
 
-            if (randomDirection.sqrMagnitude < 0.005f) {
+            if (randomDirection.sqrMagnitude < minimalLengthOfProjection) {
                 if (!fallbackRandomDirections.TryGetValue(label, out var fallbackRandomDirection))
                     while(true){
                         fallbackRandomDirection = Vector3.Cross(Random.onUnitSphere, preferredRandomDirection);
-                        if( fallbackRandomDirection.sqrMagnitude < 0.005f) continue;
+                        if( fallbackRandomDirection.sqrMagnitude < minimalLengthOfProjection) continue;
                         fallbackRandomDirections[label] = fallbackRandomDirection = fallbackRandomDirection.normalized;
                         break;
                     }
