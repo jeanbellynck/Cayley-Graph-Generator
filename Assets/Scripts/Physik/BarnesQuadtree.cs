@@ -21,16 +21,18 @@ public class BarnesQuadtree {
     private float minimalDistanceSquared; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
     private float maximalDistanceSquared;
     private bool isLeaf = true;
-    private int dim = 3;
+    private int treeDim = 3; // The dimension can by smaller than the dimension of the vertices. Thin should be ok, since the force always scales to the sqare of the distance.
+    private int vertexDim;
 
-    public BarnesQuadtree(VectorN position, float radius, float theta, float minimalDistanceSquared, float maximalDistanceSquared) {
+    public BarnesQuadtree(int dimension, VectorN position, float radius, float theta, float minimalDistanceSquared, float maximalDistanceSquared) {
+        this.treeDim = dimension;
         this.position = position;
         this.radius = radius;
         this.thetaSquared = theta;
         this.minimalDistanceSquared = minimalDistanceSquared;
         this.maximalDistanceSquared = maximalDistanceSquared;
         this.mass = 0;
-        dim = position.Size();
+        vertexDim = position.Size();
     }
 
     public void Add(List<Vertex> points) {
@@ -63,13 +65,13 @@ public class BarnesQuadtree {
 
     public void Teile() {
         isLeaf = false;
-        subtrees = new BarnesQuadtree[(int)Mathf.Pow(2, dim)];
+        subtrees = new BarnesQuadtree[(int)Mathf.Pow(2, treeDim)];
         for (int i = 0; i < subtrees.Length; i++) {
-            int[] quadrant = new int[dim];
-            for (int j = 0; j < dim; j++) {
+            int[] quadrant = new int[treeDim];
+            for (int j = 0; j < treeDim; j++) {
                 quadrant[j] = i / (int)Mathf.Pow(2, j) % 2;
             }
-            subtrees[i] = new BarnesQuadtree(position + radius / 2 * quadrantToVector(quadrant), radius / 2, thetaSquared, minimalDistanceSquared, maximalDistanceSquared);
+            subtrees[i] = new BarnesQuadtree(treeDim, position + radius / 2 * quadrantToVector(quadrant), radius / 2, thetaSquared, minimalDistanceSquared, maximalDistanceSquared);
             subtrees[i].Add(points);
         }
         points = null;
@@ -80,7 +82,7 @@ public class BarnesQuadtree {
         if(punkt.IsNaN) {
             return false;
         }
-        for (int i = 0; i < dim; i++) {
+        for (int i = 0; i < treeDim; i++) {
             if (punkt[i] < position[i] - radius || punkt[i] >= position[i] + radius) {
                 return false;
             }
@@ -92,7 +94,7 @@ public class BarnesQuadtree {
      * Calculates the center of mass of this cube as well as all subcubes.
      **/
     public void BerechneSchwerpunkt() {
-        schwerpunkt = VectorN.Zero(dim);
+        schwerpunkt = VectorN.Zero(vertexDim);
         if (mass == 0) {
             // This cube is empty. Do nothing.
         }
@@ -118,13 +120,13 @@ public class BarnesQuadtree {
      **/
     public VectorN calculateRepulsionForceOnVertex(Vertex pointActedOn) {
         // This cube is empty. It does not repel the point.
-        if (mass == 0) return VectorN.Zero(dim);
+        if (mass == 0) return VectorN.Zero(vertexDim);
 
         VectorN diff = schwerpunkt - pointActedOn.Position;
         float distanceSquared = diff.MagnitudeSquared();
 
         // This cube sits too far 
-        if (distanceSquared > maximalDistanceSquared) return VectorN.Zero(dim);
+        if (distanceSquared > maximalDistanceSquared) return VectorN.Zero(vertexDim);
 
         // If the points are far away, use the Barnes Hut approximation, else process them directly
         if (4 * radius * radius * thetaSquared < distanceSquared) {
@@ -147,19 +149,19 @@ public class BarnesQuadtree {
         // Leaves are either of minimalSize or contain only one point
         if (points.Count == 1) {
             // This cube contains the point itself and can be ignored
-            if (points[0].Equals(pointActedOn)) return VectorN.Zero(dim);
+            if (points[0].Equals(pointActedOn)) return VectorN.Zero(vertexDim);
         }
         if (distanceSquared > minimalDistanceSquared) {
             return CalculateForce(diff, distanceSquared);
         } else if (distanceSquared == 0) {
-            return VectorN.Random(dim, 0.05f);
+            return VectorN.Random(treeDim, 0.05f);
         } else {
             return CalculateForce(diff, distanceSquared);
         }
     }
 
     public VectorN calculateRepulsionForceOnVertexInsideSubtree(Vertex pointActedOn) {
-        VectorN force = VectorN.Zero(dim);
+        VectorN force = VectorN.Zero(vertexDim);
         foreach (BarnesQuadtree subtree in subtrees) {
             force.Add(subtree.calculateRepulsionForceOnVertex(pointActedOn));
         }
@@ -177,8 +179,8 @@ public class BarnesQuadtree {
     }
 
     private VectorN quadrantToVector(int[] quadrant) {
-        VectorN result = new VectorN(dim);
-        for (int i = 0; i < dim; i++) {
+        VectorN result = new VectorN(vertexDim);
+        for (int i = 0; i < treeDim; i++) {
             result[i] = quadrant[i] == 0 ? -1 : 1;
         }
         return result;
