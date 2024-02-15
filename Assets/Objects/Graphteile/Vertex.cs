@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class Vertex : MonoBehaviour {
     [SerializeField] float mass = 1;
     public float Mass { get => mass; protected set => mass = value; }
 
-    public VectorN Velocity { get => Velocity1; set => Velocity1 = value; }
+    public VectorN Velocity { get; set; }
     public VectorN Force { get; set; }
 
     public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; set; } = new();
@@ -26,10 +27,14 @@ public class Vertex : MonoBehaviour {
     float creationTime; // = Time.time;
     public float Age => Time.time - creationTime;
 
-    public virtual float EdgeCompletion => 1f;
+    public virtual float EdgeCompletion {
+        get => 1f;
+        protected set => throw new NotImplementedException();
+    }
 
+    public event Action OnEdgeChange;
+    
     public VectorN Position { get => position; set => position = value; }
-    VectorN Velocity1 { get; set; }
 
     public readonly Dictionary<char, Vector3> splineDirections = new();
     [SerializeField] float splineDirectionFactor = 0.2f; // actually I would like to see these in the inspector AND have them be static
@@ -48,21 +53,31 @@ public class Vertex : MonoBehaviour {
 
     // Start is called before the first frame update
     protected virtual void Start() {
-        creationTime = Time.time;
         if (Mass == 0) {
             Mass = 0.1f;
         }
         Mr = GetComponent<Renderer>();
-        Update();
     }
 
-    protected void Initialize(VectorN position, GraphManager graphManager) {
-        this.position = position;
-        VectorN zero = VectorN.Zero(position.Size());
-        Velocity1 = zero;
-        Force = zero;
+    public virtual void Initialize(VectorN position, GraphManager graphManager) {
+        creationTime = Time.time;
+
         this.graphManager = graphManager;
+
+        VectorN zero = VectorN.Zero(position.Size());
+        Position = position;
+        Force = zero;
+        Velocity = zero;
+
+        splineDirections.Clear();
+        preferredRandomDirections.Clear();
+        fallbackRandomDirections.Clear();
+
         //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
+        //OnEdgeChange += RecalculateSplineDirections; // would be ok, but not necessary, as the edges call this method themselves
+
+        OnEdgeChange?.Invoke();
+
     }
 
     protected virtual void Update() {
@@ -100,16 +115,6 @@ public class Vertex : MonoBehaviour {
         return other != null && Id == other.Id;
     }
 
-    public void Reset(int dimension) {
-        creationTime = Time.time;
-        VectorN zero = VectorN.Zero(dimension);
-        Force = zero;
-        Position = zero;
-        Velocity = zero;
-        splineDirections.Clear();
-        preferredRandomDirections.Clear();
-        fallbackRandomDirections.Clear();
-    }
 
     //IEnumerator<int> CalculateSplineDirections() {
     //    var r = Random.Range(0, SplineDirectionUpdateFrameInterval);
@@ -268,12 +273,12 @@ public class Vertex : MonoBehaviour {
      */
     public void AddEdge(Edge edge) {
         // Determine whether this the edge points to this vertex or away from it
-        if (edge.StartPoint.Equals(this)) {
+        if (edge.StartPoint.Equals(this)) 
             AddOutgoingEdge(edge);
-        }
-        if (edge.EndPoint.Equals(this)) {
+        else if (edge.EndPoint.Equals(this)) 
             AddIncomingEdge(edge);
-        }
+        else
+            throw new Exception("The edge does not point to this vertex.");
     }
 
     public void RemoveEdge(Edge edge) {
@@ -294,6 +299,7 @@ public class Vertex : MonoBehaviour {
             LabeledOutgoingEdges.Add(generator, new HashSet<Edge>());
         }
         LabeledOutgoingEdges[generator].Add(edge);
+        OnEdgeChange?.Invoke();
     }
 
     /**
@@ -304,6 +310,7 @@ public class Vertex : MonoBehaviour {
         if (LabeledOutgoingEdges.ContainsKey(label)) {
             LabeledOutgoingEdges[label].Remove(edge);
         }
+        OnEdgeChange?.Invoke();
     }
 
     /**
@@ -315,6 +322,7 @@ public class Vertex : MonoBehaviour {
             LabeledIncomingEdges.Add(label, new HashSet<Edge>());
         }
         LabeledIncomingEdges[label].Add(edge);
+        OnEdgeChange?.Invoke();
     }
 
     /**
@@ -325,6 +333,7 @@ public class Vertex : MonoBehaviour {
         if (LabeledIncomingEdges.ContainsKey(label)) {
             LabeledIncomingEdges[label].Remove(edge);
         }
+        OnEdgeChange?.Invoke();
     }
 
 

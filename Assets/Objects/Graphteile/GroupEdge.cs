@@ -4,15 +4,15 @@ using UnityEngine;
 
 
 public class GroupEdge : Edge {
-    public static readonly IDictionary<char, Color> LabelColours = new Dictionary<char, Color>();
 
     public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity, GraphManager graphManager) {
+
         if(char.IsLower(operation)) {
             base.Initialize(startVertex, endVertex, operation, graphManager);
         } else {
             base.Initialize(endVertex, startVertex, char.ToLower(operation), graphManager);
         }
-        SetFarbe(LabelColours[char.ToLower(operation)], new Color(100, 100, 100));
+        SetColors(LabelColors[char.ToLower(operation)]);
         calculateEdgeLength(hyperbolicity);
     }
 
@@ -63,6 +63,6 @@ public class GroupEdge : Edge {
     }
 
     public new GroupVertex getOpposite(GroupVertex opposite) {
-        return (GroupVertex) base.getOpposite(opposite);
+        return (GroupVertex) base.GetOpposite(opposite);
     }
 }

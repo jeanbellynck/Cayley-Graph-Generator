@@ -12,11 +12,24 @@ public class GraphManager : MonoBehaviour {
     public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
     CayleyGraph cayleyGraph;
     public int LabelCount { get; private set; }
+    public readonly Dictionary<char, Color> labelColors = new();
+    [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
+
+
     public float Activity => cayleyGraph.Activity;
 
+
     public void Initialize(char[] generators, CayleyGraph cayleyGraph) {
-        LabelCount = generators.Length;
+        LabelCount = 2 * generators.Length;
         this.cayleyGraph = cayleyGraph;
+
+        labelColors.Clear();
+        for (int i = 0; i < generators.Length; i++) {
+            labelColors.Add(generators[i],
+                i < ColorList.Length
+                    ? ColorList[i]
+                    : Random.ColorHSV(0,1,0.9f, 1));
+        }
     }
 
     public List<Vertex> getVertex() {

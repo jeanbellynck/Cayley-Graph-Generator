@@ -16,7 +16,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     protected string[] relators;// = new string[]{"abAB"};
 
     private float hyperbolicity = 1;
-    private Dictionary<char, Dictionary<char, float>> hyperbolicityMatrix = new Dictionary<char, Dictionary<char, float>>();
+    private Dictionary<char, Dictionary<char, float>> hyperbolicityMatrix = new();
 
 
     // Konfigurationen
@@ -27,16 +27,16 @@ public class CayleyGraphMaker : MonoBehaviour {
     public GameObject vertexPrefab;
     public GameObject edgePrefab;
     public GroupColorPanel groupColorPanel;
-    public Color[] colourList = new Color[] { new Color(255, 0, 0), new Color(0, 0, 255), new Color(0, 255, 0), new Color(255, 255, 0) };
 
     private int simulationDimensionality = 3;
 
 
     // Contains the references to all vertices on the border of the graph, sorted by distance to the center.
-    List<List<GroupVertex>> randKnoten = new List<List<GroupVertex>>();
+    List<List<GroupVertex>> randKnoten = new();
     // Contains the references of al vertices which need to be checked for relator application.
-    HashSet<GroupVertex> relatorCandidates = new HashSet<GroupVertex>();
-    HashSet<GroupVertex> edgeMergeCandidates = new HashSet<GroupVertex>();
+    HashSet<GroupVertex> relatorCandidates = new();
+    HashSet<GroupVertex> edgeMergeCandidates = new();
+
 
     public void StartVisualization(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators, int dimension) {
         this.graphManager = graphManager;
@@ -50,22 +50,12 @@ public class CayleyGraphMaker : MonoBehaviour {
             operators[i] = char.ToLower(generators[i]);
             operators[i + generators.Length] = char.ToUpper(generators[i]);
         }
-        GroupEdge.LabelColours.Clear();
-        for (int i = 0; i < generators.Length; i++) {
-            if (i < colourList.Length) {
-                GroupEdge.LabelColours.Add(generators[i], colourList[i]);
-            }
-            else {
-                GroupEdge.LabelColours.Add(generators[i], new Color(Random.Range(0, 255), Random.Range(0, 255), Random.Range(0, 255)));
-            }
-
-        }
-
-        groupColorPanel.updateView(GroupEdge.LabelColours);
+        
+        groupColorPanel.updateView(graphManager.labelColors);
 
         //int simulationDimensionality = 2*generators.Length + 1;
         GroupVertex neutralElement = neutralElementGameObject.GetComponent<GroupVertex>();
-        neutralElement.Reset(simulationDimensionality);
+        neutralElement.Initialize(VectorN.Zero(simulationDimensionality), graphManager );
         graphManager.AddVertex(neutralElement);
         AddBorderVertex(neutralElement);
 
@@ -84,7 +74,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         relatorCandidates = new HashSet<GroupVertex>();
         edgeMergeCandidates = new HashSet<GroupVertex>();
         if (graphManager != null) {
-            List<Vertex> vertices = new List<Vertex>(graphManager.getVertex());
+            List<Vertex> vertices = new(graphManager.getVertex());
             graphManager.RemoveVertex(neutralElementGameObject.GetComponent<GroupVertex>());
             vertices.Remove(neutralElementGameObject.GetComponent<GroupVertex>());
             foreach (Vertex vertex in vertices) {
@@ -266,7 +256,7 @@ public class CayleyGraphMaker : MonoBehaviour {
      **/
     public List<string> generateRelatorVariants(string relator) {
         string relatorInverse = RelatorDecoder.invertSymbol(relator);
-        List<string> variants = new List<string>();
+        List<string> variants = new();
         for (int i = 0; i < relator.Length; i++) {
             variants.Add(relator[i..] + relator[..i]);
             variants.Add(relatorInverse[i..] + relatorInverse[..i]);
@@ -290,7 +280,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
         foreach (char op in vertex2.GetEdges().Keys) {
-            List<GroupEdge> generatorEdgesCopy = new List<GroupEdge>(vertex2.GetEdges(op));
+            List<GroupEdge> generatorEdgesCopy = new(vertex2.GetEdges(op));
             foreach (GroupEdge edge in generatorEdgesCopy) {
                 CreateEdge(vertex1, edge.getOpposite(vertex2), op);
             }

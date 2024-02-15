@@ -14,10 +14,15 @@ public class GroupVertex : Vertex {
     public List<string> PathsToNeutralElement { get => pathsToNeutralElement; protected set => pathsToNeutralElement = value; }
 
 
+    public override float EdgeCompletion { get; protected set; }
 
-    // Start is called before the first frame update
-    public override float EdgeCompletion => (float) LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) /
-                                            graphManager.LabelCount;
+    void CalculateEdgeCompletion()
+    {
+        EdgeCompletion = (float)(
+            LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) +
+            LabeledOutgoingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty())
+        ) / graphManager.LabelCount;
+    }
 
     protected override void Start() {
         base.Start();
@@ -35,8 +40,14 @@ public class GroupVertex : Vertex {
         Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
     }
 
+    public override void Initialize(VectorN position, GraphManager graphManager) {
+        OnEdgeChange -= CalculateEdgeCompletion;
+        OnEdgeChange += CalculateEdgeCompletion;
+        base.Initialize(position, graphManager);
+    }
+
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
-        base.Initialize(predecessor.Position, predecessor.graphManager);
+        Initialize(predecessor.Position, predecessor.graphManager);
         name = predecessor.name + op;
 
         GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
@@ -59,7 +70,7 @@ public class GroupVertex : Vertex {
     }
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
-        base.Initialize((Position + vertex2.Position) / 2, graphManager);
+        Initialize((Position + vertex2.Position) / 2, graphManager);
         foreach(string path in vertex2.PathsToNeutralElement) {
             AddPathToNeutralElement(path);
         }

@@ -61,6 +61,8 @@ MonoBehaviour:
   graphManager: {fileID: 0}
   midDisplacementFactor: 0.18
   midDirectionFactor: 0.3
+  startColor: {r: 0, g: 0, b: 0, a: 0}
+  endColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &3310283270684842847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,7 +192,69 @@ MonoBehaviour:
   _colorModifier:
     blend: 1
     useClippedPercent: 0
-    keys: []
+    keys:
+    - _featherStart: 0
+      _featherEnd: 0.6000000238418579
+      _centerStart: 0.10000000149011612
+      _centerEnd: 0.8999999761581421
+      interpolation:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      blend: 1
+      color: {r: 0, g: 0, b: 0, a: 0}
+      blendMode: 0
+    - _featherStart: 0.5
+      _featherEnd: 1
+      _centerStart: 0.10000000149011612
+      _centerEnd: 0.8999999761581421
+      interpolation:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      blend: 1
+      color: {r: 0, g: 0, b: 0, a: 0}
+      blendMode: 0
   _sizeModifier:
     blend: 0.447
     useClippedPercent: 0
@@ -250,7 +314,7 @@ MonoBehaviour:
   _baked: 0
   _markDynamic: 1
   _size: 0.03
-  _color: {r: 255, g: 0, b: 0, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
   _offset: {x: 0, y: 0, z: 0}
   _normalMethod: 1
   _calculateTangents: 1

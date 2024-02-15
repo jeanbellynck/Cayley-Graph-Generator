@@ -1,5 +1,7 @@
 using Dreamteck.Splines;
 using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -35,6 +37,9 @@ public class Edge : MonoBehaviour {
     SplinificationType splinificationType => graphManager.splinificationType;
     SplinificationType? lastSplinificationType = null;
 
+
+    protected IDictionary<char, Color> LabelColors => graphManager.labelColors;
+
     SplineComputer splineComputer;
     SplineRenderer splineRenderer;
     MeshRenderer meshRenderer;
@@ -50,6 +55,8 @@ public class Edge : MonoBehaviour {
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
     public virtual float Activity => graphManager.Activity;
+
+    [SerializeField] Color startColor, endColor;
 
     void Start() {
         creationTime = Time.time;
@@ -82,16 +89,15 @@ public class Edge : MonoBehaviour {
         Destroy(gameObject);
     }
 
-    public void SetFarbe(Color farbe1, Color farbe2) {
-        splineRenderer.color = farbe1;
-        // todo? also have a color gradient on splines? Not really...
-        lineRenderer.startColor = farbe1;
-        lineRenderer.endColor = farbe2;
+    public void SetColors(Color startColor, Color? endColor = null) {
+        this.startColor = startColor;
+        this.endColor = endColor ?? startColor.Desaturate(0.2f);
     }
 
     const float scalingC = 1.324717957244f; // scaling(0) = 1/3
     readonly float scalingB = 1 / Mathf.Log(1 + scalingC); // scaling(1) = 1
-    float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
+    //float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
+    float MidDisplacementScaling(float x) => scalingB * Mathf.Sqrt(scalingC + x);
 
 
     protected virtual void LateUpdate() {
@@ -137,6 +143,9 @@ public class Edge : MonoBehaviour {
         Vector3 startPointWithSpacing = startPosition + lineDirection * vertexRadius;
         Vector3 endPointWithSpacing = endPosition - lineDirection * vertexRadius;
 
+        lineRenderer.startColor = startColor.WithAlpha(startPoint.EdgeCompletion);
+        lineRenderer.endColor = endColor.WithAlpha(endPoint.EdgeCompletion);
+
         lineRenderer.widthCurve = new(
             new Keyframe(time: 0, value: lineWidth)
             , new Keyframe(time: 0.999f - PercentHead, value: lineWidth) // neck of arrow
@@ -156,6 +165,11 @@ public class Edge : MonoBehaviour {
         meshRenderer.enabled = true;
         var startPoint = StartPoint;
         var endPoint = EndPoint; // in case we update how the property works
+
+        splineRenderer.colorModifier.keys[0].color = startColor.WithAlpha(startPoint.EdgeCompletion);
+        splineRenderer.colorModifier.keys[1].color = endColor.WithAlpha(endPoint.EdgeCompletion);
+        
+
         Vector3 startPosition = startPoint.transform.position;
         Vector3 endPosition = endPoint.transform.position;
         Vector3 vector = endPosition - startPosition;
@@ -196,7 +210,7 @@ public class Edge : MonoBehaviour {
         });
     }
 
-    public virtual Vertex getOpposite(GroupVertex vertex) {
+    protected virtual Vertex GetOpposite(Vertex vertex) {
         if (vertex.Equals(StartPoint)) return EndPoint;
         if (vertex.Equals(EndPoint)) return StartPoint;
         throw new Exception("Vertex is not part of this edge.");

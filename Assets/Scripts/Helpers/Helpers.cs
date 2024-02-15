@@ -27,6 +27,15 @@ public static class Helpers {
         return false;
     }
 
+    public static Color Desaturate(this Color color, float f) {
+        // Copilot
+        //Color.RGBToHSV(color, out var h, out var s, out var v);
+        //return Color.HSVToRGB(h, s * amount, v);
+        var (r,g,b) = (color.r, color.g, color.b);
+        var L = 0.3f * r + 0.6f * g + 0.1f * b; // L=Color.greyscale
+        return new Color(r + f * (L - r),g + f * (L - g),  b + f * (L - b));
+    }
+
     public static Vector3 Average(IEnumerable<Vector3> vectors) {
         var sum = Vector3.zero;
         var count = 0;
