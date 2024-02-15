@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -20,16 +21,14 @@ public class CayleyGraph : MonoBehaviour {
 
 
     // These values are probably better moved to CayleyGraphMaker entirely
-    public char[] generators = new char[0];
-    public string[] relators = new string[0];
+    [SerializeField] char[] generators = new char[0];
+    [SerializeField] string[] relators = new string[0];
 
 
     public float Activity => Math.Clamp(physik.alpha, 0f, 1f);
 
     // Start is called before the first frame update
     void Start() {
-        setGenerators("a, b");
-        setRelators("[a, b], a^5");
         cayleyGraphMaker.setPhysics(physik);
     }
 
@@ -38,34 +37,21 @@ public class CayleyGraph : MonoBehaviour {
     void Update() {
     }
 
-    public void setGenerators(string generatorString) {
-        generatorString = generatorString.Replace(" ", "").Replace(";", "").Replace(",", "");
-        char[] newGenerators = string.Join("", generatorString).ToCharArray();
-        if(!newGenerators.Equals(generators)) {
-            generators = newGenerators;
-            cayleyGraphMaker.setGenerators(generators);
-            hyperbolicityMatrix.SetMatrixSize(generators.Length);
-        }
-
+    void setGenerators(IEnumerable<char> newGenerators) {
+        if (newGenerators.SequenceEqual(generators)) return;
+        generators = newGenerators.ToArray();
+        cayleyGraphMaker.setGenerators(generators);
+        hyperbolicityMatrix.SetMatrixSize(generators.Length);
     }
 
-    public void setRelators(string relators) {
-        if (relators.Equals("")) {
-            this.relators = new string[0];
-            return;
-        }
-
-        // Apply the Relotor Decoder
-        this.relators = RelatorDecoder.decodeRelators(relators);
-
-    }
+    void setRelators(IEnumerable<string> relators) => this.relators = relators.ToArray();
 
     public void setVertexNumber(string vertexNumber) {
         cayleyGraphMaker.setVertexNumber(int.Parse(vertexNumber));
     }
 
-    public InputField generatorInputField;
-    public InputField relatorInputField;
+    public GeneratorMenu generatorMenu;
+    public RelatorMenu relatorMenu;
     public InputField vertexNumberInputField;
     public InputField hyperbolicityInputField;
     public HyperbolicityMatrix hyperbolicityMatrix;
@@ -74,7 +60,6 @@ public class CayleyGraph : MonoBehaviour {
 
     public void generateButton() {
         StopVisualization();
-        setRelators(relatorInputField.text);
         StartVisualization();
     }
 
@@ -92,6 +77,8 @@ public class CayleyGraph : MonoBehaviour {
 
     public void StartVisualization() {
         setVertexNumber(vertexNumberInputField.text);
+        setGenerators(generatorMenu.GetGenerators());
+        setRelators(relatorMenu.GetRelators());
         graphManager.Initialize(generators);
         int projectionDimension = dimensionInputDD.value + 2;
         physik.startUp(graphManager, projectionDimension);
@@ -101,15 +88,11 @@ public class CayleyGraph : MonoBehaviour {
 
 
     public void SelectGroupOption(string name, string generatorString, string relatorString) {
-        StopVisualization();
         Debug.Log("Set Group: " + name);
         // Set the generators and relators for the input fields and for the program
-        generatorInputField.text = string.Join(", ", generatorString);
-        relatorInputField.text = string.Join(", ", relatorString);
-        // Generator is automatically updated on value change
-        //setGenerators(generatorString); 
-        setRelators(relatorString);
-        StartVisualization();
+        generatorMenu.SetGenerators(generatorString.Where(char.IsLetter));
+        relatorMenu.SetRelatorString(relatorString);
+        generateButton();
     }
 
     public void openHelpPage() {

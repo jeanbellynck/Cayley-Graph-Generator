@@ -3,6 +3,17 @@ using UnityEngine;
 
 
 public static class Helpers {
+
+    public static bool ContainsTwice<T>(this IEnumerable<T> enumerable, T item) {
+        var alreadySeen = false;
+        foreach (var i in enumerable) {
+            if (i?.Equals(item) is not true) continue;
+            if (alreadySeen) return true;
+            alreadySeen = true;
+        }
+        return false;
+    }
+
     public static Vector3 Average(IEnumerable<Vector3> vectors) {
         var sum = Vector3.zero;
         var count = 0;
