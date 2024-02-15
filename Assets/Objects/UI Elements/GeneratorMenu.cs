@@ -32,7 +32,9 @@ public class GeneratorMenu : MonoBehaviour
             AddGeneratorInput(generator);
     }
 
-    public void AddGeneratorInput(char preferredGeneratorName = default) {
+    public void AddGeneratorInput() => AddGeneratorInput(default);
+
+    public void AddGeneratorInput(char preferredGeneratorName) {
         var selectedGenerators = GetGenerators().Select(a => a - 'a').ToArray();
         int preferredGeneratorNumber = preferredGeneratorName - 'a';
         if (preferredGeneratorNumber is < 0 or >= 26) 
