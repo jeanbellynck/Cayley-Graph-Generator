@@ -1,0 +1,69 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+
+public class GeneratorMenu : MonoBehaviour
+{
+    [SerializeField] GameObject generatorInputPrefab;
+    List<TMP_InputField> generatorInputs = new();
+    List<GameObject> generatorGameObjects = new();
+
+    public IEnumerable<char> GetGenerators() {
+        return from input in generatorInputs
+            let a = input.text.FirstOrDefault()
+            let b = input.placeholder.GetComponent<TMP_Text>().text.FirstOrDefault()
+            let c = a != default ? a : b != default ? b : 'a'
+            select char.ToLower(c);
+    }
+
+    public void SetGenerators(IEnumerable<char> generators) {
+        foreach (var generatorGameObject in generatorGameObjects) {
+            Destroy(generatorGameObject);
+        } 
+        generatorInputs.Clear();
+        generatorGameObjects.Clear();
+
+        foreach (var generator in generators) 
+            AddGeneratorInput(generator);
+    }
+
+    public void AddGeneratorInput(char preferredGeneratorName = default) {
+        var selectedGenerators = GetGenerators().Select(a => a - 'a').ToArray();
+        int preferredGeneratorNumber = preferredGeneratorName - 'a';
+        if (preferredGeneratorNumber is < 0 or >= 26) 
+            preferredGeneratorNumber = selectedGenerators.DefaultIfEmpty(0).Max();
+        var expectedGeneratorNumber = preferredGeneratorNumber;
+        for (var i = preferredGeneratorNumber; i < 26 + preferredGeneratorNumber; i++) {
+            if (selectedGenerators.Contains(i%26)) continue;
+            expectedGeneratorNumber = i%26;
+            break;
+        }
+        string expectedName = ((char)(expectedGeneratorNumber + 'a')).ToString();
+        var newGeneratorInputGameObject = Instantiate(generatorInputPrefab, transform);
+        generatorGameObjects.Add(newGeneratorInputGameObject);
+
+        var newGeneratorInputField = newGeneratorInputGameObject.GetComponentInChildren<TMP_InputField>();
+        generatorInputs.Add(newGeneratorInputField);
+        newGeneratorInputField.text = expectedName;
+        newGeneratorInputField.placeholder.GetComponent<TMP_Text>().text = expectedName;
+        //newGeneratorInput.GetComponentInChildren<Button>().onClick.AddListener(() => Destroy(newGeneratorInput));
+        newGeneratorInputField.onEndEdit.AddListener((s) => {
+            if (string.IsNullOrWhiteSpace(s)) s = "";
+            var c = char.ToLower(s.TrimStart().FirstOrDefault());
+            if (c is > 'z' or < 'a') {
+                Destroy(newGeneratorInputGameObject);
+                generatorInputs.Remove(newGeneratorInputField);
+                generatorGameObjects.Remove(newGeneratorInputGameObject);
+                return;
+            }
+            newGeneratorInputField.text = c.ToString();
+        });
+
+    }
+
+}
