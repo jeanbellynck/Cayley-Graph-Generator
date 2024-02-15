@@ -16,8 +16,9 @@ public class GeneratorMenu : MonoBehaviour
     public IEnumerable<char> GetGenerators() {
         return from input in generatorInputs
             let a = input.text.FirstOrDefault()
-            let b = input.placeholder.GetComponent<TMP_Text>().text.FirstOrDefault()
-            let c = a != default ? a : b != default ? b : 'a'
+            let c = a != default ? a : 
+                (input.placeholder.GetComponent<TMP_Text>().text.Length > 0 ? input.placeholder.GetComponent<TMP_Text>().text[0] : 'a')
+                //shouldn't be necessary as it should delete itself if the input is empty => I don't care about performance if it only happens in this case
             select char.ToLower(c);
     }
 
@@ -57,7 +58,8 @@ public class GeneratorMenu : MonoBehaviour
         newGeneratorInputField.onEndEdit.AddListener((s) => {
             if (string.IsNullOrWhiteSpace(s)) s = "";
             var c = char.ToLower(s.TrimStart().FirstOrDefault());
-            if (c is > 'z' or < 'a') {
+            var generators = GetGenerators();
+            if (c is > 'z' or < 'a' || generators.ContainsTwice(c)) {
                 Destroy(newGeneratorInputGameObject);
                 generatorInputs.Remove(newGeneratorInputField);
                 generatorGameObjects.Remove(newGeneratorInputGameObject);

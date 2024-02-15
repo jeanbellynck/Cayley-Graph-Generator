@@ -19,7 +19,7 @@ public class RelatorMenu : MonoBehaviour {
         set => SetRelators(value);
     }
 
-    public IEnumerable<string> GetRelators() => GetRelatorStrings().SelectMany(input => RelatorDecoder.DecodeRelatorStrings(input));
+    public IEnumerable<string> GetRelators() => GetRelatorStrings().SelectMany(input => RelatorDecoder.DecodeRelatorStrings(input, false));
     public IEnumerable<string> GetRelatorStrings() => from input in relatorInputs.Values select input.text;
 
     public void Awake() {
@@ -41,6 +41,7 @@ public class RelatorMenu : MonoBehaviour {
             if (firstRelator == default) {
                 Destroy(relatorGameObjects[oldIndex]);
                 relatorInputs.Remove(oldIndex);
+                relatorGameObjects.Remove(oldIndex);
                 return;
             }
 
