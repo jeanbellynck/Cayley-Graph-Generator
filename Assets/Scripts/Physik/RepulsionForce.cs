@@ -31,11 +31,18 @@ public class RepulsionForce : Force {
     public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
         if(repelForceFactor == 0 || alpha == 0) yield return null;
         // Every tick the BarnesQuadtree is recalculated. This is expensive but necessary since the vertices move.
-        BarnesQuadtree bqb = new BarnesQuadtree(VectorN.Zero(graphManager.getDim()), radius, QuadTreeTheta * QuadTreeTheta, barnesQuadTreeMinimalDistance * barnesQuadTreeMinimalDistance, barnesQuadTreeMaximalDistance * barnesQuadTreeMaximalDistance);
+        Profiler.BeginSample("QuadtreeCreation");
+        int treeDimension = Math.Min(graphManager.getDim(), 2);
+        BarnesQuadtree bqb = new BarnesQuadtree(treeDimension, VectorN.Zero(graphManager.getDim()), radius, QuadTreeTheta * QuadTreeTheta, barnesQuadTreeMinimalDistance * barnesQuadTreeMinimalDistance, barnesQuadTreeMaximalDistance * barnesQuadTreeMaximalDistance);
+        Profiler.EndSample();
+        Profiler.BeginSample("AddVerticesToQuadtree");
         foreach (Vertex vertex in graphManager.getVertex()) {
             bqb.Add(vertex);
         }
+        Profiler.EndSample();
+        Profiler.BeginSample("BerechneSchwerpunkt");
         bqb.BerechneSchwerpunkt();
+        Profiler.EndSample();
 
         int vertexIndex = 0;
         int vertexPerBatch = 400;
@@ -49,7 +56,7 @@ public class RepulsionForce : Force {
                 VectorN force = vertex.Mass * repelForceFactor * alpha * bqb.calculateRepulsionForceOnVertex(vertex);
                 Profiler.EndSample();
                 force = force.ClampMagnitude(maximalForce);
-                vertex.RepelForce = force;
+                vertex.Force = force;
             }
             vertexIndex += vertexPerBatch;
         }

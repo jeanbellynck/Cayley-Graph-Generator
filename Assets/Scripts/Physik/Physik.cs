@@ -19,6 +19,7 @@ public class Physik : MonoBehaviour {
     public float alphaDecay = 0.1f;
 
     public float velocityDecay = 0.9f;
+    private int dimension = 3; // Describes the dimension of the projection. The default is always 4D.
 
 
     GraphManager graphManager;
@@ -27,15 +28,20 @@ public class Physik : MonoBehaviour {
     RepulsionForce repulsionForce;
     [SerializeField]
     LinkForce linkForce;
+    [SerializeField]
+    ProjectionForce projectionForce;
 
     public void Start() {
-        repulsionForce = new RepulsionForce(radius);
-        linkForce = new LinkForce();
     }
 
-    public void startUp(GraphManager graphManager) {
+    public void startUp(GraphManager graphManager, int dimension) {
         this.graphManager = graphManager;
         alpha = alphaSetting;
+        this.dimension = dimension;
+        
+        repulsionForce = new RepulsionForce(radius);
+        linkForce = new LinkForce();
+        projectionForce = new ProjectionForce(0.5f, dimension);
         //dim = 2*generators.Length + 1;
         StartCoroutine(LoopPhysics());
     }
@@ -65,6 +71,7 @@ public class Physik : MonoBehaviour {
             if(alpha == 0) {break;}
             geschwindigkeitenZurücksetzen();
             yield return repulsionForce.ApplyForce(graphManager, alpha);
+            yield return projectionForce.ApplyForce(graphManager, alpha);
             yield return linkForce.ApplyForce(graphManager, alpha);
             updateVertices();
             
@@ -78,7 +85,7 @@ public class Physik : MonoBehaviour {
         float realVelocityDecay = Mathf.Pow(velocityDecay, timeStep);
         foreach (Vertex vertex in graphManager.getVertex()) {
             float ageFactor = Mathf.Max(1, (3 - 1) * (1 - vertex.Age)); // Young vertices are strong
-            VectorN force = ageFactor * (vertex.RepelForce + vertex.LinkForce); 
+            VectorN force = ageFactor * vertex.Force; 
             vertex.Position += vertex.Velocity * timeStep + 0.5f * force * timeStep * timeStep;
             vertex.Velocity += force * timeStep;
             vertex.Velocity *= realVelocityDecay;
@@ -92,8 +99,7 @@ public class Physik : MonoBehaviour {
      */
     private void geschwindigkeitenZurücksetzen() {
         foreach (Vertex vertex in graphManager.getVertex()) {
-            vertex.LinkForce = VectorN.Zero(dim);
-            vertex.RepelForce = VectorN.Zero(dim);
+            vertex.Force = VectorN.Zero(dim);
             vertex.Velocity = vertex.Velocity.ClampMagnitude(radius/10);
             vertex.Position = vertex.Position.ClampMagnitude(radius);
             vertex.transform.position = VectorN.ToVector3(vertex.Position);
