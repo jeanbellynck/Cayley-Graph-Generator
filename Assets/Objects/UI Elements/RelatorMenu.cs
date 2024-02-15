@@ -14,29 +14,28 @@ public class RelatorMenu : MonoBehaviour {
     readonly Dictionary<string, TMP_InputField> relatorInputs = new();
     readonly Dictionary<string, GameObject> relatorGameObjects = new();
 
-    public IEnumerable<string> GetRelators() {
-        return from input in relatorInputs.Values
-            select input.text;
+    public IEnumerable<string> Relators { // this is probably bad practice but fun (not used currently)
+        get => GetRelators();
+        set => SetRelators(value);
     }
+
+    public IEnumerable<string> GetRelators() => GetRelatorStrings().SelectMany(input => RelatorDecoder.DecodeRelatorStrings(input));
+    public IEnumerable<string> GetRelatorStrings() => from input in relatorInputs.Values select input.text;
 
     public void Awake() {
         if (generatorMenu == null)
-            generatorMenu = FindObjectOfType<GeneratorMenu>();
+            generatorMenu = FindFirstObjectByType<GeneratorMenu>();
         SetRelatorString("[a,b], a^5");
     }
 
-    public void AddRelatorString([CanBeNull] string relatorString) {
+    public void AddRelatorString([CanBeNull] string relatorString) =>
         AddRelatorString(relatorString, null);
-    }
 
-    void AddRelatorString([CanBeNull] string relatorString, [CanBeNull] string oldIndex) {
-        var newRelators = RelatorDecoder.decodeRelators(relatorString ?? "");
-        AddRelators(newRelators, oldIndex);
-    }
+    void AddRelatorString([CanBeNull] string relatorString, [CanBeNull] string oldIndex) => 
+        AddRelators(RelatorDecoder.SeparateRelators(relatorString ?? ""), oldIndex);
 
     void AddRelators(IEnumerable<string> relators, [CanBeNull] string oldIndex) {
-        var knownRelators = GetRelators().ToList();
-        relators = relators.Where(s => !string.IsNullOrWhiteSpace(s) && !knownRelators.Contains(s));
+        relators = relators.Where(s => !string.IsNullOrWhiteSpace(s));
         string firstRelator = relators.FirstOrDefault();
         if (oldIndex != null && relatorInputs.ContainsKey(oldIndex)) {
             if (firstRelator == default) {
@@ -51,7 +50,10 @@ public class RelatorMenu : MonoBehaviour {
         var index = string.IsNullOrWhiteSpace(oldIndex) ? "" : oldIndex + '.';
         var i = 1;
         List<char> generators = generatorMenu.GetGenerators().ToList();
+        var knownRelators = GetRelatorStrings().ToList();
+
         foreach (var relator in relators) {
+            if (knownRelators.Contains(relator)) continue;
             while (relatorInputs.ContainsKey(index + i))
                 i++;
             var newIndex = index + i;
