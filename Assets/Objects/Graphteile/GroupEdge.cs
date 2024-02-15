@@ -5,13 +5,12 @@ using UnityEngine;
 
 public class GroupEdge : Edge {
     public static readonly IDictionary<char, Color> LabelColours = new Dictionary<char, Color>();
-    public override float Activity => (StartPoint is GroupVertex sp) ? sp.Activity : (EndPoint is GroupVertex ep) ? ep.Activity : 1;
 
-    public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity) {
+    public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity, GraphManager graphManager) {
         if(char.IsLower(operation)) {
-            base.Initialize(startVertex, endVertex, operation);
+            base.Initialize(startVertex, endVertex, operation, graphManager);
         } else {
-            base.Initialize(endVertex, startVertex, char.ToLower(operation));
+            base.Initialize(endVertex, startVertex, char.ToLower(operation), graphManager);
         }
         SetFarbe(LabelColours[char.ToLower(operation)], new Color(100, 100, 100));
         calculateEdgeLength(hyperbolicity);

@@ -10,8 +10,13 @@ using Button = UnityEngine.UI.Button;
 public class GeneratorMenu : MonoBehaviour
 {
     [SerializeField] GameObject generatorInputPrefab;
-    List<TMP_InputField> generatorInputs = new();
-    List<GameObject> generatorGameObjects = new();
+    readonly List<TMP_InputField> generatorInputs = new();
+    readonly List<GameObject> generatorGameObjects = new();
+
+    public IEnumerable<char> Generators {
+        get => GetGenerators();
+        set => SetGenerators(value);
+    }
 
     public IEnumerable<char> GetGenerators() {
         return from input in generatorInputs

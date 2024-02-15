@@ -7,18 +7,6 @@ using Vector3 = UnityEngine.Vector3;
 public class Vertex : MonoBehaviour {
 
 
-    public readonly Dictionary<char, Vector3> splineDirections = new();
-    const int SplineDirectionUpdateFrameInterval = 15;
-    [SerializeField] float splineDirectionFactor = 0.2f; // actually I would like to see these in the inspector AND have them be static
-    [SerializeField] float orthogonalSplineDirectionFactor = 0.1f;
-    [SerializeField] bool preferEights = false;
-    [SerializeField] float equalDirectionDisplacementFactor = 0.3f;
-
-
-    Dictionary<char, Vector3> preferredRandomDirections = new ();
-    Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
-    readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
-
 
     public int Id { get; set; }
 
@@ -38,8 +26,25 @@ public class Vertex : MonoBehaviour {
     float creationTime; // = Time.time;
     public float Age => Time.time - creationTime;
 
+    public virtual float EdgeCompletion => 1f;
+
     public VectorN Position { get => position; set => position = value; }
     VectorN Velocity1 { get; set; }
+
+    public readonly Dictionary<char, Vector3> splineDirections = new();
+    [SerializeField] float splineDirectionFactor = 0.2f; // actually I would like to see these in the inspector AND have them be static
+    [SerializeField] float orthogonalSplineDirectionFactor = 0.1f;
+    [SerializeField] bool preferEights = false;
+    [SerializeField] float equalDirectionDisplacementFactor = 0.3f;
+
+
+    Dictionary<char, Vector3> preferredRandomDirections = new ();
+    Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
+    readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
+
+    [SerializeField] public GraphManager graphManager;
+    public float Activity => graphManager.Activity;
+
 
     // Start is called before the first frame update
     protected virtual void Start() {
@@ -51,11 +56,12 @@ public class Vertex : MonoBehaviour {
         Update();
     }
 
-    protected void Initialize(VectorN position) {
+    protected void Initialize(VectorN position, GraphManager graphManager) {
         this.position = position;
         VectorN zero = VectorN.Zero(position.Size());
         Velocity1 = zero;
         Force = zero;
+        this.graphManager = graphManager;
         //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
     }
 

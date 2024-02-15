@@ -4,22 +4,21 @@ using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
 public class GroupVertex : Vertex {
-    [SerializeField]
-    private int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
-    [SerializeField]
-    private List<string> pathsToNeutralElement = new List<string>(); // The paths to the identity element. This is used to visualize the paths to the identity element.
+    [SerializeField] int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
+    [SerializeField] List<string> pathsToNeutralElement = new(); // The paths to the identity element. This is used to visualize the paths to the identity element.
 
     public float Stress { get; private set; }
 
     public int DistanceToNeutralElement { get => distanceToNeutralElement;
         private set => distanceToNeutralElement = value; }
-    public List<string> PathsToNeutralElement { get => pathsToNeutralElement; set => pathsToNeutralElement = value; }
+    public List<string> PathsToNeutralElement { get => pathsToNeutralElement; protected set => pathsToNeutralElement = value; }
 
-    [SerializeField] CayleyGraph cayleyGraph;
-    public float Activity => cayleyGraph.Activity;
 
 
     // Start is called before the first frame update
+    public override float EdgeCompletion => (float) LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) /
+                                            graphManager.LabelCount;
+
     protected override void Start() {
         base.Start();
     }
@@ -27,17 +26,17 @@ public class GroupVertex : Vertex {
     // Update is called once per frame
     protected override void Update() {
         base.Update();
+
         Stress = (from generator in LabeledOutgoingEdges.Keys
             let inEdge = GetIncomingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
             let outEdge = GetOutgoingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
             select Vector3.Angle(inEdge, outEdge) / 180
         ).DefaultIfEmpty(0).Max();
-        Mr.material.color = new Color(Stress, 0, 0);
+        Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
     }
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
-        base.Initialize(predecessor.Position);
-        cayleyGraph = predecessor.cayleyGraph;
+        base.Initialize(predecessor.Position, predecessor.graphManager);
         name = predecessor.name + op;
 
         GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
@@ -60,7 +59,7 @@ public class GroupVertex : Vertex {
     }
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
-        base.Initialize((Position + vertex2.Position) / 2);
+        base.Initialize((Position + vertex2.Position) / 2, graphManager);
         foreach(string path in vertex2.PathsToNeutralElement) {
             AddPathToNeutralElement(path);
         }

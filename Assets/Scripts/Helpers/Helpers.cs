@@ -1,8 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
 public static class Helpers {
+
+    public static bool IsEmpty<T>(this IEnumerable<T> list) {
+        try {
+            list.First();
+            return false;
+        }
+        catch (InvalidOperationException) {
+            return true;
+        }
+    }
 
     public static bool ContainsTwice<T>(this IEnumerable<T> enumerable, T item) {
         var alreadySeen = false;

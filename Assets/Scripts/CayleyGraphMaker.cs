@@ -158,9 +158,9 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         GroupEdge newEdge = Instantiate(edgePrefab, transform).GetComponent<GroupEdge>();
-        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity);
-
+        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity, graphManager);
         graphManager.AddEdge(newEdge);
+
         return newEdge;
     }
 

@@ -58,6 +58,7 @@ MonoBehaviour:
   startPoint: {fileID: 0}
   endPoint: {fileID: 0}
   label: 0
+  graphManager: {fileID: 0}
   midDisplacementFactor: 0.18
   midDirectionFactor: 0.3
 --- !u!114 &3310283270684842847

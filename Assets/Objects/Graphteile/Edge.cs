@@ -31,7 +31,8 @@ public class Edge : MonoBehaviour {
         WhenSimulationSlowsDown,
         WhenSimulationHasStopped
     }
-    public static SplinificationType splinificationType = SplinificationType.WhenSimulationHasStopped;
+
+    SplinificationType splinificationType => graphManager.splinificationType;
     SplinificationType? lastSplinificationType = null;
 
     SplineComputer splineComputer;
@@ -39,19 +40,22 @@ public class Edge : MonoBehaviour {
     MeshRenderer meshRenderer;
     LineRenderer lineRenderer;
 
+    bool finished;
+    public GraphManager graphManager;
+
     [SerializeField]
     protected float midDisplacementFactor = 0.18f;
     [SerializeField]
     protected float midDirectionFactor = 0.3f;
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
-    public virtual float Activity => 1f;
+    public virtual float Activity => graphManager.Activity;
 
     void Start() {
         creationTime = Time.time;
     }
 
-    protected void Initialize(Vertex startPoint, Vertex endPoint, char label) {
+    protected void Initialize(Vertex startPoint, Vertex endPoint, char label, GraphManager graphManager) {
         this.StartPoint = startPoint;
         this.EndPoint = endPoint;
         this.Label = label;
@@ -63,6 +67,7 @@ public class Edge : MonoBehaviour {
         splineRenderer = GetComponent<SplineRenderer>();
         meshRenderer = GetComponent<MeshRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
+        this.graphManager = graphManager;
 
         useSplines = splinificationType == SplinificationType.Always;
 
@@ -89,7 +94,6 @@ public class Edge : MonoBehaviour {
     float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
 
 
-    bool finished;
     protected virtual void LateUpdate() {
         if (startPoint == null || endPoint == null) return;
         if (splinificationType != lastSplinificationType) {

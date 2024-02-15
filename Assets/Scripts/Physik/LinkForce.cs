@@ -17,7 +17,7 @@ public class LinkForce : Force {
     public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
         if (linkForceFactor == 0 || alpha == 0) yield return null;
         for (int i = 0; i < stabilityIterations; i++) {
-            foreach (Edge edge in graphManager.GetKanten()) {
+            foreach (Edge edge in graphManager.GetEdges()) {
                 VectorN force = calculateLinkForce(edge);
                 edge.StartPoint.Force += linkForceFactor * alpha * force;
                 edge.EndPoint.Force -= linkForceFactor * alpha * force;

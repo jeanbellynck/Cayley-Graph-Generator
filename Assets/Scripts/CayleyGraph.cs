@@ -79,7 +79,7 @@ public class CayleyGraph : MonoBehaviour {
         setVertexNumber(vertexNumberInputField.text);
         setGenerators(generatorMenu.GetGenerators());
         setRelators(relatorMenu.GetRelators());
-        graphManager.Initialize(generators);
+        graphManager.Initialize(generators, this);
         int projectionDimension = dimensionInputDD.value + 2;
         physik.startUp(graphManager, projectionDimension);
         int actualDimension = projectionDimension + 0;
