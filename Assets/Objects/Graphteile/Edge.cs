@@ -96,8 +96,12 @@ public class Edge : MonoBehaviour {
 
     const float scalingC = 1.324717957244f; // scaling(0) = 1/3
     readonly float scalingB = 1 / Mathf.Log(1 + scalingC); // scaling(1) = 1
+    const float scalingD = 1.8f;
+    readonly float scalingE = 1 / 3f - scalingD * Mathf.Sqrt(scalingC);
+
+
     //float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
-    float MidDisplacementScaling(float x) => scalingB * Mathf.Sqrt(scalingC + x);
+    float MidDisplacementScaling(float x) => scalingD * Mathf.Sqrt(scalingC + x) + scalingE;
 
 
     protected virtual void LateUpdate() {
