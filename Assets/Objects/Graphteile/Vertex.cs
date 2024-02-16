@@ -48,6 +48,7 @@ public class Vertex : MonoBehaviour {
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
 
     [SerializeField] public GraphManager graphManager;
+    public bool updateSplineDirections;
     public float Activity => graphManager.Activity;
 
 
@@ -73,15 +74,15 @@ public class Vertex : MonoBehaviour {
         preferredRandomDirections.Clear();
         fallbackRandomDirections.Clear();
 
-        //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
-        //OnEdgeChange += RecalculateSplineDirections; // would be ok, but not necessary, as the edges call this method themselves
+        //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again 
+        OnEdgeChange += RecalculateSplineDirections;
 
         OnEdgeChange?.Invoke();
 
     }
 
     protected virtual void Update() {
-        
+        if (updateSplineDirections) RecalculateSplineDirections();
     }
 
     public void OnDrawGizmos() {
@@ -95,15 +96,13 @@ public class Vertex : MonoBehaviour {
 
     public void Destroy() {
         // Destroy all edges too
-        foreach (HashSet<Edge> genEdges in LabeledIncomingEdges.Values) {
-            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
-            foreach (Edge edge in genEdgesCopy) {
+        foreach (HashSet<Edge> genEdges in LabeledIncomingEdges.Values.ToList()) {
+            foreach (Edge edge in genEdges.ToList()) {
                 edge.Destroy();
             }
-        }
-        foreach (HashSet<Edge> genEdges in LabeledOutgoingEdges.Values) {
-            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
-            foreach (Edge edge in genEdgesCopy) {
+        } // copy by .ToList() to avoid concurrent modification (InvalidOperationException)
+        foreach (HashSet<Edge> genEdges in LabeledOutgoingEdges.Values.ToList()) { 
+            foreach (Edge edge in genEdges.ToList()) {
                 edge.Destroy();
             }
         }
@@ -115,21 +114,8 @@ public class Vertex : MonoBehaviour {
         return other != null && Id == other.Id;
     }
 
-
-    //IEnumerator<int> CalculateSplineDirections() {
-    //    var r = Random.Range(0, SplineDirectionUpdateFrameInterval);
-    //    while (true) {
-    //        if (Time.frameCount % SplineDirectionUpdateFrameInterval != r) {
-    //            yield return 0;
-    //            continue;
-    //        }
-    //        RecalculateSplineDirections();
-    //        yield return 1;
-    //    }
-    //}
-
     public void RecalculateSplineDirections(){
-        var labels = LabeledIncomingEdges.Keys.Union(LabeledOutgoingEdges.Keys).ToList();
+        var labels = LabeledIncomingEdges.Keys.Union(LabeledOutgoingEdges.Keys).Union(splineDirections.Keys).ToList();
         labels.Sort();
         List<char> randomLabels = new();
 
@@ -310,6 +296,10 @@ public class Vertex : MonoBehaviour {
         if (LabeledOutgoingEdges.ContainsKey(label)) {
             LabeledOutgoingEdges[label].Remove(edge);
         }
+
+        if (LabeledOutgoingEdges[label].Count == 0) {
+            LabeledOutgoingEdges.Remove(label);
+        }
         OnEdgeChange?.Invoke();
     }
 
@@ -332,6 +322,10 @@ public class Vertex : MonoBehaviour {
         char label = edge.Label;
         if (LabeledIncomingEdges.ContainsKey(label)) {
             LabeledIncomingEdges[label].Remove(edge);
+        }
+
+        if (LabeledIncomingEdges[label].Count == 0) {
+            LabeledIncomingEdges.Remove(label);
         }
         OnEdgeChange?.Invoke();
     }

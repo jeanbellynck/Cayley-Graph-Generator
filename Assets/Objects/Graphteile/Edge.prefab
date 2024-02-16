@@ -52,17 +52,19 @@ MonoBehaviour:
   lineWidth: 0.1
   arrowWidth: 0.2
   PercentHead: 0.1
-  vertexRadius: 0.1
-  useSplines: 0
-  length: 0
+  vertexRadius: 0.053
+  splineArrowWidthFactor: 6
+  splineWidth: 0.05
+  useSplines: 1
+  length: 1
   startPoint: {fileID: 0}
   endPoint: {fileID: 0}
-  label: 0
+  label: 97
   graphManager: {fileID: 0}
   midDisplacementFactor: 0.18
   midDirectionFactor: 0.3
-  startColor: {r: 0, g: 0, b: 0, a: 0}
-  endColor: {r: 0, g: 0, b: 0, a: 0}
+  startColor: {r: 0.8490566, g: 0, b: 0, a: 1}
+  endColor: {r: 0.73018867, g: 0.0509434, b: 0.0509434, a: 1}
 --- !u!114 &3310283270684842847
 MonoBehaviour:
   m_ObjectHideFlags: 0

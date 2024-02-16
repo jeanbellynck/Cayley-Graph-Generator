@@ -9,8 +9,17 @@ public class Edge : MonoBehaviour {
     [SerializeField] protected float lineWidth = 0.1f;
     [SerializeField] protected float arrowWidth = 0.2f;
     [SerializeField] protected float PercentHead = 0.1f;
-    [SerializeField] protected float vertexRadius = 0.1f;
+    [SerializeField] protected float vertexRadius = 0.75f;
+    [SerializeField] float splineArrowWidthFactor = 6f;
+    [SerializeField] float splineWidth = 0.05f;
     [SerializeField] bool useSplines = true;
+    bool UseSplines {
+        get => useSplines;
+        set {
+            useSplines = value;
+            startPoint.updateSplineDirections = value;
+        }
+    }
 
     [SerializeField] float length;
 
@@ -76,7 +85,7 @@ public class Edge : MonoBehaviour {
         lineRenderer = GetComponent<LineRenderer>();
         this.graphManager = graphManager;
 
-        useSplines = splinificationType == SplinificationType.Always;
+        UseSplines = splinificationType == SplinificationType.Always;
 
         LateUpdate();
     }
@@ -91,13 +100,17 @@ public class Edge : MonoBehaviour {
 
     public void SetColors(Color startColor, Color? endColor = null) {
         this.startColor = startColor;
-        this.endColor = endColor ?? startColor.Desaturate(0.2f);
+        this.endColor = endColor ?? startColor.Desaturate(0.3f);
     }
 
     const float scalingC = 1.324717957244f; // scaling(0) = 1/3
     readonly float scalingB = 1 / Mathf.Log(1 + scalingC); // scaling(1) = 1
+    const float scalingD = 1.8f;
+    readonly float scalingE = 1 / 3f - scalingD * Mathf.Sqrt(scalingC);
+
+
     //float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
-    float MidDisplacementScaling(float x) => scalingB * Mathf.Sqrt(scalingC + x);
+    float MidDisplacementScaling(float x) => scalingD * Mathf.Sqrt(scalingC + x) + scalingE;
 
 
     protected virtual void LateUpdate() {
@@ -110,24 +123,24 @@ public class Edge : MonoBehaviour {
 
         switch (splinificationType) {
             case SplinificationType.Never:
-                useSplines = false;
+                UseSplines = false;
                 break;
             case SplinificationType.Always:
             case SplinificationType.WhenSimulationSlowsDown 
                 when Activity < 1 && Mathf.SmoothStep(0, 1, Age) > Activity:
             case SplinificationType.WhenSimulationHasStopped 
                 when Activity == 0:
-                useSplines = true;
+                UseSplines = true;
                 break;
             case SplinificationType.WhenSimulationHasStopped:
             case SplinificationType.WhenSimulationSlowsDown:
-                useSplines = false;
+                UseSplines = false;
                 break;
             default: break;
         }
         if (Activity == 0) finished = true;
 
-        if (useSplines)
+        if (UseSplines)
             UpdateSpline();
         else 
             UpdateLine();
@@ -174,9 +187,9 @@ public class Edge : MonoBehaviour {
         Vector3 endPosition = endPoint.transform.position;
         Vector3 vector = endPosition - startPosition;
 
-        //if (!startPoint.splineDirections.ContainsKey(Label))
+        if (!startPoint.splineDirections.ContainsKey(Label)) // shouldn't happen
             startPoint.RecalculateSplineDirections();
-        //if (!endPoint.splineDirections.ContainsKey(Label))
+        if (!endPoint.splineDirections.ContainsKey(Label))
             endPoint.RecalculateSplineDirections();
         Vector3 startDirection = startPoint.splineDirections[Label];
         Vector3 endDirection = endPoint.splineDirections[Label];
@@ -208,6 +221,13 @@ public class Edge : MonoBehaviour {
             new SplinePoint(endPosition, endPosition - endDirection) 
             // Why do we have to subtract the direction? and why from the position?
         });
+        var vertexRadiusInSplineUnits = splineComputer.Travel(0, vertexRadius);
+        splineRenderer.clipFrom = vertexRadiusInSplineUnits;
+        splineRenderer.clipTo = 1 - vertexRadiusInSplineUnits;
+        splineRenderer.sizeModifier.keys[0].start = 1 - vertexRadiusInSplineUnits - PercentHead;
+        splineRenderer.sizeModifier.keys[0].end = 1 - vertexRadiusInSplineUnits;
+        splineRenderer.sizeModifier.keys[0].size = splineArrowWidthFactor;
+        splineRenderer.size = splineWidth;
     }
 
     protected virtual Vertex GetOpposite(Vertex vertex) {
