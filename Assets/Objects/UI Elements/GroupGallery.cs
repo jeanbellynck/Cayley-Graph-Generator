@@ -38,8 +38,19 @@ public class GroupGallery : MonoBehaviour
         new Group("F", "Thompson group F", "a; b", "[aB, Aba]; [aB, AABaa]"),
         new Group("²F<sub>4</sub>(2)'", "Tits group", "a; b", "a^2; b^3; (ab)^13; [a, b]^5, [a, bab]^4, ((ab)^4aB)^6"),
         //new RandomGroup(),
-        new Group("?", "???", "a; b; c", "aaa; bbb; ccc; abAbA; acab"),
         new RandomGraphGroup(),
+    };
+
+    Group[] eacgt = {
+        new FreeGroup(),
+        new Group("SL(2, ℤ)", "Special Linear group (different presentation than above)", "a, b", "b^2=(ab)^3, b^4"),
+        new Group("SL(2, ℤ[1/2])", "Special Linear group over a bigger ring", "a, b", "(ab)^3B^2, (ub)^2B^2, (bua^2)^3B^2, b^4, Uau=a^4"),
+        new Group("SL(2, ℤ[1/3])", "Special Linear group over a bigger ring", "a, b", "(ab)^3B^2, (ub)^2B^2, (bua^3)^3B^2, b^4, Uau=a^9"),
+        new Group("ℍ²", "A simple hyperbolic group", "a; b", "abab; a^5; b^5"),
+        new BraidGroup(),
+        new Group("F", "Thompson group F", "a; b", "[aB, Aba]; [aB, AABaa]"),
+        new Group("F", "Thompson group F (partial infinite presentation)", "a, b, c, d", "Aba=c, Aca=d, Bcb=d"),
+        new Group("F", "Thompson-Brown group F<sub>3</sub> (partial infinite presentation)", "a, b, c, d, e", "Aba=d, Aca=e, Bcb=e")
     };
     
     
@@ -76,6 +87,22 @@ public class GroupGallery : MonoBehaviour
 
         // For each Group create a new group object and set it as a child of the gallery.
         foreach (Group group in infiniteGroups)
+        {
+            GameObject newGroup = Instantiate(groupPrefab, transform);
+            newGroup.GetComponent<GroupOption>().group = group;
+            newGroup.transform.SetParent(groupGallery.transform);
+
+            // When the button is clicked the setGroupAndStartVisualisation() method of CayleyGraph is called
+            newGroup.GetComponent<Button>().onClick.AddListener(() => cayleyGraph.GetComponent<CayleyGraph>().SelectGroupOption(group.name, string.Join(',', group.generators), string.Join(',', group.relators)));
+        }
+
+        // Add an infinite group label
+        GameObject eacgtGroupLabel = Instantiate(labelPrefab, transform);
+        eacgtGroupLabel.GetComponent<TMP_Text>().text = "EACGT Group Examples";
+        eacgtGroupLabel.transform.SetParent(groupGallery.transform);
+
+        // For each Group create a new group object and set it as a child of the gallery.
+        foreach (Group group in eacgt)
         {
             GameObject newGroup = Instantiate(groupPrefab, transform);
             newGroup.GetComponent<GroupOption>().group = group;
