@@ -50,7 +50,8 @@ public class GroupGallery : MonoBehaviour
         new BraidGroup(),
         new Group("F", "Thompson group F", "a; b", "[aB, Aba]; [aB, AABaa]"),
         new Group("F", "Thompson group F (partial infinite presentation)", "a, b, c, d", "Aba=c, Aca=d, Bcb=d"),
-        new Group("F", "Thompson-Brown group F<sub>3</sub> (partial infinite presentation)", "a, b, c, d, e", "Aba=d, Aca=e, Bcb=e")
+        new Group("F", "Thompson-Brown group F3 (partial infinite presentation)", "a, b, c, d, e", "Aba=d, Aca=e, Bcb=e"),
+        new Group("G<sub>4</sub><sup>2</sup>", "Manturov-Kim group", "a, b, c, d, e, f", "aa, bb, cc, dd, ee, ff, afaf, bfbf, abab, acac, bcbc, adad, bebe, cdcd, cece, dfdf, efef, dede, abfabf, defdef, acdacd, bcebce")
     };
     
     
