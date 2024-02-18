@@ -56,7 +56,9 @@ public class HyperbolicityMatrix : MonoBehaviour {
     }
 
     public void ValueChanged(string value) {
-        if(float.TryParse(value, out float result) && result != 0) {
+        char separator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator.First();
+        
+        if(float.TryParse(value.Replace('.', separator).Replace(',', separator), out float result) && result != 0) {
             UpdateMatrix();
         }
     }
@@ -71,7 +73,9 @@ public class HyperbolicityMatrix : MonoBehaviour {
 
         // Read Hyperbolicity out of hyperbolicityTextField
         float hyperbolicity;
-        if(float.TryParse(hyperbolicityTextField.GetComponent<InputField>().text, out hyperbolicity) && hyperbolicity > 0) {
+
+        char separator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator.First();
+        if(float.TryParse(hyperbolicityTextField.GetComponent<InputField>().text.Replace('.', separator).Replace(',', separator), out hyperbolicity) && hyperbolicity > 0) {
             // continue
         } else {
             //exit
