@@ -125,42 +125,48 @@ public class BarnesQuadtree {
         VectorN diff = schwerpunkt - pointActedOn.Position;
         float distanceSquared = diff.MagnitudeSquared();
 
-        // This cube sits too far 
-        if (distanceSquared > maximalDistanceSquared) return VectorN.Zero(vertexDim);
 
-        // If the points are far away, use the Barnes Hut approximation, else process them directly
-        if (4 * radius * radius * thetaSquared < distanceSquared) {
-            return CalculateForce(diff, distanceSquared);
-        }
-        else {
+        if(punktInBounds(pointActedOn)) {
             if (isLeaf) {
-                return calculateRepulsionForceOnVertexInsideLeaf(pointActedOn, diff, distanceSquared);
+                return calculateRepulsionForceOnVertexInsideLeaf(pointActedOn, diff);
             }
             else {
-                return calculateRepulsionForceOnVertexInsideSubtree(pointActedOn);
+                return CalculateRepulsionForceOnVertexInsideSubtree(pointActedOn);
             }
+        }
+        if (distanceSquared > maximalDistanceSquared) {
+            return VectorN.Zero(vertexDim);
+        }
+        if (4 * radius * radius * thetaSquared > distanceSquared) {
+            if (isLeaf) {
+                return calculateRepulsionForceOnVertexInsideLeaf(pointActedOn, diff);
+            }
+            else {
+                return CalculateRepulsionForceOnVertexInsideSubtree(pointActedOn);
+            }
+        } else {
+            return CalculateForce(diff, distanceSquared);
         }
     }
 
     /**
      * Calculates how all vertices inside this cube-leaf repel the given point.
      **/
-    public VectorN calculateRepulsionForceOnVertexInsideLeaf(Vertex pointActedOn, VectorN diff, float distanceSquared) {
-        // Leaves are either of minimalSize or contain only one point
-        if (points.Count == 1) {
-            // This cube contains the point itself and can be ignored
-            if (points[0].Equals(pointActedOn)) return VectorN.Zero(vertexDim);
+    public VectorN calculateRepulsionForceOnVertexInsideLeaf(Vertex pointActedOn, VectorN diff) {
+        VectorN force = VectorN.Zero(vertexDim);
+        foreach (Vertex point in points) {
+            if (point.Equals(pointActedOn)) continue;
+            float distanceSquared = (point.Position - pointActedOn.Position).MagnitudeSquared();
+            if (distanceSquared == 0) {
+                force += VectorN.Random(treeDim, 0.05f);
+            } else {
+                force += CalculateForceWithMass(diff, distanceSquared, point.Mass);
+            }
         }
-        if (distanceSquared > minimalDistanceSquared) {
-            return CalculateForce(diff, distanceSquared);
-        } else if (distanceSquared == 0) {
-            return VectorN.Random(treeDim, 0.05f);
-        } else {
-            return CalculateForce(diff, distanceSquared);
-        }
+        return force;
     }
 
-    public VectorN calculateRepulsionForceOnVertexInsideSubtree(Vertex pointActedOn) {
+    public VectorN CalculateRepulsionForceOnVertexInsideSubtree(Vertex pointActedOn) {
         VectorN force = VectorN.Zero(vertexDim);
         foreach (BarnesQuadtree subtree in subtrees) {
             force.Add(subtree.calculateRepulsionForceOnVertex(pointActedOn));
@@ -173,9 +179,11 @@ public class BarnesQuadtree {
      * Does the same as above but uses the center of mass of the cube instead of a second vertex
      **/
     private VectorN CalculateForce(VectorN diff, float distanceSquared) {
-        int power = Math.Max(diff.Size()-1, 0);
-        float distance = Mathf.Sqrt(distanceSquared);
-        return diff.Normalize().Multiply((-1) * mass / Mathf.Pow(distance, power));
+        return CalculateForceWithMass(diff, distanceSquared, mass);
+    }
+
+    private VectorN CalculateForceWithMass(VectorN diff, float distanceSquared, float mass) {
+        return diff.Normalize().Multiply((-1) * mass / distanceSquared);
     }
 
     private VectorN quadrantToVector(int[] quadrant) {

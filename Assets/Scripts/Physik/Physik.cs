@@ -34,10 +34,11 @@ public class Physik : MonoBehaviour {
     public void Start() {
     }
 
-    public void startUp(GraphManager graphManager, int dimension) {
+    public void startUp(GraphManager graphManager, int dimension, int generatorCount) {
         this.graphManager = graphManager;
         alpha = alphaSetting;
         this.dimension = dimension;
+        this.timeStep = 0.5f / generatorCount;
         
         repulsionForce = new RepulsionForce(radius);
         linkForce = new LinkForce();
@@ -74,7 +75,6 @@ public class Physik : MonoBehaviour {
             yield return projectionForce.ApplyForce(graphManager, alpha);
             yield return linkForce.ApplyForce(graphManager, alpha);
             updateVertices();
-            
             // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
         }
     }

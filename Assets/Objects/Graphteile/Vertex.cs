@@ -85,6 +85,8 @@ public class Vertex : MonoBehaviour {
     }
 
     public void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(Force));
         // Draw a line pointing in the direction of the force
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(Velocity));

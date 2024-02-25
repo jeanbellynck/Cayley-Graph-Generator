@@ -2,6 +2,8 @@ using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 using UnityEditor;
+using System.Globalization;
+using System.Linq;
 
 public class HyperbolicityMatrix : MonoBehaviour {
     public GameObject textFieldPrefab;
@@ -70,7 +72,7 @@ public class HyperbolicityMatrix : MonoBehaviour {
         // Temporary solution. Matrix is currently disabled
         cayleyGraph.GetComponent<CayleyGraph>().SetHyperbolicity(hyperbolicityTextField.GetComponent<InputField>().text);
         return;
-
+        /**
         // Read Hyperbolicity out of hyperbolicityTextField
         float hyperbolicity;
 
@@ -89,6 +91,7 @@ public class HyperbolicityMatrix : MonoBehaviour {
             for (int j = 0; j < matrixSize; j++) {
                 // Matrix is currently deactivated
                 matrix[i, j] = hyperbolicity;
+                **/
                 /**
                 if(float.TryParse(textFields[i, j].GetComponent<TMP_InputField>().text, out float result) && result != 0) {
                     matrix[i, j] = float.Parse(textFields[i, j].GetComponent<TMP_InputField>().text);
@@ -96,8 +99,9 @@ public class HyperbolicityMatrix : MonoBehaviour {
                     matrix[i, j] = 1;
                 }
                 **/
+                /**
             }
-        }
+        }**/
         //cayleyGraph.GetComponent<CayleyGraph>().SetHyperbolicityMatrix(matrix);
     }
 }

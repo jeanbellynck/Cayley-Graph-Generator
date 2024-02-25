@@ -19,7 +19,7 @@ public class RepulsionForce : Force {
     public float radius; // The radius of the BarnesQuadtree. This is the maximal distance between two points in the BarnesQuadtree. This is used to calculate the repulsion force.
     public float maximalForce;
 
-    public RepulsionForce(float radius, float repelForceFactor = 1.5f, float barnesQuadTreeMinimalDistance = 0.5f, float barnesQuadTreeMaximalDistance = 100, float QuadTreeTheta = 0.9f, float maximalForce = 10) {
+    public RepulsionForce(float radius, float repelForceFactor = 1.5f, float barnesQuadTreeMinimalDistance = 0.5f, float barnesQuadTreeMaximalDistance = 50, float QuadTreeTheta = 0.9f, float maximalForce = 10) {
         this.repelForceFactor = repelForceFactor;
         this.barnesQuadTreeMinimalDistance = barnesQuadTreeMinimalDistance;
         this.barnesQuadTreeMaximalDistance = barnesQuadTreeMaximalDistance;
@@ -32,7 +32,7 @@ public class RepulsionForce : Force {
         if(repelForceFactor == 0 || alpha == 0) yield return null;
         // Every tick the BarnesQuadtree is recalculated. This is expensive but necessary since the vertices move.
         Profiler.BeginSample("QuadtreeCreation");
-        int treeDimension = Math.Min(graphManager.getDim(), 2);
+        int treeDimension = Math.Min(graphManager.getDim(), 3);
         BarnesQuadtree bqb = new BarnesQuadtree(treeDimension, VectorN.Zero(graphManager.getDim()), radius, QuadTreeTheta * QuadTreeTheta, barnesQuadTreeMinimalDistance * barnesQuadTreeMinimalDistance, barnesQuadTreeMaximalDistance * barnesQuadTreeMaximalDistance);
         Profiler.EndSample();
         Profiler.BeginSample("AddVerticesToQuadtree");
@@ -56,7 +56,7 @@ public class RepulsionForce : Force {
                 VectorN force = vertex.Mass * repelForceFactor * alpha * bqb.calculateRepulsionForceOnVertex(vertex);
                 Profiler.EndSample();
                 force = force.ClampMagnitude(maximalForce);
-                vertex.Force = force;
+                vertex.Force += force;
             }
             vertexIndex += vertexPerBatch;
         }

@@ -81,7 +81,7 @@ public class CayleyGraph : MonoBehaviour {
         setRelators(relatorMenu.GetRelators());
         graphManager.Initialize(generators, this);
         int projectionDimension = dimensionInputDD.value + 2;
-        physik.startUp(graphManager, projectionDimension);
+        physik.startUp(graphManager, projectionDimension, generators.Length);
         int actualDimension = projectionDimension + 0;
         cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, actualDimension);
     }
