@@ -902,6 +902,7 @@ GameObject:
   - component: {fileID: 597129566339041361}
   - component: {fileID: 2788712629139325419}
   - component: {fileID: 5479567410342823035}
+  - component: {fileID: 5656214399710793822}
   m_Layer: 0
   m_Name: Group Option
   m_TagString: Untagged
@@ -1078,6 +1079,19 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5656214399710793822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7511116124807839910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: Group text
 --- !u!1 &8327791638162936651
 GameObject:
   m_ObjectHideFlags: 0
