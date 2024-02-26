@@ -4656,6 +4656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: 
+  url: 
 --- !u!1 &630793160
 GameObject:
   m_ObjectHideFlags: 0
@@ -5000,6 +5001,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltip: {fileID: 944813758}
+  rightClickURL: 
   tooltipText: {fileID: 929252208}
 --- !u!1 &661246219
 GameObject:
@@ -7290,8 +7292,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 203.34}
-  m_Pivot: {x: 0, y: 0}
+  m_SizeDelta: {x: 500, y: 203.34}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &944813761
 MonoBehaviour:
   m_ObjectHideFlags: 0
