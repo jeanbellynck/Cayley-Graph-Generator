@@ -32,7 +32,7 @@ public class TooltipManager : MonoBehaviour {
         if (isPointerOver)
         {
             timer += Time.deltaTime;
-            if (timer >= 1f)
+            if (timer >= 1f && tooltipText.text != "")
             {
                 tooltip.SetActive(true);
                 ///tooltipText.ForceMeshUpdate();
@@ -52,12 +52,16 @@ public class TooltipManager : MonoBehaviour {
 
     
     public void ShowTooltip(string tooltipString, string rightClickURL = "") {
+        if(tooltipString == "") {
+            isPointerOver = false;
+            return;
+        }
+        
         tooltipText.text = tooltipString;
+        this.rightClickURL = rightClickURL;
         if(rightClickURL != "") {
             tooltipText.text += "\n<b>Right click for more info.</b>";
         }
-
-        this.rightClickURL = rightClickURL;
         isPointerOver = true;
     }
 

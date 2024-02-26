@@ -5,6 +5,8 @@ public class CyclicGroup : Group
         name = "C<sub>n</sub>";
         description = "The cyclic groups";
         parameters = new string[][] {new string[] {"n", "2", "Order of the cyclic group"}};
+        tooltipInfo = "The cyclic group of order n is the group of integers modulo n under addition. It can be understood as numbers on a clock.";
+        tooltipURL = "https://en.wikipedia.org/wiki/Cyclic_group";
         updatePresentation();
     }
 

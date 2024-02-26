@@ -8,6 +8,8 @@ public class DihedralGroup : Group
         name = "D<sub>n</sub>";
         description = "The dihedral groups";
         parameters = new string[][] {new string[] {"n", "2", "Edges of the polygon the dihedral group is a symmetry group of"}};
+        tooltipInfo = "The dihedral group of order 2n is the group of symmetries of a regular n-gon. The group element r rotates the n-gon, the group element s induces a reflection. Every symmetry can be recreated by chaining r and s together.";
+        tooltipURL = "https://en.wikipedia.org/wiki/Dihedral_group";
         updatePresentation();
     }
 

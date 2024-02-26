@@ -8,7 +8,7 @@ public class DicyclicGroup : Group
     {
         name = "Dic<sub>n</sub>";
         description = "The dicyclic groups";
-        parameters = new string[][] {new string[] {"n", "2", "The order of the cyclic group the dicyclic group is based on"}};
+        parameters = new string[][] {new string[] {"n", "2", "The order of the cyclic group the dicyclic group is based on", "The dicyclic groups generalization of the finite quaterion group.", "https://en.wikipedia.org/wiki/Dicyclic_group"}};
         updatePresentation();
     }
 
