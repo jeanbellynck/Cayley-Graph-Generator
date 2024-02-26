@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.UI;
 
 /**
     * This class is responsible for managing the tooltip that appears when hovering over a group in the group gallery.
@@ -9,6 +10,7 @@ using System.Collections;
 public class TooltipManager : MonoBehaviour {
     public static TooltipManager _instance;
     public GameObject tooltip;
+    public string rightClickURL = "";
     public TMP_Text tooltipText;
     private float timer;
     private bool isPointerOver = false;
@@ -33,6 +35,15 @@ public class TooltipManager : MonoBehaviour {
             if (timer >= 1f)
             {
                 tooltip.SetActive(true);
+                ///tooltipText.ForceMeshUpdate();
+                //LayoutRebuilder.ForceRebuildLayoutImmediate(tooltip.transform.GetChild(0).GetComponent<RectTransform>());
+                LayoutRebuilder.ForceRebuildLayoutImmediate(tooltip.GetComponent<RectTransform>());
+                // On right click do a RickRoll
+                if (Input.GetMouseButtonDown(1) && rightClickURL != "")
+                {
+                    Application.OpenURL(rightClickURL);
+                    //Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+                }
             }
         }
         Vector3 mousePos = Input.mousePosition;
@@ -40,12 +51,19 @@ public class TooltipManager : MonoBehaviour {
     }
 
     
-
-    public void ShowTooltip(string tooltipString) {
+    public void ShowTooltip(string tooltipString, string rightClickURL = "") {
         tooltipText.text = tooltipString;
+        if(rightClickURL != "") {
+            tooltipText.text += "\n<b>Right click for more info.</b>";
+        }
+
+        this.rightClickURL = rightClickURL;
         isPointerOver = true;
     }
 
+    public void OnMouseDown() {
+    }
+ 
     
     public void HideTooltip() {
         isPointerOver = false;

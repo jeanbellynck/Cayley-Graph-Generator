@@ -7,6 +7,7 @@ public class GroupOption : MonoBehaviour
     public Group group;
 
     public GameObject groupParameterPrefab;
+    public Tooltip tooltip;
 
 
     // Start is called before the first frame update
@@ -16,6 +17,9 @@ public class GroupOption : MonoBehaviour
         transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>().text = group.name; 
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = group.description;
         setPresentation();
+        // Set tooltip information
+        tooltip.text = group.tooltipInfo;
+        tooltip.url = group.tooltipURL;
         
         // For each parameter create a new parameter object and set it as a child of the groupOption object.
         for(int i = 0; i < group.parameters.Length; i++)

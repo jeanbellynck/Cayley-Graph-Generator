@@ -8,7 +8,7 @@ public class GroupGallery : MonoBehaviour
     
     // List of groups to be displayed, parameters are name, generators and relators.
     Group[] finiteGroups = {
-        new Group("e", "The trivial group", "", ""),
+        new Group("e", "The trivial group", "", "", "A very simple group", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
         new CyclicGroup(),
         new Group("V<sub>4</sub>", "The Klein group", "a; b", "a^2; b^2; abAB"),
         new TorusGroup(),
