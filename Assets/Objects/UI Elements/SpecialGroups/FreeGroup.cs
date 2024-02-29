@@ -8,6 +8,8 @@ public class FreeGroup : Group
         name = "F<sup>n</sup>";
         description = "The free group";
         parameters = new string[][] {new string[] {"n", "2", "Symbols in the free group"}};
+        tooltipInfo = "The free group where the generating elements have no relationship to each other. This means it is not possible to write an equation such as ab = ba. Due to that reason its Cayley graph has no loop it the group looks like a tree.";
+        tooltipURL = "https://en.wikipedia.org/wiki/Free_group";
         updatePresentation();
     }
 

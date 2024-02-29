@@ -9,6 +9,8 @@ public class BSGroup : Group
         name = "BS(m, n)";
         description = "The Baumslag-Solitar group";
         parameters = new string[][] {new string[] {"m", "1", "First exponent of the relation a^n = ba^mB"}, new string[] {"n", "2", "Second exponent of the relation a^n = ba^mB"}};
+        tooltipInfo = "Baumslag-Solitar groups are a st of groups with simple presentations. They are counterexamples to many intuitions, making them ideal candidates to test new conjectures.";
+        tooltipURL = "https://en.wikipedia.org/wiki/Baumslag%E2%80%93Solitar_group";
         updatePresentation();
     }
 
