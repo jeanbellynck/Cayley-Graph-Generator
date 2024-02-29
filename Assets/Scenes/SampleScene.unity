@@ -2956,7 +2956,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 315231446}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
@@ -4677,8 +4677,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: 
-  url: 
+  text: In this field we enter the generators of a group. In the graph, generators
+    are represented as arrows. You can click on the ?-symbol to get a more detailed
+    explanation.
+  url: https://en.wikipedia.org/wiki/Presentation_of_a_group
 --- !u!114 &627319551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9625,6 +9627,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1244907021}
   - component: {fileID: 1244907022}
+  - component: {fileID: 1244907023}
   m_Layer: 0
   m_Name: Relators
   m_TagString: Untagged
@@ -9679,6 +9682,22 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1244907023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1244907020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: 'The relators, together with the generators form the presentation of a group.
+    A presentation is very similar to a generating set but instead of embedding the
+    generators in an ambient group we describe the relationships between them directy. '
+  url: https://en.wikipedia.org/wiki/Presentation_of_a_group
 --- !u!1 &1332393197
 GameObject:
   m_ObjectHideFlags: 0
