@@ -147,8 +147,10 @@ public class Edge : MonoBehaviour {
         Vector3 startPointWithSpacing = startPosition + lineDirection * vertexRadius;
         Vector3 endPointWithSpacing = endPosition - lineDirection * vertexRadius;
 
-        lineRenderer.startColor = startColor.WithAlpha(startPoint.EdgeCompletion);
-        lineRenderer.endColor = endColor.WithAlpha(endPoint.EdgeCompletion);
+        startColor.a = StartPoint.EdgeCompletion;
+        endColor.a = EndPoint.EdgeCompletion;
+        lineRenderer.startColor = startColor;
+        lineRenderer.endColor = endColor;
 
         lineRenderer.widthCurve = new(
             new Keyframe(time: 0, value: lineWidth)
@@ -170,8 +172,10 @@ public class Edge : MonoBehaviour {
         var startPoint = StartPoint;
         var endPoint = EndPoint; // in case we update how the property works
 
-        splineRenderer.colorModifier.keys[0].color = startColor.WithAlpha(startPoint.EdgeCompletion);
-        splineRenderer.colorModifier.keys[1].color = endColor.WithAlpha(endPoint.EdgeCompletion);
+        startColor.a = StartPoint.EdgeCompletion;
+        endColor.a = EndPoint.EdgeCompletion;
+        splineRenderer.colorModifier.keys[0].color = startColor;
+        splineRenderer.colorModifier.keys[1].color = endColor;
         
 
         Vector3 startPosition = startPoint.transform.position;
