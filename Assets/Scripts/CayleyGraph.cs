@@ -50,12 +50,12 @@ public class CayleyGraph : MonoBehaviour {
         cayleyGraphMaker.setVertexNumber(int.Parse(vertexNumber));
     }
 
-    public GeneratorMenu generatorMenu;
-    public RelatorMenu relatorMenu;
-    public InputField vertexNumberInputField;
-    public InputField hyperbolicityInputField;
-    public HyperbolicityMatrix hyperbolicityMatrix;
-    public TMP_Dropdown dimensionInputDD;
+    [SerializeField] GeneratorMenu generatorMenu;
+    [SerializeField] RelatorMenu relatorMenu;
+    [SerializeField] InputField vertexNumberInputField;
+    [SerializeField] InputField hyperbolicityInputField;
+    [SerializeField] HyperbolicityMatrix hyperbolicityMatrix;
+    [SerializeField] TMP_Dropdown dimensionInputDD;
 
 
     public void generateButton() {
@@ -77,6 +77,7 @@ public class CayleyGraph : MonoBehaviour {
 
     public void StartVisualization() {
         setVertexNumber(vertexNumberInputField.text);
+        relatorMenu.FixGeneratorMenu();
         setGenerators(generatorMenu.GetGenerators());
         setRelators(relatorMenu.GetRelators());
         graphManager.Initialize(generators, this);

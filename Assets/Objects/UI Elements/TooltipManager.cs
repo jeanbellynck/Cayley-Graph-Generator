@@ -8,7 +8,14 @@ using UnityEngine.UI;
     * Copied from https://www.youtube.com/watch?v=y2N_J391ptg
     */
 public class TooltipManager : MonoBehaviour {
-    public static TooltipManager _instance;
+    static TooltipManager _instance;
+
+    public static TooltipManager Instance {
+        get {
+            if (_instance == null) _instance = new GameObject().AddComponent<TooltipManager>();
+            return _instance;
+        }
+    }
     public GameObject tooltip;
     public string rightClickURL = "";
     public TMP_Text tooltipText;

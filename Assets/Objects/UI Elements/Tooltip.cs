@@ -7,11 +7,11 @@ public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler 
     public string url = "";
 
     public void OnPointerEnter(PointerEventData eventData) {
-        TooltipManager._instance.ShowTooltip(text, url);
+        TooltipManager.Instance.ShowTooltip(text, url);
     }
 
     public void OnPointerExit(PointerEventData eventData) {
-        TooltipManager._instance.HideTooltip();
+        TooltipManager.Instance.HideTooltip();
     }
 
 }

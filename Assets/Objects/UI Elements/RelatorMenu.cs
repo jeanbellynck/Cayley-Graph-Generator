@@ -67,6 +67,7 @@ public class RelatorMenu : MonoBehaviour {
             newInputField.text = relator;
             newInputField.onEndEdit.AddListener((s) => { AddRelatorString(s, newIndex); });
 
+            // Add the generators that are used in the relator to the generator menu
             foreach (var c in
                      from a in relator
                      where char.IsLetter(a) // should not happen, but currently, if you enter e.g. "5", RelatorDecoder will return "5" (which is nonsensical)
@@ -77,6 +78,15 @@ public class RelatorMenu : MonoBehaviour {
                 generators.Add(c);
             }
         }
+    }
+
+    public void FixGeneratorMenu() {
+        generatorMenu.AddGenerators(
+            from relator in GetRelatorStrings()
+            from a in relator
+            where char.IsLetter(a)
+            select char.ToLower(a)
+        );
     }
 
     public void SetRelatorString([CanBeNull] string relatorString) {

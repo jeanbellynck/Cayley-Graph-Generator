@@ -38,6 +38,15 @@ public class GeneratorMenu : MonoBehaviour
             AddGeneratorInput(generator);
     }
 
+    public void AddGenerators(IEnumerable<char> generators) {
+        var presentGenerators = GetGenerators().ToList();
+        foreach (var generator in generators) {
+            if (presentGenerators.Contains(generator)) continue;
+            presentGenerators.Add(generator);
+            AddGeneratorInput(generator);
+        }
+    }
+
     public void AddGeneratorInput() => AddGeneratorInput(default);
 
     public void AddGeneratorInput(char preferredGeneratorName) {

@@ -77,3 +77,4 @@ crashlytics-build.properties
 #IDE settings  / cache
 .idea
 .vsconfig
+*.png
