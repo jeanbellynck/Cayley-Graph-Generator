@@ -467,12 +467,15 @@ namespace DanielLochner.Assets.SimpleSideMenu
 
         public void SetState(State state)
         {
+            if(state == State.Open) {
+                // Put to front
+                transform.SetAsLastSibling();
+            }
             onStateSelected.Invoke(TargetState = state);
         }
         public void ToggleState()
         {
             SetState((State)(((int)TargetState + 1) % 2));
-
         }
         public void Open()
         {
