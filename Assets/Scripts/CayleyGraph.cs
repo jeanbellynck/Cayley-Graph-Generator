@@ -15,7 +15,6 @@ public class CayleyGraph : MonoBehaviour {
 
 
     public GraphManager graphManager;
-    public MeshManager meshManager = new MeshManager();
 
     public CayleyGraphMaker cayleyGraphMaker;
 
@@ -66,13 +65,6 @@ public class CayleyGraph : MonoBehaviour {
     public void StopVisualization() {
         physik.StopAllCoroutines();
         cayleyGraphMaker.StopVisualization();
-        // Destroy Mesh Objects
-        ICollection<MeshGenerator> meshes = meshManager.GetMeshes();
-        foreach (MeshGenerator mesh in meshes) {
-            Destroy(mesh.gameObject);
-        }
-        meshManager.resetMeshes();
-        graphManager.ResetGraph();
     }
 
     public void StartVisualization() {
@@ -84,7 +76,7 @@ public class CayleyGraph : MonoBehaviour {
         int projectionDimension = dimensionInputDD.value + 2;
         physik.startUp(graphManager, projectionDimension, generators.Length);
         int actualDimension = projectionDimension + 0;
-        cayleyGraphMaker.StartVisualization(graphManager, meshManager, generators, relators, actualDimension);
+        cayleyGraphMaker.StartVisualization(graphManager, generators, relators, actualDimension);
     }
 
 

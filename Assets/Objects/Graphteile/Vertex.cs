@@ -339,5 +339,29 @@ public class Vertex : MonoBehaviour {
     }
 
 
+    /**
+    * This method is used to get a neighbouring vertex by following a labelled edge.
+    * WARNING: This always returns the first vertex associated to a generator. All others (if present) are ignored
+    */
+    public Vertex FollowEdge(char op) {
+        return GetEdges(op)?.FirstOrDefault()?.GetOpposite(this);
+    }
+
+
+    protected Dictionary<char, List<Edge>> GetEdges() {
+        Dictionary<char, List<Edge>> edges = new Dictionary<char, List<Edge>>();
+        foreach (char op in LabeledOutgoingEdges.Keys) {
+            edges.Add(op, GetOutgoingEdges(op).ToList());
+        }
+        foreach (char op in LabeledIncomingEdges.Keys) {
+            edges.Add(char.ToUpper(op), GetIncomingEdges(op).ToList());
+        }
+        return edges;
+    }
+
+    protected IEnumerable<Edge> GetEdges(char op) {
+        return char.IsLower(op) ? GetOutgoingEdges(op).ToList() : GetIncomingEdges(char.ToLower(op)).ToList();
+    }
+
 
 }

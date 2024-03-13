@@ -4,25 +4,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MeshManager {
+    readonly List<MeshGenerator> meshList = new();
+    readonly GameObject meshPrefab;
 
-    public ICollection<MeshGenerator> meshList = new List<MeshGenerator>();
-
-    public void AddMesh(MeshGenerator meshGen)
-    {
-        meshList.Add(meshGen);
+    public MeshManager(GameObject meshPrefab) {
+        this.meshPrefab = meshPrefab;
     }
 
-    // Start is called before the first frame update
-
-
-    public ICollection<MeshGenerator> GetMeshes()
+    public void AddMesh(IEnumerable<Vertex> vertices, Transform parent)
     {
-        return meshList;
+        MeshGenerator meshGen = GameObject.Instantiate(meshPrefab, parent.position, Quaternion.identity, parent).GetComponent<MeshGenerator>();
+        meshGen.Initialize(vertices);
+        meshList.Add(meshGen);
     }
 
     public void resetMeshes()
     {
-        
+        foreach (MeshGenerator mesh in meshList) {
+            GameObject.Destroy(mesh.gameObject);
+        }
         meshList.Clear();
     }
 }

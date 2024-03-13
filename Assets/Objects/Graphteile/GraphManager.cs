@@ -32,10 +32,11 @@ public class GraphManager : MonoBehaviour {
         }
     }
 
-    public List<Vertex> getVertex() {
+    public List<Vertex> getVertices() {
         return vertices;
     }
 
+    // referred to from event (UI)
     public void SetSplinificationMode(int t) {
         splinificationType = (Edge.SplinificationType) t;
     }
@@ -48,10 +49,7 @@ public class GraphManager : MonoBehaviour {
     }
 
     public void ResetGraph() {
-        List<Vertex> verticesCopy = new List<Vertex>(vertices);
-        foreach (Vertex vertex in verticesCopy) {
-            RemoveVertex(vertex);
-        }
+        foreach (Vertex vertex in new List<Vertex>(vertices)) vertex.Destroy();
         vertices.Clear();
         edges.Clear();
         idCounter = 1;
@@ -62,9 +60,6 @@ public class GraphManager : MonoBehaviour {
         edge.graphManager = this;
     }
 
-    /** 
-     * ToDo: Only remove the edge, delete will be done from cayleyGraphMaker
-     **/
     public void RemoveVertex(Vertex vertex) {
         foreach (HashSet<Edge> genEdges in vertex.LabeledIncomingEdges.Values) {
             HashSet<Edge> genEdgesCopy = new HashSet<Edge>(genEdges);

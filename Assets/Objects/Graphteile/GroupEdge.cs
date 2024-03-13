@@ -62,7 +62,7 @@ public class GroupEdge : Edge {
         return StartPoint.Equals(other.StartPoint) && EndPoint.Equals(other.EndPoint) && Label == other.Label;
     }
 
-    public new GroupVertex getOpposite(GroupVertex opposite) {
+    public new GroupVertex GetOpposite(GroupVertex opposite) {
         return (GroupVertex) base.GetOpposite(opposite);
     }
 }

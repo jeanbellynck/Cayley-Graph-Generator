@@ -8,25 +8,24 @@ public class CayleyGraphMaker : MonoBehaviour {
     private MeshManager meshManager;
     private Physik physik; // I wonder whether the reference to Physics is necessary? 
 
-    public GameObject neutralElementGameObject;
-
-
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
     protected char[] operators; // Like generators but with upper and lower case letters
     protected string[] relators;// = new string[]{"abAB"};
 
-    private float hyperbolicity = 1;
-    private Dictionary<char, Dictionary<char, float>> hyperbolicityMatrix = new();
+    [SerializeField] float hyperbolicity = 1;
+    readonly Dictionary<(char, char), float> hyperbolicityMatrix = new();
 
 
     // Konfigurationen
-    public int vertexNumber; // Describes the number of vertices the graph should have. It would be better to have a config file with all the data.
-    public float drawingSpeed = 1; // Describes the speed at which new vertices should be drawn in vertices per second 
+    [SerializeField] int vertexNumber; // Describes the number of vertices the graph should have. It would be better to have a config file with all the data.
+    [SerializeField] float drawingSpeed = 1; // Describes the speed at which new vertices should be drawn in vertices per second 
 
-    public GameObject meshPrefab;
-    public GameObject vertexPrefab;
-    public GameObject edgePrefab;
-    public GroupColorPanel groupColorPanel;
+    [SerializeField] GameObject vertexPrefab;
+    [SerializeField] GameObject edgePrefab;
+    [SerializeField] GameObject meshPrefab;
+    [SerializeField] GroupColorPanel groupColorPanel;
+
+    [SerializeField] Kamera kamera;
 
     private int simulationDimensionality = 3;
 
@@ -38,9 +37,9 @@ public class CayleyGraphMaker : MonoBehaviour {
     HashSet<GroupVertex> edgeMergeCandidates = new();
 
 
-    public void StartVisualization(GraphManager graphManager, MeshManager meshManager, char[] generators, string[] relators, int dimension) {
+    public void StartVisualization(GraphManager graphManager, char[] generators, string[] relators, int dimension) {
         this.graphManager = graphManager;
-        this.meshManager = meshManager;
+        this.meshManager = new(meshPrefab);
         this.generators = generators;
         this.relators = relators;
         this.simulationDimensionality = dimension;
@@ -54,10 +53,9 @@ public class CayleyGraphMaker : MonoBehaviour {
         groupColorPanel.updateView(graphManager.labelColors);
 
         //int simulationDimensionality = 2*generators.Length + 1;
-        GroupVertex neutralElement = neutralElementGameObject.GetComponent<GroupVertex>();
-        neutralElement.Initialize(VectorN.Zero(simulationDimensionality), graphManager );
-        graphManager.AddVertex(neutralElement);
-        AddBorderVertex(neutralElement);
+
+        // neutral element:
+        kamera.center = CreateVertex(null, default).transform;
 
         StartCoroutine(createNewElementsAndApplyRelators());
     }
@@ -70,26 +68,18 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public void StopVisualization() {
         StopAllCoroutines();
-        randKnoten = new List<List<GroupVertex>>();
-        relatorCandidates = new HashSet<GroupVertex>();
-        edgeMergeCandidates = new HashSet<GroupVertex>();
-        if (graphManager != null) {
-            List<Vertex> vertices = new(graphManager.getVertex());
-            graphManager.RemoveVertex(neutralElementGameObject.GetComponent<GroupVertex>());
-            vertices.Remove(neutralElementGameObject.GetComponent<GroupVertex>());
-            foreach (Vertex vertex in vertices) {
-                graphManager.RemoveVertex(vertex);
-                vertex.Destroy();
-            }
-            //graphManager.ResetGraph();
-        }
+        randKnoten = new();
+        relatorCandidates = new();
+        edgeMergeCandidates = new();
+        if (graphManager != null) graphManager.ResetGraph();
+        meshManager?.resetMeshes();
     }
 
 
     IEnumerator createNewElementsAndApplyRelators() {
         bool firstIteration = true;
-        // ToDo: So zählen, dass bis tatsächliche Anzahl an Teilchen erreicht wird und aufhören, wenn kein Rand mehr übrig blebt. 
-        while (vertexNumber > graphManager.getVertex().Count) {
+
+        while (vertexNumber > graphManager.getVertices().Count) {
             // Speed is proportional to the number of vertices on the border. This makes knotting less likely
             float waitTime = 1 / (drawingSpeed * Mathf.Max(1, GetBorderVertexCount()));
             if (!firstIteration) {
@@ -127,13 +117,17 @@ public class CayleyGraphMaker : MonoBehaviour {
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
-        // Vertex is not the neutral element and an edge need to be created
         GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
-        newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
+        if (predecessor == null)
+            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager);
+        else
+            newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
         graphManager.AddVertex(newVertex);
 
         AddBorderVertex(newVertex);
-        CreateEdge(predecessor, newVertex, op);
+        // Vertex is not the neutral element and an edge need to be created
+        if (predecessor != null) 
+            CreateEdge(predecessor, newVertex, op);
 
         return newVertex;
     }
@@ -142,7 +136,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
         // If the edge already exists, no edge is created and the existing edge is returned
         foreach (GroupEdge edge in startvertex.GetEdges(op)) {
-            if (edge.getOpposite(startvertex).Equals(endvertex)) {
+            if (edge.GetOpposite(startvertex).Equals(endvertex)) {
                 return edge;
             }
         }
@@ -157,7 +151,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     void AddBorderVertex(GroupVertex vertex) {
         if (randKnoten.Count <= vertex.DistanceToNeutralElement) {
-            randKnoten.Add(new List<GroupVertex>());
+            randKnoten.Add(new());
         }
 
         randKnoten[vertex.DistanceToNeutralElement].Add(vertex);
@@ -216,7 +210,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                 GroupEdge primaryEdge = generatorEdges[0];
                 for (int i = 1; i < generatorEdges.Count; i++) {
                     //edgeMergeCandidates.Add(vertex); // After an edge merge a vertex might be merged with its neighbor meaning its edges can be merged again.
-                    MergesVertices(primaryEdge.getOpposite(vertex), generatorEdges[i].getOpposite(vertex));
+                    MergesVertices(primaryEdge.GetOpposite(vertex), generatorEdges[i].GetOpposite(vertex));
                 }
             }
         }
@@ -269,11 +263,9 @@ public class CayleyGraphMaker : MonoBehaviour {
     */
     void MergesVertices(GroupVertex vertex1, GroupVertex vertex2) {
         if (vertex1.Equals(vertex2)) return;
-        // The vertex with the longer name will be deleted. (We dont want to delete the neutral element.)
+        // The vertex with the longer name will be deleted. (We don't want to delete the neutral element.)
         if (vertex2.name.Length < vertex1.name.Length) {
-            GroupVertex temp = vertex1;
-            vertex1 = vertex2;
-            vertex2 = temp;
+            (vertex1, vertex2) = (vertex2, vertex1);
         }
 
         vertex1.Merge(vertex2, hyperbolicity);
@@ -282,7 +274,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         foreach (char op in vertex2.GetEdges().Keys) {
             List<GroupEdge> generatorEdgesCopy = new(vertex2.GetEdges(op));
             foreach (GroupEdge edge in generatorEdgesCopy) {
-                CreateEdge(vertex1, edge.getOpposite(vertex2), op);
+                CreateEdge(vertex1, edge.GetOpposite(vertex2), op);
             }
         }
 
@@ -300,19 +292,19 @@ public class CayleyGraphMaker : MonoBehaviour {
      * This is a method that would better fit into a "group element" class.
      * Taking in paths to identity and using the hyperbolicityMatrix it calculates the scaling of a generator. This give the desired length of an edge.
      **/
-    private float calculateScalingForGenerator(char generator, string path) {
+    float CalculateScalingForGenerator(char generator, string path) {
         float scaling = 1;
         foreach (char op in path) {
-            scaling *= hyperbolicityMatrix[op][generator];
+            scaling *= hyperbolicityMatrix[(op, generator)];
         }
         return scaling;
     }
 
 
     void DrawMesh() {
-        foreach (GroupVertex vertex in graphManager.getVertex()) {
+        foreach (var vertex in graphManager.getVertices()) {
             foreach (string relator in relators) {
-                GroupVertex[] vertices = new GroupVertex[relator.Length];
+                var vertices = new Vertex[relator.Length];
                 vertices[0] = vertex;
 
                 bool doInitialize = true;
@@ -321,11 +313,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                     if (vertices[i + 1] == null) { doInitialize = false; break; }
                 }
 
-                if (doInitialize) {
-                    MeshGenerator meshGen = Instantiate(meshPrefab, transform.position, Quaternion.identity, transform).GetComponent<MeshGenerator>();
-                    meshGen.Initialize(vertices);
-                    meshManager.AddMesh(meshGen);
-                }
+                if (doInitialize) meshManager.AddMesh(vertices, transform);
             }
 
             //if(vertex.name != "") {break;}
@@ -351,19 +339,17 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public void SetHyperbolicityMatrix(float[,] matrix) {
         for (int i = 0; i < matrix.GetLength(0); i++) {
-            hyperbolicityMatrix[generators[i]] = new Dictionary<char, float>();
-            hyperbolicityMatrix[char.ToUpper(generators[i])] = new Dictionary<char, float>();
             for (int j = 0; j < matrix.GetLength(1); j++) {
                 float matrixValue = matrix[i, j];
                 if (matrixValue < 0) {
                     // For negative Values the hyperbolic scaling is done in one direction
-                    hyperbolicityMatrix[generators[i]][generators[j]] = -matrix[i, j];
-                    hyperbolicityMatrix[char.ToUpper(generators[i])][generators[j]] = -1 / matrix[i, j];
+                    hyperbolicityMatrix[(generators[i], generators[j])] = -matrix[i, j];
+                    hyperbolicityMatrix[(char.ToUpper(generators[i]), generators[j])] = -1 / matrix[i, j];
                 }
                 else {
                     // For positive Values the hyperbolic scaling is done in both directions
-                    hyperbolicityMatrix[generators[i]][generators[j]] = matrix[i, j];
-                    hyperbolicityMatrix[char.ToUpper(generators[i])][generators[j]] = matrix[i, j];
+                    hyperbolicityMatrix[(generators[i], generators[j])] = matrix[i, j];
+                    hyperbolicityMatrix[(char.ToUpper(generators[i]), generators[j])] = matrix[i, j];
                 }
             }
         }
@@ -373,17 +359,17 @@ public class CayleyGraphMaker : MonoBehaviour {
     /**
      * Recalculates the length of all edges according to the hyperbolicity.
      */
-    private void recalculateHyperbolicity() {
-        if (graphManager == null) {
+    void recalculateHyperbolicity() {
+        if (graphManager == null)
             return;
-        }
-        List<GroupEdge> edges = graphManager.GetEdges().Cast<GroupEdge>().ToList();
-        foreach (GroupEdge edge in edges) {
-            edge.calculateEdgeLength(hyperbolicity);
-        }
-        foreach (GroupVertex vertex in graphManager.getVertex()) {
-            vertex.calculateVertexMass(hyperbolicity);
-        }
+
+        foreach (var edge in graphManager.GetEdges())
+            if (edge is GroupEdge groupEdge)
+                groupEdge.calculateEdgeLength(hyperbolicity);
+
+        foreach (var vertex in graphManager.getVertices())
+            if (vertex is GroupVertex groupVertex) 
+                groupVertex.calculateVertexMass(hyperbolicity);
     }
 
 

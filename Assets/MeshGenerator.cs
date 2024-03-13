@@ -1,15 +1,17 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
     Mesh mesh;
-    GroupVertex[] vertexElements = new GroupVertex[0];
+    Vertex[] vertexElements = { };
     
-    public void Initialize(GroupVertex[] vertexElements) {
-        this.vertexElements = vertexElements;
-        mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
+    public void Initialize(IEnumerable<Vertex> vertexElements) {
+        this.vertexElements = vertexElements.ToArray();
+        GetComponent<MeshFilter>().mesh = mesh = new();
         mesh.Clear();
         UpdateVertices();
         UpdateTriangles();

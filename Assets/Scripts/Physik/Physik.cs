@@ -51,7 +51,7 @@ public class Physik : MonoBehaviour {
         if(graphManager== null) return;
         // The following code interpolate the vertices between the physics steps. This makes the animation smoother.
         if (alpha == 0) return;
-        foreach(Vertex vertex in graphManager.getVertex()) {
+        foreach(Vertex vertex in graphManager.getVertices()) {
             // The velocity of the pysics engine translated to real velocity (The physics engine is running at a different speed than the game engine)
             UnityEngine.Vector3 velocity = VectorN.ToVector3(vertex.Velocity) * timeStep / physicsDeltaTime;
             vertex.transform.position += velocity * Time.deltaTime;
@@ -83,7 +83,7 @@ public class Physik : MonoBehaviour {
 
     private void updateVertices() {
         float realVelocityDecay = Mathf.Pow(velocityDecay, timeStep);
-        foreach (Vertex vertex in graphManager.getVertex()) {
+        foreach (Vertex vertex in graphManager.getVertices()) {
             float ageFactor = Mathf.Max(1, (3 - 1) * (1 - vertex.Age)); // Young vertices are strong
             VectorN force = ageFactor * vertex.Force; 
             vertex.Position += vertex.Velocity * timeStep + 0.5f * force * timeStep * timeStep;
@@ -98,7 +98,7 @@ public class Physik : MonoBehaviour {
      * Also bounds th force by the maximal force.
      */
     private void geschwindigkeitenZurücksetzen() {
-        foreach (Vertex vertex in graphManager.getVertex()) {
+        foreach (Vertex vertex in graphManager.getVertices()) {
             vertex.Force = VectorN.Zero(dim);
             vertex.Velocity = vertex.Velocity.ClampMagnitude(radius/10);
             vertex.Position = vertex.Position.ClampMagnitude(radius);

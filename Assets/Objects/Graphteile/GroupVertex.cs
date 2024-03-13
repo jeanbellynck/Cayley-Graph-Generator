@@ -40,15 +40,27 @@ public class GroupVertex : Vertex {
         Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
     }
 
+    public new Dictionary<char, List<GroupEdge>> GetEdges() {
+        return base.GetEdges().ToDictionary(kvp=> kvp.Key, kvp => kvp.Value.Cast<GroupEdge>().ToList());
+    }
+
+    public new List<GroupEdge> GetEdges(char op) {
+        return base.GetEdges(op).Cast<GroupEdge>().ToList();
+    }
+
+    public new GroupVertex FollowEdge(char op) {
+        return (GroupVertex) base.FollowEdge(op);
+    }
+
     public override void Initialize(VectorN position, GraphManager graphManager) {
-        OnEdgeChange -= CalculateEdgeCompletion;
         OnEdgeChange += CalculateEdgeCompletion;
         base.Initialize(position, graphManager);
+        name = "1";
     }
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
         Initialize(predecessor.Position, predecessor.graphManager);
-        name = predecessor.name + op;
+        name = predecessor.name == "1" ? op.ToString() : predecessor.name + op;
 
         GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
         if (prepredecessor != null) {
@@ -105,38 +117,6 @@ public class GroupVertex : Vertex {
             }
         }
         return mass;**/
-    }
-
-    public Dictionary<char, List<GroupEdge>> GetEdges() {
-        Dictionary<char, List<GroupEdge>> edges = new Dictionary<char, List<GroupEdge>>();
-        foreach (char op in LabeledOutgoingEdges.Keys) {
-            edges.Add(op, GetOutgoingEdges(op).Cast<GroupEdge>().ToList());
-        }
-        foreach (char op in LabeledIncomingEdges.Keys) {
-            edges.Add(char.ToUpper(op), GetIncomingEdges(op).Cast<GroupEdge>().ToList());
-        }
-        return edges;
-    }
-
-    public List<GroupEdge> GetEdges(char op) {
-        if (char.IsLower(op))
-            return GetOutgoingEdges(op).Cast<GroupEdge>().ToList();
-        else
-            return GetIncomingEdges(char.ToLower(op)).Cast<GroupEdge>().ToList();
-    }
-
-    /**
-    * This method is used to get a neighbouring vertex by following a labelled edge.
-    * WARNING: This always returns the first vertex associated to a generator. All others (if present) are ignored
-    */
-    public GroupVertex FollowEdge(char op) {
-        List<GroupEdge> edge = GetEdges(op);
-        if (edge.Count > 0) {
-            return (GroupVertex) edge[0].getOpposite(this);
-        }
-        else {
-            return null;
-        }
     }
 
     public void AddPathToNeutralElement(string path) {

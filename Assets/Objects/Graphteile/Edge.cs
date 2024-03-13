@@ -218,7 +218,7 @@ public class Edge : MonoBehaviour {
         });
     }
 
-    protected virtual Vertex GetOpposite(Vertex vertex) {
+    public virtual Vertex GetOpposite(Vertex vertex) {
         if (vertex.Equals(StartPoint)) return EndPoint;
         if (vertex.Equals(EndPoint)) return StartPoint;
         throw new Exception("Vertex is not part of this edge.");

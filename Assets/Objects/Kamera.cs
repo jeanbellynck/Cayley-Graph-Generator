@@ -5,40 +5,31 @@ using DanielLochner.Assets.SimpleSideMenu;
 
 public class Kamera : MonoBehaviour
 {
-    public float wheelSensitivity = 1; 
-    public float pinchSensitivity = 0.05f; 
+    [SerializeField] float wheelSensitivity = 1; 
+    [SerializeField] float pinchSensitivity = 0.05f; 
     
-    public float rotationSpeed = 1;
-
-    public Vector2 turn;
+    [SerializeField] float rotationSpeed = 1;
 
     // Camera movement should only be possible when the sideMenu states are closed
     public GameObject[] sideMenues;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
     bool pinching = false;
+    public Transform center ;
+    [SerializeField] Camera cam;
+    
+
     void Update()
     {
-        // Get the camera object
-        Camera cam = Camera.main;
-
+        if (center != null) transform.position = center.position;
         // Camera movement should only be possible when the sideMenu states are closed
         foreach (GameObject sideMenu in sideMenues)
         {
             if (sideMenu.GetComponent<SimpleSideMenu>().TargetState == State.Open)
-            {
                 return;
-            }
         }
 
         // Zoom by mouse wheel
-        cam.orthographicSize = Math.Max(1, cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel")*wheelSensitivity);
+        cam.orthographicSize = Math.Max(1, cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel") * wheelSensitivity);
 
         // Zoom by finger pinch is broken on WebGL. Zoom will be deactived on mobile devices.
         if (Input.touchCount == 2)
@@ -69,7 +60,7 @@ public class Kamera : MonoBehaviour
 
             // Create a rotation for each axis and multiply them together
             Quaternion rotation = Quaternion.Euler(-v, h, 0);
-            transform.parent.rotation = transform.parent.rotation * rotation;
+            transform.rotation *= rotation;
         }
         if (Input.touchCount == 1 && !pinching) {
             Touch touchZero = Input.GetTouch(0);
@@ -79,7 +70,7 @@ public class Kamera : MonoBehaviour
 
                 // Create a rotation for each axis and multiply them together
                 Quaternion rotation = Quaternion.Euler(-v, h, 0);
-                transform.parent.rotation = transform.parent.rotation * rotation;
+                transform.rotation *= rotation;
             }
         }
         if (Input.touchCount == 0 && pinching) {
@@ -87,15 +78,7 @@ public class Kamera : MonoBehaviour
         }
     }
 
-    public void zoomIn()
-    {
-        Camera cam = Camera.main;
-        cam.orthographicSize = Math.Max(1, cam.orthographicSize - 3);
-    }
+    public void zoomIn() => cam.orthographicSize = Math.Max(1, cam.orthographicSize - 3);
 
-    public void zoomOut()
-    {
-        Camera cam = Camera.main;
-        cam.orthographicSize = Math.Max(1, cam.orthographicSize + 3);
-    }
+    public void zoomOut() => cam.orthographicSize = Math.Max(1, cam.orthographicSize + 3);
 }
