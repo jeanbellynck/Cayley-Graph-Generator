@@ -6,8 +6,8 @@ public class GroupOption : MonoBehaviour
 {
     public Group group;
 
-    public GameObject groupParameterPrefab;
-    public Tooltip tooltip;
+    [SerializeField] GameObject groupParameterPrefab;
+    [SerializeField] Tooltip tooltip;
 
 
     // Start is called before the first frame update
@@ -18,17 +18,16 @@ public class GroupOption : MonoBehaviour
         transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = group.description;
         setPresentation();
         // Set tooltip information
-        tooltip.text = group.tooltipInfo;
-        tooltip.url = group.tooltipURL;
+        tooltip.content = new() { text = group.tooltipInfo, url = group.tooltipURL };
         
         // For each parameter create a new parameter object and set it as a child of the groupOption object.
         for(int i = 0; i < group.parameters.Length; i++)
         {
-            string[] parameter = group.parameters[i];
+            var parameter = group.parameters[i];
             GameObject newParameter = Instantiate(groupParameterPrefab, transform);
-            newParameter.transform.GetChild(0).GetComponent<TMP_Text>().text = parameter[0] + "=";
-            newParameter.transform.GetChild(1).GetComponent<TMP_InputField>().text = parameter[1];
-            newParameter.transform.GetChild(2).GetComponent<Text>().text = parameter[2];
+            newParameter.transform.GetChild(0).GetComponent<TMP_Text>().text = parameter.name + "=";
+            newParameter.transform.GetChild(1).GetComponent<TMP_InputField>().text = parameter.value;
+            newParameter.transform.GetChild(2).GetComponent<Text>().text = parameter.description;
             
             // For each parameter set updateParameter() as the on Value Changed method
             int iTemp = i;
@@ -45,7 +44,7 @@ public class GroupOption : MonoBehaviour
     * The presentation is then updated in the UI.
     **/
     public void updateParameter(int parameterIndex, string parameterValue) {
-        group.parameters[parameterIndex][1] = parameterValue;  
+        group.parameters[parameterIndex].value = parameterValue;  
         group.updatePresentation();
         setPresentation();
         // Update Layout using LayoutRebuilder (copied from https://stackoverflow.com/questions/60201481/unity-3d-vertical-layout-group-not-placing-elements-where-they-should-be)

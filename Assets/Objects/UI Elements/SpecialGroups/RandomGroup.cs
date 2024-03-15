@@ -7,14 +7,14 @@ public class RandomGroup : Group
     {
         name = "R<sub>n, m, p</sub>";
         description = "A random group";
-        parameters = new string[][] {new string[] {"n", "3", "Amount of generators used"}, new string[] {"m", "4", "Maximal Size of relators"}, new string[] {"p", "0.5", "Probability that a relator word is included in the presentation"}};
+        parameters = new GroupParameter[] {new() {name = "n", value = "3", description = "Amount of generators used"}, new() {name = "m", value = "4", description = "Maximal Size of relators"}, new() {name = "p", value = "0.5", description = "Probability that a relator word is included in the presentation"}};
         updatePresentation();
     }
 
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0][1], out int n) && n >= 1 && int.TryParse(parameters[1][1], out int m) && m >= 1 && float.TryParse(parameters[2][1], out float p) && p >= 0 && p <= 1)
+        if (int.TryParse(parameters[0].value, out int n) && n >= 1 && int.TryParse(parameters[1].value, out int m) && m >= 1 && float.TryParse(parameters[2].value, out float p) && p >= 0 && p <= 1)
         {
             List<string> gen = new List<string>(); // Lowercase Generators 
             List<string> Gen = new List<string>(); // Uppercase Generators

@@ -1,13 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
-public class GroupVertex : Vertex {
-    [SerializeField] int distanceToNeutralElement = 0; // This is the distance to the neutral element of the group. It is used to determine the distance to the neutral element of the group. Currently this is not properly updated.
-    [SerializeField] List<string> pathsToNeutralElement = new(); // The paths to the identity element. This is used to visualize the paths to the identity element.
+public class GroupVertex : Vertex, ITooltipOnHover {
+    [SerializeField] int distanceToNeutralElement = 0; 
+    [SerializeField] List<string> pathsToNeutralElement = new(); 
 
     public float Stress { get; private set; }
+    TooltipContent tooltipContent = new();
 
     public int DistanceToNeutralElement { get => distanceToNeutralElement;
         private set => distanceToNeutralElement = value; }
@@ -26,6 +28,7 @@ public class GroupVertex : Vertex {
 
     protected override void Start() {
         base.Start();
+        Update();
     }
 
     // Update is called once per frame
@@ -52,40 +55,43 @@ public class GroupVertex : Vertex {
         return (GroupVertex) base.FollowEdge(op);
     }
 
-    public override void Initialize(VectorN position, GraphManager graphManager) {
+    public void Initialize(VectorN position, GraphManager graphManager, string name = "1", IEnumerable<string> pathsToNeutralElement = null) {
         OnEdgeChange += CalculateEdgeCompletion;
+        OnEdgeChange += () => tooltipContent = new() { text = string.Join('\n', PathsToNeutralElement) };
+        if (!string.IsNullOrEmpty(name)) this.name = name;
+        if (pathsToNeutralElement != null) PathsToNeutralElement = pathsToNeutralElement.ToList();
+
         base.Initialize(position, graphManager);
-        name = "1";
     }
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
-        Initialize(predecessor.Position, predecessor.graphManager);
-        name = predecessor.name == "1" ? op.ToString() : predecessor.name + op;
+        Initialize(
+            predecessor.Position, 
+            predecessor.graphManager,
+            predecessor.name == "1" ? op.ToString() : predecessor.name + op
+            
+            );
 
-        GroupVertex prepredecessor = predecessor.FollowEdge(ToggleCase(op));
+        GroupVertex prepredecessor = predecessor.FollowEdge(RelatorDecoder.invertGenerator(op));
         if (prepredecessor != null) {
             VectorN diff = predecessor.Position - prepredecessor.Position;
             Position = predecessor.Position + hyperbolicScaling * (diff.Normalize()*hyperbolicScaling + VectorN.Random(predecessor.Position.Size(), 0.1f));
         }
         else {
-            Position = predecessor.Position +  VectorN.Random(predecessor.Position.Size(), hyperbolicScaling);
+            Position = predecessor.Position + VectorN.Random(predecessor.Position.Size(), hyperbolicScaling);
         }
         Velocity = VectorN.Zero(Position.Size());
         transform.position = VectorN.ToVector3(Position);
 
         DistanceToNeutralElement = predecessor.DistanceToNeutralElement + 1;
-        List<string> pathsToNeutralElement = predecessor.PathsToNeutralElement;
-        foreach (string path in pathsToNeutralElement) {
-            AddPathToNeutralElement(path + op);
-        }
+        PathsToNeutralElement = (from path in predecessor.PathsToNeutralElement select path + op).ToList();
         calculateVertexMass(hyperbolicScaling);
     }
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
-        Initialize((Position + vertex2.Position) / 2, graphManager);
-        foreach(string path in vertex2.PathsToNeutralElement) {
-            AddPathToNeutralElement(path);
-        }
+        Position = (Position + vertex2.Position) / 2;
+        PathsToNeutralElement.AddRange(vertex2.PathsToNeutralElement);
+        distanceToNeutralElement = Math.Min(vertex2.distanceToNeutralElement, distanceToNeutralElement);
         calculateVertexMass(hyperbolicity);
     }
 
@@ -119,21 +125,7 @@ public class GroupVertex : Vertex {
         return mass;**/
     }
 
-    public void AddPathToNeutralElement(string path) {
-        pathsToNeutralElement.Add(path);
-    }
-
-    public void AddPathsToNeutralElement(List<string> paths) {
-        pathsToNeutralElement.AddRange(paths);
-    }
-
-    
-    public char ToggleCase(char c) {
-        if (char.IsUpper(c)) {
-            return char.ToLower(c);
-        }
-        else {
-            return char.ToUpper(c);
-        }
+    public TooltipContent GetTooltip() {
+        return tooltipContent;
     }
 }

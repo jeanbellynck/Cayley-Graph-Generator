@@ -119,7 +119,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
         GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
         if (predecessor == null)
-            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager);
+            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager, "1", new List<string>());
         else
             newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
         graphManager.AddVertex(newVertex);

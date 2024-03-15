@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.UIElements;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -48,6 +49,7 @@ public class Vertex : MonoBehaviour {
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
 
     [SerializeField] public GraphManager graphManager;
+    [SerializeField] float maxSpeed;
     public float Activity => graphManager.Activity;
 
 
@@ -80,8 +82,16 @@ public class Vertex : MonoBehaviour {
 
     }
 
+    float velocityRescaling(float x, float v) => x < v ? 1f : (MathF.Sqrt(x - v + 0.25f) + v - 0.5f) / x;
     protected virtual void Update() {
-        
+        if (Activity == 0)
+            transform.position = VectorN.ToVector3(Position);
+        else {
+            var movingDirection = VectorN.ToVector3(Position) - transform.position;
+            transform.position += Time.deltaTime * velocityRescaling(movingDirection.magnitude, maxSpeed / Activity) *
+                                  movingDirection;
+        }
+
     }
 
     public void OnDrawGizmos() {
@@ -94,7 +104,7 @@ public class Vertex : MonoBehaviour {
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(VectorN.ToVector3(position), 0.1f);
     }
-
+    
     public void Destroy() {
         // Destroy all edges too
         foreach (HashSet<Edge> genEdges in LabeledIncomingEdges.Values) {

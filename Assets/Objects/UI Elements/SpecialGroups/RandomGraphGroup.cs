@@ -7,21 +7,21 @@ public class RandomGraphGroup : Group {
     public RandomGraphGroup() {
         name = "RG<sub>v, e, g</sub>";
         description = "A group defined by loops in a random graph with labels in the generating set";
-        parameters = new string[][] {
-            new string[] {
-                "v",
-                "5",
-                "Number of vertices"
+        parameters = new GroupParameter[] {
+            new(){
+                name = "v",
+                value = "5",
+                description = "Number of vertices"
             },
-            new string[] {
-                "e",
-                "12",
-                "Number of edges"
+            new () {
+                name = "e",
+                value = "12",
+                description = "Number of edges"
             },
-            new string[] {
-                "g",
-                "0.8",
-                "#Generators = max. valency of graph * this; >= 0.5"
+            new() {
+                name = "g",
+                value = "0.8",
+                description = "#Generators = max. valency of graph * this; >= 0.5"
             }
         };
         updatePresentation();
@@ -30,11 +30,11 @@ public class RandomGraphGroup : Group {
 
     public override void updatePresentation() {
         char separator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator.First();
-        if (!int.TryParse(parameters[0][1], out int v) || 
+        if (!int.TryParse(parameters[0].value, out int v) || 
             v < 1 ||
-            !int.TryParse(parameters[1][1], out int e) ||
+            !int.TryParse(parameters[1].value, out int e) ||
             e < 0 ||
-            !float.TryParse(parameters[2][1].Replace('.', separator).Replace(',', separator), out float g) ||
+            !float.TryParse(parameters[2].value.Replace('.', separator).Replace(',', separator), out float g) ||
             g < 0.5) 
             return;
 

@@ -53,8 +53,7 @@ public class Physik : MonoBehaviour {
         if (alpha == 0) return;
         foreach(Vertex vertex in graphManager.getVertices()) {
             // The velocity of the pysics engine translated to real velocity (The physics engine is running at a different speed than the game engine)
-            UnityEngine.Vector3 velocity = VectorN.ToVector3(vertex.Velocity) * timeStep / physicsDeltaTime;
-            vertex.transform.position += velocity * Time.deltaTime;
+            vertex.Position += vertex.Velocity * timeStep / physicsDeltaTime * Time.deltaTime;
         }
     }
 
@@ -102,7 +101,7 @@ public class Physik : MonoBehaviour {
             vertex.Force = VectorN.Zero(dim);
             vertex.Velocity = vertex.Velocity.ClampMagnitude(radius/10);
             vertex.Position = vertex.Position.ClampMagnitude(radius);
-            vertex.transform.position = VectorN.ToVector3(vertex.Position);
+            //vertex.transform.position = VectorN.ToVector3(vertex.Position);
         }
     }
 

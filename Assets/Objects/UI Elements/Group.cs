@@ -2,7 +2,13 @@
 using Unity.VisualScripting;
 
 public class Group {
-    
+
+    public struct GroupParameter {
+        public string name;
+        public string value;
+        public string description;
+    }
+
     public string name;
     public string description;
     public string[] generators;
@@ -10,14 +16,14 @@ public class Group {
     public string tooltipInfo = "";
     public string tooltipURL = "";
 
-    public string[][] parameters;
+    public GroupParameter[] parameters;
 
     public Group() {
         this.name = "Group";
         this.description = "Group description";
-        this.generators = new string[]{"a; b"};
-        this.relators = new string[]{"abAB"};
-        this.parameters = new string[0][];
+        this.generators = new[]{"a; b"};
+        this.relators = new[]{"abAB"};
+        this.parameters = new GroupParameter[]{};
     }
     
     public Group(string name, string description, string generators, string relators, string tooltipInfo, string tooltipURL) : this (name, description, generators, relators){
@@ -31,10 +37,10 @@ public class Group {
         this.description = description;
         this.generators = generators.Replace(" ", "").Split(';');
         this.relators = relators.Replace(" ", "").Split(';');
-        this.parameters = new string[0][];
+        this.parameters = new GroupParameter[] { };
     }
     
-    public Group(string name, string description, string generators, string relators, string[][] parameters)
+    public Group(string name, string description, string generators, string relators, GroupParameter[] parameters)
     {
         this.name = name;
         this.description = description;
