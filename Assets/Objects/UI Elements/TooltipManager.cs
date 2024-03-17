@@ -58,11 +58,10 @@ public class TooltipManager : MonoBehaviour {
             }
         }
 
-        if (Activated) {
-            if (Time.time >= timer + hoverTime && !isActive) {
-                ActuallyShowTooltip();
-                isActive = true;
-            }
+        if (!isActive && Activated && Time.time >= timer + hoverTime) {
+            Debug.Log("Show tooltip");
+            ActuallyShowTooltip();
+            isActive = true;
         }
 
         if (!isActive) return;
@@ -89,22 +88,19 @@ public class TooltipManager : MonoBehaviour {
 
 
     public void OnHover(TooltipContent content, bool fromUI = true) {
-        //timer = Time.time;
+        // log onto the console
+        Debug.Log(content.text);
+        timer = Time.time;
         this.content = content;
-        if (fromUI) {
-            uiActivated = true;
-            objectActivated = false;
-        }
-        else {
-            objectActivated = true;
-            uiActivated = false;
-        }
+        uiActivated = fromUI;
+        objectActivated = !fromUI;
     }
 
 
     public void HideTooltip() {
         uiActivated = false;
         objectActivated = false;
+        isActive = false;
         tooltipPanel.gameObject.SetActive(false);
     }
 }
