@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using MathNet.Numerics.Providers.LinearAlgebra;
 using UnityEngine.UI;
 
 /**
@@ -14,6 +15,7 @@ public class TooltipManager : MonoBehaviour {
     
     [SerializeField] RectTransform tooltipPanel;
     [SerializeField] TMP_Text tooltipText;
+    [SerializeField] Kamera kamera;
     [SerializeField] float hoverTime = 1f;
     
     TooltipContent content;
@@ -40,9 +42,11 @@ public class TooltipManager : MonoBehaviour {
     }
     
     void Update() {
-        if (!uiActivated) {
+        if (!uiActivated) { // UI elements have priority
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out var hit, tooltipLayer)) {
+
+            Debug.DrawRay(ray.origin, ray.direction.normalized * 100000, Color.yellow,0.1f);
+            if (Physics.Raycast(ray, out var hit)) { // , tooltipLayer
                 var tooltipObject = hit.transform;
                 if (tooltipObject != lastHoverObject) {
                     lastHoverObject = tooltipObject;
@@ -58,15 +62,19 @@ public class TooltipManager : MonoBehaviour {
             }
         }
 
+
+
         if (!isActive && Activated && Time.time >= timer + hoverTime) {
-            Debug.Log("Show tooltip");
             ActuallyShowTooltip();
             isActive = true;
         }
 
         if (!isActive) return;
 
-        if (Input.GetMouseButtonDown(1) && content.url != "") {
+        if (objectActivated && Input.GetMouseButtonUp(0))
+            kamera.center = lastHoverObject;
+
+        if (Input.GetMouseButtonUp(1) && !string.IsNullOrWhiteSpace(content.url)) {
             Application.OpenURL(content.url);
             // On right click do a RickRoll
             //Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
@@ -76,25 +84,23 @@ public class TooltipManager : MonoBehaviour {
         tooltipPanel.position = new(mousePos.x + 10, mousePos.y - 10);
     }
 
-    void ActuallyShowTooltip()
-    {
-        tooltipPanel.gameObject.SetActive(true);
-        tooltipText.text = content.text;
-        if (content.url != "") tooltipText.text += "\n<b>Right click for more info.</b>";
-
-        LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipPanel);
-        transform.SetAsLastSibling();
-    }
-
-
     public void OnHover(TooltipContent content, bool fromUI = true) {
-        // log onto the console
-        Debug.Log(content.text);
         timer = Time.time;
         this.content = content;
         uiActivated = fromUI;
         objectActivated = !fromUI;
     }
+
+    void ActuallyShowTooltip()
+    {
+        tooltipPanel.gameObject.SetActive(true);
+        tooltipText.text = content.text ?? "";
+        if (!string.IsNullOrWhiteSpace(content.url)) tooltipText.text += "\n<b>Right click for more info.</b>";
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipPanel);
+        transform.SetAsLastSibling();
+    }
+
 
 
     public void HideTooltip() {

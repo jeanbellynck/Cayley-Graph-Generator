@@ -6,24 +6,24 @@ using Vector3 = UnityEngine.Vector3;
 
 public class GroupVertex : Vertex, ITooltipOnHover {
     [SerializeField] int distanceToNeutralElement = 0; 
-    [SerializeField] List<string> pathsToNeutralElement = new(); 
+    [SerializeField] List<string> pathsFromNeutralElement = new(); 
 
     public float Stress { get; private set; }
     TooltipContent tooltipContent = new();
 
     public int DistanceToNeutralElement { get => distanceToNeutralElement;
         private set => distanceToNeutralElement = value; }
-    public List<string> PathsToNeutralElement { get => pathsToNeutralElement; protected set => pathsToNeutralElement = value; }
+    public List<string> PathsFromNeutralElement { get => pathsFromNeutralElement; protected set => pathsFromNeutralElement = value; }
 
 
     public override float EdgeCompletion { get; protected set; }
 
     void CalculateEdgeCompletion()
     {
-        EdgeCompletion = (float)(
+        EdgeCompletion = graphManager.LabelCount > 0 ? 0.8f * (
             LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) +
             LabeledOutgoingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty())
-        ) / graphManager.LabelCount;
+        ) / graphManager.LabelCount + 0.2f : 1f;
     }
 
     protected override void Start() {
@@ -41,6 +41,8 @@ public class GroupVertex : Vertex, ITooltipOnHover {
             select Vector3.Angle(inEdge, outEdge) / 180
         ).DefaultIfEmpty(0).Max();
         Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
+
+        //Mr.material.SetColor("_BaseColor", new Color(Stress, 0, 0, EdgeCompletion));
     }
 
     public new Dictionary<char, List<GroupEdge>> GetEdges() {
@@ -55,11 +57,18 @@ public class GroupVertex : Vertex, ITooltipOnHover {
         return (GroupVertex) base.FollowEdge(op);
     }
 
-    public void Initialize(VectorN position, GraphManager graphManager, string name = "1", IEnumerable<string> pathsToNeutralElement = null) {
+    public void Initialize(VectorN position, GraphManager graphManager, string name = "1", IEnumerable<string> pathsFromNeutralElement = null) {
         OnEdgeChange += CalculateEdgeCompletion;
-        OnEdgeChange += () => tooltipContent = new() { text = string.Join('\n', PathsToNeutralElement) };
+        OnEdgeChange += () => {
+            var wordList = string.Join('\n', PathsFromNeutralElement);
+            tooltipContent = new() {
+                text = string.IsNullOrWhiteSpace(wordList)
+                    ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
+                    : wordList
+            };
+        };
         if (!string.IsNullOrEmpty(name)) this.name = name;
-        if (pathsToNeutralElement != null) PathsToNeutralElement = pathsToNeutralElement.ToList();
+        if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
 
         base.Initialize(position, graphManager);
     }
@@ -68,14 +77,15 @@ public class GroupVertex : Vertex, ITooltipOnHover {
         Initialize(
             predecessor.Position, 
             predecessor.graphManager,
-            predecessor.name == "1" ? op.ToString() : predecessor.name + op
-            
-            );
+            predecessor.name == "1" ? op.ToString() : predecessor.name + op,
+            from path in predecessor.PathsFromNeutralElement select path + op
+        );
 
         GroupVertex prepredecessor = predecessor.FollowEdge(RelatorDecoder.invertGenerator(op));
         if (prepredecessor != null) {
             VectorN diff = predecessor.Position - prepredecessor.Position;
-            Position = predecessor.Position + hyperbolicScaling * (diff.Normalize()*hyperbolicScaling + VectorN.Random(predecessor.Position.Size(), 0.1f));
+            if (diff.MagnitudeSquared() > 0) diff = diff.Normalize();
+            Position = predecessor.Position + hyperbolicScaling * (diff * hyperbolicScaling + VectorN.Random(predecessor.Position.Size(), 0.1f));
         }
         else {
             Position = predecessor.Position + VectorN.Random(predecessor.Position.Size(), hyperbolicScaling);
@@ -84,13 +94,12 @@ public class GroupVertex : Vertex, ITooltipOnHover {
         transform.position = VectorN.ToVector3(Position);
 
         DistanceToNeutralElement = predecessor.DistanceToNeutralElement + 1;
-        PathsToNeutralElement = (from path in predecessor.PathsToNeutralElement select path + op).ToList();
         calculateVertexMass(hyperbolicScaling);
     }
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
         Position = (Position + vertex2.Position) / 2;
-        PathsToNeutralElement.AddRange(vertex2.PathsToNeutralElement);
+        PathsFromNeutralElement.AddRange(vertex2.PathsFromNeutralElement);
         distanceToNeutralElement = Math.Min(vertex2.distanceToNeutralElement, distanceToNeutralElement);
         calculateVertexMass(hyperbolicity);
     }

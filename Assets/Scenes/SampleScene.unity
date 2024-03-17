@@ -1355,7 +1355,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.245106
+  m_Size: 0.24249822
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2116,8 +2116,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 260, y: 0}
-  m_SizeDelta: {x: 520, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &206627779
 MonoBehaviour:
@@ -2724,7 +2724,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1609308472}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3339,8 +3339,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 260, y: 0}
-  m_SizeDelta: {x: 520, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &336030529
 MonoBehaviour:
@@ -5923,10 +5923,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: In this field we enter the generators of a group. In the graph, generators
-    are represented as arrows. You can click on the ?-symbol to get a more detailed
-    explanation.
-  url: https://en.wikipedia.org/wiki/Presentation_of_a_group
 --- !u!114 &627319551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6068,7 +6064,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 270, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 520, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &634874289
@@ -6447,9 +6443,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e01cb179893c104294ada9c41d42a62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tooltip: {fileID: 944813758}
-  rightClickURL: 
+  tooltipPanel: {fileID: 944813759}
   tooltipText: {fileID: 929252208}
+  kamera: {fileID: 519420033}
+  hoverTime: 1
 --- !u!1 &661246219
 GameObject:
   m_ObjectHideFlags: 0
@@ -6707,11 +6704,11 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 645595481}
   - {fileID: 261111091}
   - {fileID: 1223529137}
   - {fileID: 1459510106}
   - {fileID: 1700154872}
-  - {fileID: 645595481}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -7992,6 +7989,10 @@ MonoBehaviour:
   - {r: 0, g: 0, b: 1, a: 1}
   - {r: 0, g: 1, b: 0, a: 1}
   - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0, b: 0.92679024, a: 1}
+  - {r: 0, g: 1, b: 0.70105433, a: 1}
+  - {r: 0, g: 0, b: 0, a: 1}
+  - {r: 0.42396927, g: 0, b: 1, a: 1}
 --- !u!1 &801383880
 GameObject:
   m_ObjectHideFlags: 0
@@ -10716,8 +10717,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1027251063}
   m_HandleRect: {fileID: 1027251062}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.36416513
+  m_Value: 0.9999999
+  m_Size: 0.3602906
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12029,10 +12030,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: 'The relators, together with the generators form the presentation of a group.
-    A presentation is very similar to a generating set but instead of embedding the
-    generators in an ambient group we describe the relationships between them directy. '
-  url: https://en.wikipedia.org/wiki/Presentation_of_a_group
 --- !u!1 &1270266413
 GameObject:
   m_ObjectHideFlags: 0
@@ -13705,7 +13702,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1339989363}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

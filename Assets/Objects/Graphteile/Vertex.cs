@@ -22,7 +22,7 @@ public class Vertex : MonoBehaviour {
     public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; set; } = new();
     protected Renderer Mr { get; private set; }
 
-    [SerializeField] VectorN position;
+    [SerializeField] VectorN _position;
     VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
 
     float creationTime; // = Time.time;
@@ -35,7 +35,7 @@ public class Vertex : MonoBehaviour {
 
     public event Action OnEdgeChange;
     
-    public VectorN Position { get => position; set => position = value; }
+    public VectorN Position { get => _position; set => _position = value; }
 
     public readonly Dictionary<char, Vector3> splineDirections = new();
     [SerializeField] float splineDirectionFactor = 0.2f; // actually I would like to see these in the inspector AND have them be static
@@ -84,8 +84,15 @@ public class Vertex : MonoBehaviour {
 
     float velocityRescaling(float x, float v) => x < v ? 1f : (MathF.Sqrt(x - v + 0.25f) + v - 0.5f) / x;
     protected virtual void Update() {
-        if (Activity == 0)
+        if (Activity == 0) {
             transform.position = VectorN.ToVector3(Position);
+            foreach (var (gen, edges) in GetEdges()) {
+                foreach (var edge in edges) {
+                    edge.finished = false; 
+                    // TODO! This is a stupid workaround since the edges (in LateUpdate) get to see Activity == 0 first and then stop updating.  (this way we get two full spline renders and expose the variable finished
+                }
+            }
+        }
         else {
             var movingDirection = VectorN.ToVector3(Position) - transform.position;
             transform.position += Time.deltaTime * velocityRescaling(movingDirection.magnitude, maxSpeed / Activity) *
@@ -102,7 +109,7 @@ public class Vertex : MonoBehaviour {
         Gizmos.DrawLine(transform.position, transform.position + VectorN.ToVector3(Velocity));
         // Draw a sphere at the current position
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(VectorN.ToVector3(position), 0.1f);
+        Gizmos.DrawSphere(VectorN.ToVector3(Position), 0.1f);
     }
     
     public void Destroy() {

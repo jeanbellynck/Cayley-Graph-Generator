@@ -54,8 +54,9 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         //int simulationDimensionality = 2*generators.Length + 1;
 
-        // neutral element:
-        kamera.center = CreateVertex(null, default).transform;
+        GroupVertex neutralElement = CreateVertex(null, default);
+        kamera.center = neutralElement.transform;
+        neutralElement.transform.localScale *= 1.6f;
 
         StartCoroutine(createNewElementsAndApplyRelators());
     }
@@ -119,7 +120,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
         GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
         if (predecessor == null)
-            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager, "1", new List<string>());
+            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager, "1", new List<string>(){""});
         else
             newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
         graphManager.AddVertex(newVertex);

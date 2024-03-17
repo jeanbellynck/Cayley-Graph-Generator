@@ -38,7 +38,7 @@ public class Physik : MonoBehaviour {
         this.graphManager = graphManager;
         alpha = alphaSetting;
         this.dimension = dimension;
-        this.timeStep = 0.5f / generatorCount;
+        this.timeStep = generatorCount > 0 ? 0.5f / generatorCount : 0.1f;
         
         repulsionForce = new RepulsionForce(radius);
         linkForce = new LinkForce();
@@ -61,26 +61,25 @@ public class Physik : MonoBehaviour {
 
     public IEnumerator LoopPhysics() {
         float startTime = Time.time - 1; // Reduce on to prevent physicsDeltaTime from being 0
-        while(true) {
+        while(alpha > 0) {
             // Measures the time of a physics step
             physicsDeltaTime = Time.time - startTime;
             startTime = Time.time;
 
             dim = graphManager.getDim();
             
-            if(alpha == 0) {break;}
-            geschwindigkeitenZurücksetzen();
+            ResetForces();
             yield return repulsionForce.ApplyForce(graphManager, alpha);
             yield return projectionForce.ApplyForce(graphManager, alpha);
             yield return linkForce.ApplyForce(graphManager, alpha);
-            updateVertices();
+            UpdateVertices();
             // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
         }
     }
 
     public float timeStep = 0.25f;
 
-    private void updateVertices() {
+    void UpdateVertices() {
         float realVelocityDecay = Mathf.Pow(velocityDecay, timeStep);
         foreach (Vertex vertex in graphManager.getVertices()) {
             float ageFactor = Mathf.Max(1, (3 - 1) * (1 - vertex.Age)); // Young vertices are strong
@@ -92,11 +91,7 @@ public class Physik : MonoBehaviour {
     }
 
 
-    /**
-     * Sets the speed of all vertices to 0.
-     * Also bounds th force by the maximal force.
-     */
-    private void geschwindigkeitenZurücksetzen() {
+    void ResetForces() {
         foreach (Vertex vertex in graphManager.getVertices()) {
             vertex.Force = VectorN.Zero(dim);
             vertex.Velocity = vertex.Velocity.ClampMagnitude(radius/10);

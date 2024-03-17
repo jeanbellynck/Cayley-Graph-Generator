@@ -16,9 +16,6 @@ public class GroupEdge : Edge {
         calculateEdgeLength(hyperbolicity);
     }
 
-    // Start is called before the first frame update
-    void Start() { }
-
     public void calculateEdgeLength(float hyperbolicity) {
         int distance = Math.Min(((GroupVertex) StartPoint).DistanceToNeutralElement, ((GroupVertex) EndPoint).DistanceToNeutralElement);
         Length = Mathf.Pow(hyperbolicity, distance);

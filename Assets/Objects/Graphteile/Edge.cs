@@ -20,8 +20,8 @@ public class Edge : MonoBehaviour {
     [SerializeField] Vertex startPoint;
     [SerializeField] Vertex endPoint;
 
-    [SerializeField] char label;
-    public char Label { get => label; protected set => label = value; }
+    [SerializeField] char _label;
+    public char Label { get => _label; protected set => _label = value; }
     public Vertex StartPoint { get => startPoint; protected set => startPoint = value; }
     public Vertex EndPoint { get => endPoint; protected set => endPoint = value; }
     public float Length { get => length; protected set => length = value; }
@@ -45,7 +45,7 @@ public class Edge : MonoBehaviour {
     MeshRenderer meshRenderer;
     LineRenderer lineRenderer;
 
-    bool finished;
+    public bool finished;
     public GraphManager graphManager;
 
     [SerializeField]
