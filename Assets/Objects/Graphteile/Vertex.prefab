@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8930971666199616475}
   - component: {fileID: -7715269276983235028}
   - component: {fileID: -7652529086318207544}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Vertex
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ MonoBehaviour:
   graphManager: {fileID: 0}
   maxSpeed: 8
   distanceToNeutralElement: 0
-  pathsToNeutralElement: []
+  pathsFromNeutralElement: []
 --- !u!135 &-7652529086318207544
 SphereCollider:
   m_ObjectHideFlags: 0

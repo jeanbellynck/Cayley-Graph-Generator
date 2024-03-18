@@ -6,7 +6,6 @@ using System.Linq;
 using Random = System.Random;
 using QuikGraph;
 using TaggedGraph = QuikGraph.UndirectedGraph<string, QuikGraph.TaggedEdge<string, EdgeData>>;
-using SharpGraph;
 using ShGraph = SharpGraph.Graph;
 using GeneratorSet = System.Collections.Generic.HashSet<string>;
 public class EdgeData {

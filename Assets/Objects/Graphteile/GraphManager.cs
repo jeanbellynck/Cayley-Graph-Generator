@@ -10,18 +10,19 @@ public class GraphManager : MonoBehaviour {
     readonly List<Vertex> vertices = new();
     readonly List<Edge> edges = new();
     public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
-    CayleyGraph cayleyGraph;
+    IActivityProvider activityProvider;
     public int LabelCount { get; private set; }
     public readonly Dictionary<char, Color> labelColors = new();
     [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
 
 
-    public float Activity => cayleyGraph.Activity;
+    public float Activity => activityProvider.Activity;
+    //public Kamera kamera { get; protected set; }
 
-
-    public void Initialize(char[] generators, CayleyGraph cayleyGraph) {
+    public void Initialize(char[] generators, IActivityProvider activityProvider) { //, Kamera kamera
         LabelCount = 2 * generators.Length;
-        this.cayleyGraph = cayleyGraph;
+        this.activityProvider = activityProvider;
+        //this.kamera = kamera;
 
         labelColors.Clear();
         for (int i = 0; i < generators.Length; i++) {

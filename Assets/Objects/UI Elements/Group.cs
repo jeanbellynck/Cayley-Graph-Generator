@@ -1,6 +1,3 @@
-
-using Unity.VisualScripting;
-
 public class Group {
 
     public struct GroupParameter {

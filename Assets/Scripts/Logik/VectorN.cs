@@ -1,7 +1,5 @@
 using System;
-using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
 
 public struct VectorN {

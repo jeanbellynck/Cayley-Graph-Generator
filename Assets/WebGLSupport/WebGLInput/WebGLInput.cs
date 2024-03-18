@@ -7,12 +7,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using AOT;
-using System.Runtime.InteropServices; // for DllImport
 using System.Collections;
 using UnityEngine.EventSystems;
 
-namespace WebGLSupport
-{
+namespace WebGLSupport {
     internal class WebGLInputPlugin
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -232,7 +230,7 @@ namespace WebGLSupport
             if (canvas && useCamera)
             {
                 var camera = canvas.worldCamera;
-                if (!camera) camera = Camera.main;
+                if (!camera) camera = UnityEngine.Camera.main;
 
                 for (var i = 0; i < worldCorners.Length; i++)
                 {

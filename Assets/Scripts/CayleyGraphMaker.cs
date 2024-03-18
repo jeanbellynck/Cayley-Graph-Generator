@@ -25,7 +25,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     [SerializeField] GameObject meshPrefab;
     [SerializeField] GroupColorPanel groupColorPanel;
 
-    [SerializeField] Kamera kamera;
+    [SerializeField] List<Kamera> kameras;
 
     private int simulationDimensionality = 3;
 
@@ -55,7 +55,8 @@ public class CayleyGraphMaker : MonoBehaviour {
         //int simulationDimensionality = 2*generators.Length + 1;
 
         GroupVertex neutralElement = CreateVertex(null, default);
-        kamera.center = neutralElement.transform;
+            
+        foreach (var kamera in kameras) kamera.center = neutralElement.transform;
         neutralElement.transform.localScale *= 1.6f;
 
         StartCoroutine(createNewElementsAndApplyRelators());

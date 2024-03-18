@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
-namespace WebGLSupport
-{
+namespace WebGLSupport {
     public enum ContentType
     {
         Standard = 0,

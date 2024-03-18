@@ -1,7 +1,6 @@
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-using UnityEditor;
 using System.Globalization;
 using System.Linq;
 

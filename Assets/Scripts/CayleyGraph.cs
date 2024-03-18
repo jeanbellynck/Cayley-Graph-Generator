@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 /**
  * This class is both the main class for the graph and the interface for the UI.
  */
-public class CayleyGraph : MonoBehaviour {
+public class CayleyGraph : MonoBehaviour, IActivityProvider {
 
     public Physik physik;// = new Physik(10, 100);
 
@@ -24,7 +23,7 @@ public class CayleyGraph : MonoBehaviour {
     [SerializeField] string[] relators = new string[0];
 
 
-    public float Activity => Math.Clamp(physik.alpha, 0f, 1f);
+    public float Activity => physik.Activity;
 
     // Start is called before the first frame update
     void Start() {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,7 +13,7 @@ public class OpenHyperlinks : MonoBehaviour, IPointerClickHandler {
 
     private TextMeshProUGUI pTextMeshPro;
     private Canvas pCanvas;
-    private Camera pCamera;
+    private UnityEngine.Camera pCamera;
 
     public bool isLinkHighlighted { get { return pCurrentLink != -1; } }
 

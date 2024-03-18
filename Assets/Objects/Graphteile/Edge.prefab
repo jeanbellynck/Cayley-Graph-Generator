@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1127768246452650686}
   - component: {fileID: 5116376294159558719}
   - component: {fileID: 7949522777033075996}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Edge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,8 @@ MonoBehaviour:
   length: 0
   startPoint: {fileID: 0}
   endPoint: {fileID: 0}
-  label: 0
+  _label: 0
+  finished: 0
   graphManager: {fileID: 0}
   midDisplacementFactor: 0.18
   midDirectionFactor: 0.3

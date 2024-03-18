@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Dreamteck.Splines;
 
 /**
  * Used to enable smart notation for relators

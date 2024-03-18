@@ -1,10 +1,8 @@
 ﻿using System;
 using AOT;
-using System.Runtime.InteropServices; // for DllImport
 using UnityEngine;
 
-namespace WebGLSupport
-{
+namespace WebGLSupport {
     static class WebGLWindowPlugin
     {
 #if UNITY_WEBGL && !UNITY_EDITOR

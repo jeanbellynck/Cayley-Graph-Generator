@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace WebGLSupport.Detail
-{
+namespace WebGLSupport.Detail {
     public class RebuildChecker
     {
         IInputField input;

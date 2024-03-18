@@ -1,21 +1,18 @@
 using UnityEngine;
 using TMPro;
-using System.Collections;
-using MathNet.Numerics.Providers.LinearAlgebra;
 using UnityEngine.UI;
 
 /**
     * This class is responsible for managing the tooltip that appears when hovering over a group in the group gallery.
-    * Copied from https://www.youtube.com/watch?v=y2N_J391ptg
+    * Inspired by https://www.youtube.com/watch?v=y2N_J391ptg
     */
 public class TooltipManager : MonoBehaviour {
-    static TooltipManager _instance;
 
-    public static TooltipManager Instance =>_instance;
-    
+    public static TooltipManager Instance { get; private set; }
+
     [SerializeField] RectTransform tooltipPanel;
     [SerializeField] TMP_Text tooltipText;
-    [SerializeField] Kamera kamera;
+    [SerializeField] CameraManager cameraManager;
     [SerializeField] float hoverTime = 1f;
     
     TooltipContent content;
@@ -24,16 +21,15 @@ public class TooltipManager : MonoBehaviour {
     bool objectActivated;
     bool Activated => uiActivated || objectActivated;
     bool isActive;
-    int tooltipLayer;
+    int layerMask;
     Transform lastHoverObject;
 
     void Awake() {
-        if (_instance != null && _instance != this) {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
         } else {
-            _instance = this;
+            Instance = this;
         }
-        tooltipLayer = LayerMask.NameToLayer("TooltipObjects");
     }
 
     void Start() {
@@ -42,11 +38,15 @@ public class TooltipManager : MonoBehaviour {
     }
     
     void Update() {
-        if (!uiActivated) { // UI elements have priority
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var mousePosition = Input.mousePosition;
+        if (!uiActivated && cameraManager.TryGetCamera(mousePosition, out var camera)) { // UI elements have priority
 
-            Debug.DrawRay(ray.origin, ray.direction.normalized * 100000, Color.yellow,0.1f);
-            if (Physics.Raycast(ray, out var hit)) { // , tooltipLayer
+            Ray ray = camera.ScreenPointToRay(mousePosition);
+            layerMask = camera.cullingMask; // LayerMask.GetMask("TooltipObjects");
+
+
+            Debug.DrawRay(ray.origin, ray.direction.normalized * 2000, Color.yellow,0.1f);
+            if (Physics.Raycast(ray, out var hit, maxDistance: 2000, layerMask)) { 
                 var tooltipObject = hit.transform;
                 if (tooltipObject != lastHoverObject) {
                     lastHoverObject = tooltipObject;
@@ -62,8 +62,6 @@ public class TooltipManager : MonoBehaviour {
             }
         }
 
-
-
         if (!isActive && Activated && Time.time >= timer + hoverTime) {
             ActuallyShowTooltip();
             isActive = true;
@@ -71,17 +69,13 @@ public class TooltipManager : MonoBehaviour {
 
         if (!isActive) return;
 
-        if (objectActivated && Input.GetMouseButtonUp(0))
+        if (objectActivated && Input.GetMouseButtonUp(0) && cameraManager.TryGetKamera(mousePosition, out var kamera))
             kamera.center = lastHoverObject;
 
-        if (Input.GetMouseButtonUp(1) && !string.IsNullOrWhiteSpace(content.url)) {
+        if (Input.GetMouseButtonUp(1) && !string.IsNullOrWhiteSpace(content.url)) 
             Application.OpenURL(content.url);
-            // On right click do a RickRoll
-            //Application.OpenURL("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-        }
 
-        Vector3 mousePos = Input.mousePosition;
-        tooltipPanel.position = new(mousePos.x + 10, mousePos.y - 10);
+        tooltipPanel.position = new(mousePosition.x + 10, mousePosition.y - 10);
     }
 
     public void OnHover(TooltipContent content, bool fromUI = true) {
@@ -98,7 +92,7 @@ public class TooltipManager : MonoBehaviour {
         if (!string.IsNullOrWhiteSpace(content.url)) tooltipText.text += "\n<b>Right click for more info.</b>";
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipPanel);
-        transform.SetAsLastSibling();
+        tooltipPanel.SetAsLastSibling();
     }
 
 

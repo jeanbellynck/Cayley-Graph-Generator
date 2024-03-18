@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-
 public class TorusGroup : Group
 {
     public TorusGroup()

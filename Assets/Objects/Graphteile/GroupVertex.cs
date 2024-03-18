@@ -57,7 +57,7 @@ public class GroupVertex : Vertex, ITooltipOnHover {
         return (GroupVertex) base.FollowEdge(op);
     }
 
-    public void Initialize(VectorN position, GraphManager graphManager, string name = "1", IEnumerable<string> pathsFromNeutralElement = null) {
+    public void Initialize(VectorN position, GraphManager graphManager, string name = "1", IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
         OnEdgeChange += CalculateEdgeCompletion;
         OnEdgeChange += () => {
             var wordList = string.Join('\n', PathsFromNeutralElement);
@@ -137,4 +137,8 @@ public class GroupVertex : Vertex, ITooltipOnHover {
     public TooltipContent GetTooltip() {
         return tooltipContent;
     }
+
+    //public Kamera GetKamera() {
+    //    return graphManager.kamera;
+    //}
 }

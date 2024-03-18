@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Button = UnityEngine.UI.Button;
 
 public class GeneratorMenu : MonoBehaviour
 {

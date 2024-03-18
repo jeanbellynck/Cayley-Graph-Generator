@@ -1,11 +1,8 @@
 using UnityEngine;
-using System.Collections.Generic;
 using System;
-using Unity.VisualScripting;
-using System.Numerics;
 using System.Collections;
 
-public class Physik : MonoBehaviour {
+public class Physik : MonoBehaviour, IActivityProvider {
     public float radius; // Size of the boundingBox
     private int dim;
 
@@ -14,6 +11,7 @@ public class Physik : MonoBehaviour {
 
     // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
     public float alpha { get; private set; }
+    public float Activity => alpha;
     public float alphaSetting = 1;
     
     public float alphaDecay = 0.1f;

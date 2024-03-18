@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Runtime.InteropServices; // for DllImport
 using AOT;
 using System;
 
-namespace WebGLSupport
-{
+namespace WebGLSupport {
     class WebGLInputMobilePlugin
     {
 #if UNITY_WEBGL && !UNITY_EDITOR

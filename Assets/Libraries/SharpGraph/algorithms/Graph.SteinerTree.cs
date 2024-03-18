@@ -4,12 +4,10 @@
 // See LICENSE file in the samples root for full license information.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SharpGraph
-{
+namespace SharpGraph {
     public partial class Graph
     {
         /// <summary>

@@ -1,7 +1,8 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using System;
+using System.Linq;
 using DanielLochner.Assets.SimpleSideMenu;
+using NUnit.Framework.Constraints;
 
 public class Kamera : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class Kamera : MonoBehaviour
     [SerializeField] float rotationSpeed = 1;
 
     // Camera movement should only be possible when the sideMenu states are closed
-    public GameObject[] sideMenues;
+    public SimpleSideMenu[] sideMenues;
 
     bool pinching = false;
     public Transform center ;
@@ -20,13 +21,12 @@ public class Kamera : MonoBehaviour
 
     void Update()
     {
+        var mousePosition = Input.touchCount > 0 ? Input.touches.First().position : new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         if (center != null) transform.position = center.position;
         // Camera movement should only be possible when the sideMenu states are closed
-        foreach (GameObject sideMenu in sideMenues)
-        {
-            if (sideMenu.GetComponent<SimpleSideMenu>().TargetState == State.Open)
-                return;
-        }
+        if (cam.ScreenToViewportPoint(mousePosition) is not { x: <= 1 and >= 0, y: >= 0 and <= 1 } ||
+            sideMenues.Any(sideMenu => sideMenu.TargetState == State.Open))
+            return;
 
         // Zoom by mouse wheel
         cam.orthographicSize = Math.Max(1, cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel") * wheelSensitivity);
@@ -53,8 +53,15 @@ public class Kamera : MonoBehaviour
             
         }
         
+        if (Input.touchCount == 0 && pinching) {
+            pinching = false;
+        }
+
         // If mouse or finger is down, rotate the camera
-        if (Input.GetMouseButton(0) && Input.touchCount != 2 && !pinching) {
+        if (Input.GetMouseButton(0) &&
+            Input.touchCount != 2 &&
+            !pinching
+            ) {
             float h = Input.GetAxis("Mouse X") * rotationSpeed * 5;
             float v = Input.GetAxis("Mouse Y") * rotationSpeed * 5;
 
@@ -72,9 +79,6 @@ public class Kamera : MonoBehaviour
                 Quaternion rotation = Quaternion.Euler(-v, h, 0);
                 transform.rotation *= rotation;
             }
-        }
-        if (Input.touchCount == 0 && pinching) {
-            pinching = false;
         }
     }
 
