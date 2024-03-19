@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9e80633b611a1cf4ba5b70382954ad0a
+guid: 2516edf788f895b408088cad3c25aa58
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5412295076361313981
-    second: SubgroupLogo_0
+      213: 8392507163885126984
+    second: "Johannes Hei\xDFler_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SubgroupLogo_0
+      name: "Johannes Hei\xDFler_0"
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1024
-        height: 1024
+        width: 640
+        height: 640
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,8 +127,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dbe9c1642b55c1b40800000000000000
-      internalID: 5412295076361313981
+      spriteID: 8454b46dccc287470800000000000000
+      internalID: 8392507163885126984
       vertices: []
       indices: 
       edges: []
@@ -143,8 +143,7 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable:
-      SubgroupLogo_0: 5412295076361313981
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

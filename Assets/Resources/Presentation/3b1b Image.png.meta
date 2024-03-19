@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 8b630d19da00a5443a2cf2cd2d997f4a
+guid: f634def2f687f5d44911bc0b7fdb935f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8342882705006035615
-    second: splitscreen_0
+      213: -3184882965495351804
+    second: 3b1b Image_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: splitscreen_0
+      name: 3b1b Image_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 46
-        height: 4309
+        width: 1920
+        height: 1080
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,8 +127,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 16d7d5dd160283c80800000000000000
-      internalID: -8342882705006035615
+      spriteID: 406f47e21d50dc3d0800000000000000
+      internalID: -3184882965495351804
       vertices: []
       indices: 
       edges: []
