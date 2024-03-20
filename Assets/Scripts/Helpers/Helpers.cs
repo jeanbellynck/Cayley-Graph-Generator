@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -53,6 +54,7 @@ public static class Helpers {
         return count != 0 ? sum / count : Vector3.zero;
     }// copilot
 
+    public static string FixDecimalPoint(this string s) => s.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
 
     public static List<List<char>> GroupVectorsByAngle(Dictionary<char, Vector3> directions) {
         var clusters = new List<List<char>>();

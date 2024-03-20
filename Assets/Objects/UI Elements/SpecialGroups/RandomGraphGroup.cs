@@ -32,7 +32,7 @@ public class RandomGraphGroup : Group {
             v < 1 ||
             !int.TryParse(parameters[1].value, out int e) ||
             e < 0 ||
-            !float.TryParse(parameters[2].value.Replace('.', separator).Replace(',', separator), out float g) ||
+            !float.TryParse(parameters[2].value.FixDecimalPoint(), out float g) ||
             g < 0.5) 
             return;
 

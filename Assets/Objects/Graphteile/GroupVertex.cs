@@ -18,6 +18,8 @@ public class GroupVertex : Vertex, ITooltipOnHover {
 
     public override float EdgeCompletion { get; protected set; }
 
+    [SerializeField] bool inSubgroup = true;
+
     void CalculateEdgeCompletion()
     {
         EdgeCompletion = graphManager.LabelCount > 0 ? 0.8f * (
@@ -57,18 +59,19 @@ public class GroupVertex : Vertex, ITooltipOnHover {
         return (GroupVertex) base.FollowEdge(op);
     }
 
-    public void Initialize(VectorN position, GraphManager graphManager, string name = "1", IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
-        OnEdgeChange += CalculateEdgeCompletion;
-        OnEdgeChange += () => {
-            var wordList = string.Join('\n', PathsFromNeutralElement);
-            tooltipContent = new() {
-                text = string.IsNullOrWhiteSpace(wordList)
-                    ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
-                    : wordList
-            };
-        };
+    public void Initialize(VectorN position, GraphManager graphManager, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
         if (!string.IsNullOrEmpty(name)) this.name = name;
         if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
+        this.inSubgroup = inSubgroup;
+
+        OnEdgeChange += CalculateEdgeCompletion;
+        OnEdgeChange += () => {
+            tooltipContent = new() {
+                text = this.name == "1"
+                    ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
+                    : string.Join("=\n", PathsFromNeutralElement)
+            };
+        };
 
         base.Initialize(position, graphManager);
     }

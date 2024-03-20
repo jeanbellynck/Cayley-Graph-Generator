@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 010cd7a55fca7534294b15d9da18c65f
+guid: f966ff8c48b6df548aba4fc6fb1b5be5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2660809050267737630
-    second: Hyperbolic Group noText_0
+      213: -8004894201111473398
+    second: SubgroupLogo-clean_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hyperbolic Group noText_0
+      name: SubgroupLogo-clean_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1598
-        height: 899
+        x: 143
+        y: 122
+        width: 742
+        height: 788
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,8 +127,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e1e5a50dbb71de420800000000000000
-      internalID: 2660809050267737630
+      spriteID: a039a26c227e8e090800000000000000
+      internalID: -8004894201111473398
       vertices: []
       indices: 
       edges: []
@@ -143,8 +143,7 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable:
-      Hyperbolic Group noText_0: 2660809050267737630
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

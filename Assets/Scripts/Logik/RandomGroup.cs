@@ -164,7 +164,7 @@ public static class RandomGroups {
 
     static IEnumerable<List<string>> GetSimpleCycles(TaggedGraph taggedGraph)
     {
-        var sharpGraph = Converter.ConvertToSharpGraph(taggedGraph);
+        var sharpGraph = Converter.TaggedToSharpGraph(taggedGraph);
         return (
             from nodeList in sharpGraph.FindSimpleCycles()
             select (
@@ -177,9 +177,24 @@ public static class RandomGroups {
 
 
 public static class Converter {
-    public static ShGraph ConvertToSharpGraph(TaggedGraph quickGraph) =>
+    public static ShGraph TaggedToSharpGraph(TaggedGraph quickGraph) =>
         new ((
             from edge in quickGraph.Edges
             select new SharpGraph.Edge(edge.Source, edge.Target)
         ).ToList());
+
+    public static TaggedGraph SharpToTaggedGraph(ShGraph sharpGraph) {
+        var taggedGraph = new TaggedGraph();
+        foreach (var edge in sharpGraph.GetEdges()) {
+            string sourceLabel = edge.From().GetLabel();
+            string targetLabel = edge.To().GetLabel();
+            taggedGraph.AddVerticesAndEdge(
+                new(sourceLabel, 
+                    targetLabel, 
+                    new(){generator = "?", start = sourceLabel}
+                ));
+        }
+        return taggedGraph;
+    }
+
 }

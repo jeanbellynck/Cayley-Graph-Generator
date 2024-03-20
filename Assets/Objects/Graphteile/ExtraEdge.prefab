@@ -9,14 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4778737120442681794}
-  - component: {fileID: 913999209185785338}
+  - component: {fileID: -8820881167222371513}
   - component: {fileID: 3310283270684842847}
   - component: {fileID: 1769113522243741999}
   - component: {fileID: 1127768246452650686}
   - component: {fileID: 5116376294159558719}
   - component: {fileID: 7949522777033075996}
-  m_Layer: 7
-  m_Name: Edge
+  m_Layer: 9
+  m_Name: ExtraEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37,7 +37,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &913999209185785338
+--- !u!114 &-8820881167222371513
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3391233956122432578}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71a2cd62d9514c446b1f501bccddbfc1, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b17ec35f63f0dd478eac2d0eb110884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lineWidth: 0.1
@@ -54,7 +54,7 @@ MonoBehaviour:
   PercentHead: 0.1
   vertexRadius: 0.1
   useSplines: 0
-  length: 0
+  length: 1
   startPoint: {fileID: 0}
   endPoint: {fileID: 0}
   _label: 0

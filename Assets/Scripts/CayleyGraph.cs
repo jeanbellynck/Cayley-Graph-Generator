@@ -10,8 +10,7 @@ using UnityEngine.UI;
  */
 public class CayleyGraph : MonoBehaviour, IActivityProvider {
 
-    public Physik physik;// = new Physik(10, 100);
-
+    [SerializeField] Physik physik;// = new Physik(10, 100);
 
     public GraphManager graphManager;
 
@@ -98,7 +97,7 @@ public class CayleyGraph : MonoBehaviour, IActivityProvider {
 
     public void SetHyperbolicity(string hyperbolicityString) {
         print("scaling changed to:" + hyperbolicityString);
-        if (float.TryParse(hyperbolicityString, out float hyperbolicity) && hyperbolicity != 0) {
+        if (float.TryParse(hyperbolicityString.FixDecimalPoint(), out float hyperbolicity) && hyperbolicity != 0) {
             cayleyGraphMaker.setHyperbolicity(hyperbolicity);
         }
     }

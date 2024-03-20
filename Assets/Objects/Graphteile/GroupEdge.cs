@@ -11,7 +11,6 @@ public class GroupEdge : Edge {
         } else {
             base.Initialize(endVertex, startVertex, char.ToLower(operation), graphManager);
         }
-        SetColors(LabelColors[char.ToLower(operation)]);
         calculateEdgeLength(hyperbolicity);
     }
 

@@ -111,7 +111,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         DrawMesh();
-        StartCoroutine(physik.decayAlpha());
+        physik.shutDown();
     }
 
 

@@ -57,9 +57,7 @@ public class HyperbolicityMatrix : MonoBehaviour {
     }
 
     public void ValueChanged(string value) {
-        char separator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator.First();
-        
-        if(float.TryParse(value.Replace('.', separator).Replace(',', separator), out float result) && result != 0) {
+        if(float.TryParse(value.FixDecimalPoint(), out float result) && result != 0) {
             UpdateMatrix();
         }
     }
@@ -76,7 +74,7 @@ public class HyperbolicityMatrix : MonoBehaviour {
         float hyperbolicity;
 
         char separator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator.First();
-        if(float.TryParse(hyperbolicityTextField.GetComponent<InputField>().text.Replace('.', separator).Replace(',', separator), out hyperbolicity) && hyperbolicity > 0) {
+        if(float.TryParse(hyperbolicityTextField.GetComponent<InputField>().text.FixDecimalPoint(), out hyperbolicity) && hyperbolicity > 0) {
             // continue
         } else {
             //exit
@@ -91,16 +89,16 @@ public class HyperbolicityMatrix : MonoBehaviour {
                 // Matrix is currently deactivated
                 matrix[i, j] = hyperbolicity;
                 **/
-                /**
-                if(float.TryParse(textFields[i, j].GetComponent<TMP_InputField>().text, out float result) && result != 0) {
-                    matrix[i, j] = float.Parse(textFields[i, j].GetComponent<TMP_InputField>().text);
-                } else {
-                    matrix[i, j] = 1;
-                }
-                **/
-                /**
-            }
-        }**/
+        /**
+        if(float.TryParse(textFields[i, j].GetComponent<TMP_InputField>().text.FixDecimalPoint(), out float result) && result != 0) {
+            matrix[i, j] = float.Parse(textFields[i, j].GetComponent<TMP_InputField>().text);
+        } else {
+            matrix[i, j] = 1;
+        }
+        **/
+        /**
+    }
+}**/
         //cayleyGraph.GetComponent<CayleyGraph>().SetHyperbolicityMatrix(matrix);
     }
 }

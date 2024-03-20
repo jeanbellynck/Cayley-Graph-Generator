@@ -104,23 +104,15 @@ public class Physik : MonoBehaviour, IActivityProvider {
     * Slowly reduces the maximal force to 0. This is used to stop the simulation.
     */
     public void shutDown() {
-        alpha -= 0.01f;
-        
-            /**
-            if (actualMaximalForce < usualMaximalForce && 0 < actualMaximalForce) {
-                actualMaximalForce -= usualMaximalForce * Time.deltaTime / shutDownTime;
-            }
-            if (actualMaximalForce < 0) {
-                actualMaximalForce = 0;
-            }**/
-        StopAllCoroutines();
+        StartCoroutine(decayAlpha());
     }
 
-    public IEnumerator decayAlpha() {
+    IEnumerator decayAlpha() {
         while(alpha > 0) {
             alpha -= alphaDecay * Time.deltaTime;
             yield return null;
         }
         alpha = 0;
+        StopAllCoroutines();
     }
 }

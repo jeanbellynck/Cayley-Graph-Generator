@@ -13,7 +13,7 @@ public class RandomGroup : Group
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0].value, out int n) && n >= 1 && int.TryParse(parameters[1].value, out int m) && m >= 1 && float.TryParse(parameters[2].value, out float p) && p >= 0 && p <= 1)
+        if (int.TryParse(parameters[0].value, out int n) && n >= 1 && int.TryParse(parameters[1].value, out int m) && m >= 1 && float.TryParse(parameters[2].value.FixDecimalPoint(), out float p) && p >= 0 && p <= 1)
         {
             List<string> gen = new List<string>(); // Lowercase Generators 
             List<string> Gen = new List<string>(); // Uppercase Generators

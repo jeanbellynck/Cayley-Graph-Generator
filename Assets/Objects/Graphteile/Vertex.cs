@@ -8,7 +8,6 @@ using Vector3 = UnityEngine.Vector3;
 public class Vertex : MonoBehaviour {
 
 
-
     public int Id { get; set; }
 
     [SerializeField] float mass = 1;
@@ -370,13 +369,20 @@ public class Vertex : MonoBehaviour {
             edges.Add(op, GetOutgoingEdges(op).ToList());
         }
         foreach (char op in LabeledIncomingEdges.Keys) {
-            edges.Add(char.ToUpper(op), GetIncomingEdges(op).ToList());
+            var reverseLabel = ReverseLabel(op);
+            if (!edges.ContainsKey(reverseLabel))
+                edges.Add(reverseLabel, GetIncomingEdges(op).ToList());
+            else
+                edges[reverseLabel].AddRange(GetIncomingEdges(op));
         }
         return edges;
     }
 
-    protected IEnumerable<Edge> GetEdges(char op) {
-        return char.IsLower(op) ? GetOutgoingEdges(op).ToList() : GetIncomingEdges(char.ToLower(op)).ToList();
+    static char ReverseLabel(char label) => RelatorDecoder.invertGenerator(label); // This should be in the subclass
+    static bool IsReverseLabel(char label) => char.IsUpper(label); // This should be in the subclass
+
+    protected IEnumerable<Edge> GetEdges(char label) {
+        return IsReverseLabel(label) ? GetIncomingEdges(ReverseLabel(label)).ToList() : GetOutgoingEdges(label).ToList();
     }
 
 

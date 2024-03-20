@@ -16,15 +16,15 @@ public class Kamera : MonoBehaviour
 
     bool pinching = false;
     public Transform center ;
-    [SerializeField] Camera cam;
+    [SerializeField] protected Camera cam;
     
 
     void Update()
     {
-        var mousePosition = Input.touchCount > 0 ? Input.touches.First().position : new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        Vector3 mousePosition = Input.touchCount > 0 ? Input.touches.First().position : Input.mousePosition;
         if (center != null) transform.position = center.position;
         // Camera movement should only be possible when the sideMenu states are closed
-        if (cam.ScreenToViewportPoint(mousePosition) is not { x: <= 1 and >= 0, y: >= 0 and <= 1 } ||
+        if (!IsMouseInViewport(mousePosition) ||
             sideMenues.Any(sideMenu => sideMenu.TargetState == State.Open))
             return;
 
@@ -80,6 +80,11 @@ public class Kamera : MonoBehaviour
                 transform.rotation *= rotation;
             }
         }
+    }
+
+    public virtual bool IsMouseInViewport(Vector3 mousePosition)
+    {
+        return cam.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 };
     }
 
     public void zoomIn() => cam.orthographicSize = Math.Max(1, cam.orthographicSize - 3);

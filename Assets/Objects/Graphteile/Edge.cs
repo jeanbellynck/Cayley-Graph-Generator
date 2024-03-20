@@ -11,7 +11,7 @@ public class Edge : MonoBehaviour {
     [SerializeField] protected float vertexRadius = 0.1f;
     [SerializeField] bool useSplines = true;
 
-    [SerializeField] float length;
+    [SerializeField] float length = 1f;
 
     float creationTime; // = Time.time;
     public float Age => Time.time - creationTime;
@@ -25,7 +25,7 @@ public class Edge : MonoBehaviour {
     public Vertex EndPoint { get => endPoint; protected set => endPoint = value; }
     public float Length { get => length; protected set => length = value; }
     public Vector3 Direction => EndPoint.transform.position - StartPoint.transform.position;
-
+    
     public enum SplinificationType {
         Never,
         Always,
@@ -61,7 +61,7 @@ public class Edge : MonoBehaviour {
         creationTime = Time.time;
     }
 
-    protected void Initialize(Vertex startPoint, Vertex endPoint, char label, GraphManager graphManager) {
+    public void Initialize(Vertex startPoint, Vertex endPoint, char label, GraphManager graphManager) {
         this.StartPoint = startPoint;
         this.EndPoint = endPoint;
         this.Label = label;
@@ -74,6 +74,8 @@ public class Edge : MonoBehaviour {
         meshRenderer = GetComponent<MeshRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
         this.graphManager = graphManager;
+
+        SetColors(LabelColors[char.ToLower(label)]); // TODO: make this more general
 
         useSplines = splinificationType == SplinificationType.Always;
 
@@ -222,4 +224,6 @@ public class Edge : MonoBehaviour {
         if (vertex.Equals(EndPoint)) return StartPoint;
         throw new Exception("Vertex is not part of this edge.");
     }
+
+    //public virtual char ReverseLabel => RelatorDecoder.invertGenerator(Label); // This should be in the subclass
 }
