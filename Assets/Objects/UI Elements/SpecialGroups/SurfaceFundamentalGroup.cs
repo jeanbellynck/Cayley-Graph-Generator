@@ -8,7 +8,7 @@ public class SurfaceFundamentalGroup : Group
         description = "The fundamental group of the genus-g-surface";
         parameters = new GroupParameter[] {new() { name = "g", value = "2", description = "Genus"}};
         tooltipInfo = "This fundamental group can be found as an amalgamated product by Van-Kampen.";
-        tooltipURL = "https://en.wikipedia.org/wiki/Direct_product_of_groups";
+        //tooltipURL = "";
 
         updatePresentation();
     }

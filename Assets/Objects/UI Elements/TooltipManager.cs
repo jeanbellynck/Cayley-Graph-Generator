@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -23,6 +24,7 @@ public class TooltipManager : MonoBehaviour {
     bool isActive;
     int layerMask;
     Transform lastHoverObject;
+    ITooltipOnHover lastTooltipThing = null;
 
     void Awake() {
         if (Instance != null && Instance != this) {
@@ -32,26 +34,30 @@ public class TooltipManager : MonoBehaviour {
         }
     }
 
+    [SerializeField] Kamera uicamera;
     void Start() {
         Cursor.visible = true;
         tooltipPanel.gameObject.SetActive(false);
     }
-    
+
     void Update() {
         var mousePosition = Input.mousePosition;
-        if (!uiActivated && cameraManager.TryGetCamera(mousePosition, out var camera)) { // UI elements have priority
+        if (!uiActivated && cameraManager.TryGetKamera(mousePosition, out var kamera)) { // UI elements have priority
 
-            Ray ray = camera.ScreenPointToRay(mousePosition);
-            layerMask = camera.cullingMask; // LayerMask.GetMask("TooltipObjects");
+            Ray ray = kamera.ScreenPointToRay(mousePosition);
 
+            layerMask = kamera.cullingMask; // LayerMask.GetMask("TooltipObjects");
 
             Debug.DrawRay(ray.origin, ray.direction.normalized * 2000, Color.yellow,0.1f);
+
             if (Physics.Raycast(ray, out var hit, maxDistance: 2000, layerMask)) { 
                 var tooltipObject = hit.transform;
                 if (tooltipObject != lastHoverObject) {
                     lastHoverObject = tooltipObject;
-                    if (tooltipObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing))
+                    if (tooltipObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing)) {
+                        lastTooltipThing = tooltipThing;
                         OnHover(tooltipThing.GetTooltip(), false);
+                    }
                     else
                         HideTooltip();
                 }
@@ -67,10 +73,11 @@ public class TooltipManager : MonoBehaviour {
             isActive = true;
         }
 
-        if (!isActive) return;
+        if (objectActivated && Input.GetMouseButtonUp(0)) {
+            if (cameraManager.TryGetKamera(mousePosition, out kamera)) lastTooltipThing?.OnClick(kamera);
+        }
 
-        if (objectActivated && Input.GetMouseButtonUp(0) && cameraManager.TryGetKamera(mousePosition, out var kamera))
-            kamera.center = lastHoverObject;
+        if (!isActive) return;
 
         if (Input.GetMouseButtonUp(1) && !string.IsNullOrWhiteSpace(content.url)) 
             Application.OpenURL(content.url);
@@ -87,9 +94,14 @@ public class TooltipManager : MonoBehaviour {
 
     void ActuallyShowTooltip()
     {
+        var text = content.text ?? "";
+        if (!string.IsNullOrWhiteSpace(content.url)) 
+            text += "\n<b>Right click for more info.</b>";
+
+        //if (string.IsNullOrWhiteSpace(text))
+        //    return;
         tooltipPanel.gameObject.SetActive(true);
-        tooltipText.text = content.text ?? "";
-        if (!string.IsNullOrWhiteSpace(content.url)) tooltipText.text += "\n<b>Right click for more info.</b>";
+        tooltipText.text = text;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipPanel);
         tooltipPanel.SetAsLastSibling();

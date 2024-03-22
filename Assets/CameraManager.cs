@@ -5,11 +5,20 @@ using UnityEngine.UI;
 public class CameraManager : MonoBehaviour
 {
     [SerializeField] List<Camera> cameras;
+    [SerializeField] Camera mainCamera;
+    [SerializeField] Camera secondaryCamera;
 
     public Camera GetCamera(Vector3 mousePosition) {
-        foreach (var kamera in cameras)
-            if (kamera.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 })
-                return kamera;
+        foreach (var camera in cameras) {
+            if (camera.TryGetComponent<Kamera>(out var kamera)) {
+                if (kamera.IsMouseInViewport(mousePosition))
+                    return camera;
+            }
+            else {
+                if (camera.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 })
+                    return camera;
+            }
+        }
 
         return null;
     }
@@ -37,10 +46,10 @@ public class CameraManager : MonoBehaviour
         UpdateViewports(1);
     }
 
+    // referenced from UI
     public void UpdateViewports(float screenPercentage) {
-        var (mainCam, secondaryCam) = (cameras[0], cameras[1]);
-        mainCam.rect = new Rect(0, 0, screenPercentage, 1);
-        secondaryCam.rect = new Rect(screenPercentage, 0, 1 - screenPercentage, 1);
+        mainCamera.rect = new(0, 0, screenPercentage, 1);
+        secondaryCamera.rect = new(screenPercentage, 0, 1 - screenPercentage, 1);
     }
 
 }

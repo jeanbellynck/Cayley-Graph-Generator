@@ -5,7 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
 
-public class Vertex : MonoBehaviour {
+public class Vertex : MonoBehaviour, ITooltipOnHover {
 
 
     public int Id { get; set; }
@@ -19,6 +19,7 @@ public class Vertex : MonoBehaviour {
     public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; set; } = new();
     public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; set; } = new();
     protected Renderer Mr { get; private set; }
+    protected TooltipContent tooltipContent = new();
 
     [SerializeField] VectorN _position;
     VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
@@ -363,7 +364,7 @@ public class Vertex : MonoBehaviour {
     }
 
 
-    protected Dictionary<char, List<Edge>> GetEdges() {
+    public Dictionary<char, List<Edge>> GetEdges() {
         Dictionary<char, List<Edge>> edges = new Dictionary<char, List<Edge>>();
         foreach (char op in LabeledOutgoingEdges.Keys) {
             edges.Add(op, GetOutgoingEdges(op).ToList());
@@ -381,9 +382,10 @@ public class Vertex : MonoBehaviour {
     static char ReverseLabel(char label) => RelatorDecoder.invertGenerator(label); // This should be in the subclass
     static bool IsReverseLabel(char label) => char.IsUpper(label); // This should be in the subclass
 
-    protected IEnumerable<Edge> GetEdges(char label) {
+    public IEnumerable<Edge> GetEdges(char label) {
         return IsReverseLabel(label) ? GetIncomingEdges(ReverseLabel(label)).ToList() : GetOutgoingEdges(label).ToList();
     }
 
-
+    public TooltipContent GetTooltip() => tooltipContent;
+    public void OnClick(Kamera activeKamera) => activeKamera.center = transform;
 }

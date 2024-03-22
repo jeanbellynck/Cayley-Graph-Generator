@@ -4,12 +4,11 @@ using System.Linq;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
-public class GroupVertex : Vertex, ITooltipOnHover {
+public class GroupVertex : Vertex {
     [SerializeField] int distanceToNeutralElement = 0; 
     [SerializeField] List<string> pathsFromNeutralElement = new(); 
 
     public float Stress { get; private set; }
-    TooltipContent tooltipContent = new();
 
     public int DistanceToNeutralElement { get => distanceToNeutralElement;
         private set => distanceToNeutralElement = value; }
@@ -69,7 +68,9 @@ public class GroupVertex : Vertex, ITooltipOnHover {
             tooltipContent = new() {
                 text = this.name == "1"
                     ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
-                    : string.Join("=\n", PathsFromNeutralElement)
+                    : PathsFromNeutralElement.Count > 20 
+                        ? string.Join("=\n", PathsFromNeutralElement.GetRange(0, 20)) + "\n..." 
+                        : string.Join("=\n", PathsFromNeutralElement)
             };
         };
 
@@ -137,11 +138,4 @@ public class GroupVertex : Vertex, ITooltipOnHover {
         return mass;**/
     }
 
-    public TooltipContent GetTooltip() {
-        return tooltipContent;
-    }
-
-    //public Kamera GetKamera() {
-    //    return graphManager.kamera;
-    //}
 }

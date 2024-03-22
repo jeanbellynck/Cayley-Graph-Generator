@@ -8,16 +8,16 @@ public class Kamera : MonoBehaviour
 {
     [SerializeField] float wheelSensitivity = 1; 
     [SerializeField] float pinchSensitivity = 0.05f; 
-    
     [SerializeField] float rotationSpeed = 1;
+    
+    [SerializeField] protected Camera cam;
 
+    public Transform center;
     // Camera movement should only be possible when the sideMenu states are closed
-    public SimpleSideMenu[] sideMenues;
+    [SerializeField] protected SimpleSideMenu[] sideMenues;
 
     bool pinching = false;
-    public Transform center ;
-    [SerializeField] protected Camera cam;
-    
+
 
     void Update()
     {
@@ -31,7 +31,7 @@ public class Kamera : MonoBehaviour
         // Zoom by mouse wheel
         cam.orthographicSize = Math.Max(1, cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel") * wheelSensitivity);
 
-        // Zoom by finger pinch is broken on WebGL. Zoom will be deactived on mobile devices.
+        // Zoom by finger pinch is broken on WebGL. Zoom will be deactivated on mobile devices.
         if (Input.touchCount == 2)
         {
             pinching = true;
@@ -90,4 +90,8 @@ public class Kamera : MonoBehaviour
     public void zoomIn() => cam.orthographicSize = Math.Max(1, cam.orthographicSize - 3);
 
     public void zoomOut() => cam.orthographicSize = Math.Max(1, cam.orthographicSize + 3);
+
+    public virtual Ray ScreenPointToRay(Vector3 mousePosition) => cam.ScreenPointToRay(mousePosition);
+    public int cullingMask => cam.cullingMask;
+
 }

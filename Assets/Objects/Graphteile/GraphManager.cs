@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /**
@@ -12,17 +13,26 @@ public class GraphManager : MonoBehaviour {
     public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
     IActivityProvider activityProvider;
     public int LabelCount { get; private set; }
+
     public readonly Dictionary<char, Color> labelColors = new();
     [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
+
+    [SerializeField] GroupColorPanel groupColorPanel;
+    [SerializeField] List<Kamera> kameras;
 
 
     public float Activity => activityProvider.Activity;
     //public Kamera kamera { get; protected set; }
 
-    public void Initialize(char[] generators, IActivityProvider activityProvider) { //, Kamera kamera
-        LabelCount = 2 * generators.Length;
+    public void Initialize(char[] generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
-        //this.kamera = kamera;
+
+        UpdateLabels(generators);
+    }
+
+    public void UpdateLabels(char[] generators)
+    {
+        LabelCount = 2 * generators.Length;
 
         labelColors.Clear();
         for (int i = 0; i < generators.Length; i++) {
@@ -31,6 +41,8 @@ public class GraphManager : MonoBehaviour {
                     ? ColorList[i]
                     : Random.ColorHSV(0,1,0.9f, 1));
         }
+        groupColorPanel.updateView(labelColors);
+
     }
 
     public List<Vertex> getVertices() {
@@ -43,6 +55,10 @@ public class GraphManager : MonoBehaviour {
     }
 
     public void AddVertex(Vertex vertex) {
+        if (vertices.IsEmpty())
+            foreach (var kamera in kameras) 
+                kamera.center = vertex.transform;
+
         vertex.Id = idCounter;
         idCounter++;
         vertices.Add(vertex);

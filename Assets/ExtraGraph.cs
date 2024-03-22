@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DanielLochner.Assets.SimpleSideMenu;
 using TMPro;
 using UnityEngine;
 using TaggedGraph = QuikGraph.UndirectedGraph<string, QuikGraph.TaggedEdge<string, EdgeData>>;
@@ -16,16 +17,12 @@ public class ExtraGraph : MonoBehaviour
     [SerializeField] TMP_InputField edgeCountInput;
     [SerializeField] TMP_InputField proportionOfGeneratorsInput;
     [SerializeField] List<Kamera> cameras;
+    [SerializeField] SimpleSideMenu normalSideMenu;
+    [SerializeField] RelatorMenu normalRelatorMenu;
+    [SerializeField] GeneratorMenu normalGeneratorMenu;
 
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+    void Start() {
+        generatorMenu.OnGeneratorsChanged += () => graphManager.UpdateLabels(generatorMenu.Generators.ToArray());
     }
 
     public void StartVisualization() {
@@ -40,9 +37,6 @@ public class ExtraGraph : MonoBehaviour
         var generators = generatorMenu.Generators = 
             from generator in generatorStrings select generator.DefaultIfEmpty('?').First();
         DrawGraph(generators, graph);
-        foreach (var camera in cameras)
-            camera.center = graphManager.getVertices().FirstOrDefault()?.transform;
-
         physik.startUp(graphManager, 3, generatorStrings.Length);
         physik.shutDown();
     }
@@ -50,6 +44,11 @@ public class ExtraGraph : MonoBehaviour
     void DrawGraph(IEnumerable<char> generators, TaggedGraph graph) {
         graphManager.Initialize(generators.ToArray(), physik);
         graphManager.SetSplinificationMode((int)Edge.SplinificationType.Always);
+        TaggedGraphToGraphManager(graph);
+    }
+
+    void TaggedGraphToGraphManager(TaggedGraph graph)
+    {
         graphManager.ResetGraph();
         var vertexDict = new Dictionary<string, Vertex>();
         foreach (var vertexName in graph.Vertices) {
@@ -75,5 +74,26 @@ public class ExtraGraph : MonoBehaviour
             newEdge.Initialize(startPoint, endPoint, label, graphManager);
             graphManager.AddEdge(newEdge);
         }
+    }
+
+    TaggedGraph GraphManagerToTaggedGraph() {
+        var graph = new TaggedGraph();
+        foreach (var vertex in graphManager.getVertices()) {
+            graph.AddVertex(vertex.name);
+        }
+
+        foreach (var edge in graphManager.GetEdges()) {
+            graph.AddEdge(new(edge.StartPoint.name, edge.EndPoint.name,
+                new() { generator = edge.Label.ToString(), start = edge.StartPoint.name }));
+        }
+        return graph;
+    }
+
+    public void GetRelators() {
+        TaggedGraph graph = GraphManagerToTaggedGraph();
+        var relatorsFromGraph = RandomGroups.RelatorsFromGraph(graph);
+        normalRelatorMenu.SetRelators(relatorsFromGraph);
+        normalGeneratorMenu.SetGenerators(generatorMenu.Generators);
+        normalSideMenu.Open();
     }
 }

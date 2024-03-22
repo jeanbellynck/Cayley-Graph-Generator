@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -8,6 +9,8 @@ public class GeneratorMenu : MonoBehaviour
     [SerializeField] GameObject generatorInputPrefab;
     readonly List<TMP_InputField> generatorInputs = new();
     readonly List<GameObject> generatorGameObjects = new();
+
+    public event Action OnGeneratorsChanged;
 
     public IEnumerable<char> Generators {
         get => GetGenerators();
@@ -76,8 +79,9 @@ public class GeneratorMenu : MonoBehaviour
                 return;
             }
             newGeneratorInputField.text = c.ToString();
+            OnGeneratorsChanged?.Invoke();
         });
-
+        OnGeneratorsChanged?.Invoke();
     }
 
 }

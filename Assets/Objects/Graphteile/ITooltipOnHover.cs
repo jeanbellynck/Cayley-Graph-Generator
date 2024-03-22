@@ -1,4 +1,4 @@
 ﻿public interface ITooltipOnHover {
     TooltipContent GetTooltip();
-    //Kamera GetKamera();
+    void OnClick(Kamera activeKamera);
 }

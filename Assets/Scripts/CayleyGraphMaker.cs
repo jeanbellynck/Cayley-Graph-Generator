@@ -23,9 +23,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     [SerializeField] GameObject vertexPrefab;
     [SerializeField] GameObject edgePrefab;
     [SerializeField] GameObject meshPrefab;
-    [SerializeField] GroupColorPanel groupColorPanel;
 
-    [SerializeField] List<Kamera> kameras;
 
     private int simulationDimensionality = 3;
 
@@ -50,13 +48,9 @@ public class CayleyGraphMaker : MonoBehaviour {
             operators[i + generators.Length] = char.ToUpper(generators[i]);
         }
         
-        groupColorPanel.updateView(graphManager.labelColors);
-
         //int simulationDimensionality = 2*generators.Length + 1;
 
         GroupVertex neutralElement = CreateVertex(null, default);
-            
-        foreach (var kamera in kameras) kamera.center = neutralElement.transform;
         neutralElement.transform.localScale *= 1.6f;
 
         StartCoroutine(createNewElementsAndApplyRelators());
