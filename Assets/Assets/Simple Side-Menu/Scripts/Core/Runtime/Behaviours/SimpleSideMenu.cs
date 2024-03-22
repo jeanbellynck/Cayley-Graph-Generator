@@ -333,6 +333,11 @@ namespace DanielLochner.Assets.SimpleSideMenu
                 }
             }
 
+            // Width (Make the menu at least as slim as the screen) (For the poor smartphone users)
+            float width = Math.Min(canvasRectTransform.rect.width - 200, rectTransform.rect.width);
+            // Set the width
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+
             // Placement
             Vector2 anchorMin = Vector2.zero;
             Vector2 anchorMax = Vector2.zero;
