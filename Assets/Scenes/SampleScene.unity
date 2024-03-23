@@ -1794,7 +1794,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.34843394
+  m_Size: 0.34847254
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1998,7 +1998,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1474693457}
   m_HandleRect: {fileID: 1474693456}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3918,7 +3918,19 @@ MonoBehaviour:
       m_Calls: []
   onStateChanging:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1459450051}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onStateChanged:
     m_PersistentCalls:
       m_Calls:
@@ -9353,6 +9365,7 @@ GameObject:
   - component: {fileID: 772353317}
   - component: {fileID: 772353318}
   - component: {fileID: 772353319}
+  - component: {fileID: 772353320}
   m_Layer: 0
   m_Name: CayleyGraph
   m_TagString: Untagged
@@ -9442,12 +9455,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2009739170c434f866c3a455423344, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meshManager: {fileID: 772353320}
   hyperbolicity: 1
   vertexNumber: 300
   drawingSpeed: 1
   vertexPrefab: {fileID: 3096654801577124718, guid: 434cfa457364ce74c804ec2262665e16, type: 3}
   edgePrefab: {fileID: 3391233956122432578, guid: ef0b13f8d0b9f39498697181c6d741eb, type: 3}
-  meshPrefab: {fileID: 5113444650179130146, guid: 229d5f0e55e207244a23cf81194cdba9, type: 3}
+  simulationDimensionality: 3
+  numberOfMeshesPerFrame: 10
 --- !u!114 &772353319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9473,6 +9488,28 @@ MonoBehaviour:
   kameras:
   - {fileID: 519420033}
   - {fileID: 1308226000}
+--- !u!114 &772353320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 772353314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 485f35c36ca196c409211f88cbbb0dcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshPrefab: {fileID: 5113444650179130146, guid: 229d5f0e55e207244a23cf81194cdba9, type: 3}
+  ColorList:
+  - {r: 0.28146136, g: 0.5188679, b: 0.3339407, a: 0.2509804}
+  - {r: 0.6431373, g: 0.64027405, b: 0.43137255, a: 0.2509804}
+  - {r: 0.43271625, g: 0.6415094, b: 0.61453414, a: 0.2509804}
+  - {r: 0.7264151, g: 0.47648928, b: 0.42831078, a: 0.2509804}
+  - {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 0.2509804}
+  - {r: 0.5188679, g: 0.2961463, b: 0.34527606, a: 0.2509804}
+  - {r: 0.43666, g: 0.3499911, b: 0.6132076, a: 0.2509804}
+  defaultColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 0.2509804}
 --- !u!1 &782188392
 GameObject:
   m_ObjectHideFlags: 0
@@ -12545,10 +12582,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 342369024}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 10, y: -1103}
-  m_SizeDelta: {x: 980, y: 1003}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 10, y: 10}
+  m_SizeDelta: {x: -20, y: -110.000015}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1056061887
 MonoBehaviour:
@@ -14172,8 +14209,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 336110405}
   m_HandleRect: {fileID: 336110404}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.99999994
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16378,8 +16415,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1339989364}
   m_HandleRect: {fileID: 1339989363}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9999999
+  m_Value: 0
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16825,13 +16862,14 @@ MonoBehaviour:
   sideMenues:
   - {fileID: 1459510107}
   - {fileID: 1284729352}
-  - {fileID: 342369025}
   renderRectTransform: {fileID: 1056061886}
   renderTarget: {fileID: 1056061887}
-  renderTexture: {fileID: 8400000, guid: b13320d97df5af148afa02e84e2c30bf, type: 2}
-  canvas: {fileID: 678851485}
-  offset: {x: 0, y: 0}
-  scale: {x: 0, y: 0}
+  renderTexture: {fileID: 0}
+  canvas: {fileID: 678851486}
+  screenOffset: {x: 0, y: 0}
+  canvasOffset: {x: 0, y: 0}
+  canvasToScreenScale: {x: 1, y: 1}
+  screenToCameraOutputScale: {x: 1, y: 1}
 --- !u!224 &1459510106 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224298845508465166, guid: bbf5de98e82ccbf4c92df4cb9d3af1cb, type: 3}
@@ -17654,7 +17692,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 27134082}
   m_Direction: 0
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -20377,7 +20415,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1827836409}
   m_HandleRect: {fileID: 1827836408}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -21661,7 +21699,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2070879375}
   m_HandleRect: {fileID: 2070879374}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -23394,7 +23432,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1760846715}
   m_HandleRect: {fileID: 1760846714}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
