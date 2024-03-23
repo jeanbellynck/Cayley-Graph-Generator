@@ -30,7 +30,7 @@ public class MeshManager : MonoBehaviour {
             return false;
         type ??= "";
         var vertexIds = vertices.Select(vertex => vertex.Id).ToList();
-        if (vertexIds.Count == 0)
+        if (vertexIds.Count < 3) // meshes with less than 3 vertices would be invisible
             return false;
 
         if (!string.IsNullOrWhiteSpace(type)) {
