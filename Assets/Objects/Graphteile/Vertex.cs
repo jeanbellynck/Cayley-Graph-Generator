@@ -387,5 +387,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     public TooltipContent GetTooltip() => tooltipContent;
-    public void OnClick(Kamera activeKamera) => activeKamera.center = transform;
+    public void OnClick(Kamera activeKamera) {
+        if (activeKamera != null) activeKamera.center = transform;
+    }
 }

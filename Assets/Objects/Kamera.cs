@@ -2,7 +2,6 @@ using UnityEngine;
 using System;
 using System.Linq;
 using DanielLochner.Assets.SimpleSideMenu;
-using NUnit.Framework.Constraints;
 
 public class Kamera : MonoBehaviour
 {

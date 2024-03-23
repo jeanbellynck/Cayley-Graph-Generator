@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -24,17 +23,19 @@ public class TooltipManager : MonoBehaviour {
     bool isActive;
     int layerMask;
     Transform lastHoverObject;
-    ITooltipOnHover lastTooltipThing = null;
+    ITooltipOnHover lastTooltipThing;
 
     void Awake() {
-        if (Instance != null && Instance != this) {
-            Destroy(gameObject);
-        } else {
+        if (Instance == this) 
+            return;
+        if (Instance == null) {
             Instance = this;
+            return;
         }
+        Destroy(gameObject);
     }
 
-    [SerializeField] Kamera uicamera;
+    [SerializeField] Kamera uiCamera;
     void Start() {
         Cursor.visible = true;
         tooltipPanel.gameObject.SetActive(false);
@@ -54,30 +55,32 @@ public class TooltipManager : MonoBehaviour {
                 var tooltipObject = hit.transform;
                 if (tooltipObject != lastHoverObject) {
                     lastHoverObject = tooltipObject;
-                    if (tooltipObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing)) {
-                        lastTooltipThing = tooltipThing;
-                        OnHover(tooltipThing.GetTooltip(), false);
-                    }
+                    if (tooltipObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing))
+                        OnHoverBegin(tooltipThing, false);
                     else
-                        HideTooltip();
+                        OnHoverEnd();
                 }
             }
             else {
                 lastHoverObject = null;
-                HideTooltip();
+                OnHoverEnd();
             }
         }
 
         if (!isActive && Activated && Time.time >= timer + hoverTime) {
-            ActuallyShowTooltip();
+            ShowTooltip();
             isActive = true;
         }
 
-        if (objectActivated && Input.GetMouseButtonUp(0)) {
-            if (cameraManager.TryGetKamera(mousePosition, out kamera)) lastTooltipThing?.OnClick(kamera);
-        }
-
         if (!isActive) return;
+
+        if (Input.GetMouseButtonUp(0)) {
+            if (objectActivated) {
+                if (cameraManager.TryGetKamera(mousePosition, out kamera)) lastTooltipThing?.OnClick(kamera);
+            } else if (uiActivated) {
+                lastTooltipThing?.OnClick(null);
+            }
+        }
 
         if (Input.GetMouseButtonUp(1) && !string.IsNullOrWhiteSpace(content.url)) 
             Application.OpenURL(content.url);
@@ -85,21 +88,22 @@ public class TooltipManager : MonoBehaviour {
         tooltipPanel.position = new(mousePosition.x + 10, mousePosition.y - 10);
     }
 
-    public void OnHover(TooltipContent content, bool fromUI = true) {
+    public void OnHoverBegin(ITooltipOnHover tooltipThing, bool fromUI = true) {
         timer = Time.time;
-        this.content = content;
+        lastTooltipThing = tooltipThing;
+        content = tooltipThing.GetTooltip();
         uiActivated = fromUI;
         objectActivated = !fromUI;
     }
 
-    void ActuallyShowTooltip()
+    void ShowTooltip()
     {
         var text = content.text ?? "";
         if (!string.IsNullOrWhiteSpace(content.url)) 
             text += "\n<b>Right click for more info.</b>";
 
-        //if (string.IsNullOrWhiteSpace(text))
-        //    return;
+        if (string.IsNullOrWhiteSpace(text))
+            return;
         tooltipPanel.gameObject.SetActive(true);
         tooltipText.text = text;
 
@@ -109,7 +113,7 @@ public class TooltipManager : MonoBehaviour {
 
 
 
-    public void HideTooltip() {
+    public void OnHoverEnd() {
         uiActivated = false;
         objectActivated = false;
         isActive = false;

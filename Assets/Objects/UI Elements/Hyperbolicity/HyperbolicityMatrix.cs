@@ -1,8 +1,6 @@
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-using System.Globalization;
-using System.Linq;
 
 public class HyperbolicityMatrix : MonoBehaviour {
     public GameObject textFieldPrefab;

@@ -1,29 +1,19 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public struct TooltipContent {
-    public string text;
-    public string url;
-}
 
-public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-    public TooltipContent content { get; set; } = new();
-    public string text {
-        get => content.text;
-        set => content = new() { text = value, url = url };
-    }
-
-    public string url {
-        get => content.url;
-        set => content = new() { text = text, url = value };
-    }
+public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ITooltipOnHover {
+    public TooltipContent content = new();
 
     public void OnPointerEnter(PointerEventData eventData) {
-        TooltipManager.Instance?.OnHover(content);
+        TooltipManager.Instance?.OnHoverBegin(this);
     }
 
     public void OnPointerExit(PointerEventData eventData) {
-        TooltipManager.Instance?.HideTooltip();
+        TooltipManager.Instance?.OnHoverEnd();
     }
 
+    public TooltipContent GetTooltip() => content;
+
+    public virtual void OnClick(Kamera activeKamera) {}
 }

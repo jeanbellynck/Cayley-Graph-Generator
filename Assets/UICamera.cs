@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
-using System.Linq;
 using DanielLochner.Assets.SimpleSideMenu;
 using UnityEngine;
 using UnityEngine.UI;
-using Canvas = UnityEngine.Canvas;
 
 public class UICamera : Kamera {
     [SerializeField] RectTransform renderRectTransform;
