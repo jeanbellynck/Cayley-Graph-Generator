@@ -11,8 +11,7 @@ public static class Helpers {
         try {
             list.First();
             return false;
-        }
-        catch (InvalidOperationException) {
+        } catch (InvalidOperationException) {
             return true;
         }
     }
@@ -55,6 +54,33 @@ public static class Helpers {
     }// copilot
 
     public static string FixDecimalPoint(this string s) => s.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+
+    public static IEnumerable<T> Extend<T>(this IEnumerable<T> enumerable, Func<T> Next) {
+        foreach (var i in enumerable) 
+            yield return i;
+        for (var n = Next(); n != null; n = Next()) 
+            yield return n;
+    }
+
+    public static bool AllEqual<T>(this IEnumerable<T> enumerable) {
+        try {
+            var first = enumerable.First();
+            return enumerable.Skip(1).All(e => e.Equals(first));
+        } catch (InvalidOperationException) {
+            return true;
+        }
+    }
+
+    public static HashSet<T> intersectAll<T>(this IEnumerable<HashSet<T>> sets) {
+        try {
+            var result = new HashSet<T>(sets.First());
+            foreach (var set in sets.Skip(1)) 
+                result.IntersectWith(set);
+            return result;
+        } catch (InvalidOperationException) {
+            return new();
+        }
+    }
 
     public static List<List<char>> GroupVectorsByAngle(Dictionary<char, Vector3> directions) {
         var clusters = new List<List<char>>();

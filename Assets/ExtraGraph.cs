@@ -20,6 +20,7 @@ public class ExtraGraph : MonoBehaviour
     [SerializeField] SimpleSideMenu normalSideMenu;
     [SerializeField] RelatorMenu normalRelatorMenu;
     [SerializeField] GeneratorMenu normalGeneratorMenu;
+    [SerializeField] TaggedGraph graph;
 
     void Start() {
         generatorMenu.OnGeneratorsChanged += () => graphManager.UpdateLabels(generatorMenu.Generators.ToArray());
@@ -45,10 +46,12 @@ public class ExtraGraph : MonoBehaviour
         graphManager.Initialize(generators.ToArray(), physik);
         graphManager.SetSplinificationMode((int)Edge.SplinificationType.Always);
         TaggedGraphToGraphManager(graph);
+        Debug.Log(graph.ToStringF());
     }
 
     void TaggedGraphToGraphManager(TaggedGraph graph)
     {
+        this.graph = graph;
         graphManager.ResetGraph();
         var vertexDict = new Dictionary<string, Vertex>();
         foreach (var vertexName in graph.Vertices) {
@@ -58,7 +61,6 @@ public class ExtraGraph : MonoBehaviour
             graphManager.AddVertex(newVertex);
         }
         foreach (var edge in graph.Edges) {
-            var newEdge = Instantiate(edgePrefab, transform).GetComponent<Edge>();
             var label = edge.Tag?.generator.DefaultIfEmpty('?').First() ?? '?';
             Vertex startPoint = vertexDict[edge.Source];
             Vertex endPoint = vertexDict[edge.Target];
@@ -71,13 +73,14 @@ public class ExtraGraph : MonoBehaviour
                 // xor (minus mal minus)
                 (startPoint, endPoint) = (endPoint, startPoint);
     
+            var newEdge = Instantiate(edgePrefab, transform).GetComponent<Edge>();
             newEdge.Initialize(startPoint, endPoint, label, graphManager);
             graphManager.AddEdge(newEdge);
         }
     }
 
     TaggedGraph GraphManagerToTaggedGraph() {
-        var graph = new TaggedGraph();
+        graph = new TaggedGraph();
         foreach (var vertex in graphManager.getVertices()) {
             graph.AddVertex(vertex.name);
         }

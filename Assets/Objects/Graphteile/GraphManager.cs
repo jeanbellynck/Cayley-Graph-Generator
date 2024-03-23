@@ -14,7 +14,7 @@ public class GraphManager : MonoBehaviour {
     IActivityProvider activityProvider;
     public int LabelCount { get; private set; }
 
-    public readonly Dictionary<char, Color> labelColors = new();
+    public Dictionary<char, Color> labelColors = new();
     [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
 
     [SerializeField] GroupColorPanel groupColorPanel;
@@ -24,23 +24,22 @@ public class GraphManager : MonoBehaviour {
     public float Activity => activityProvider.Activity;
     //public Kamera kamera { get; protected set; }
 
-    public void Initialize(char[] generators, IActivityProvider activityProvider) { 
+    public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
 
         UpdateLabels(generators);
     }
 
-    public void UpdateLabels(char[] generators)
-    {
-        LabelCount = 2 * generators.Length;
+    public void UpdateLabels(IEnumerable<char> generators)
+    { 
 
-        labelColors.Clear();
-        for (int i = 0; i < generators.Length; i++) {
-            labelColors.Add(generators[i],
-                i < ColorList.Length
-                    ? ColorList[i]
-                    : Random.ColorHSV(0,1,0.9f, 1));
-        }
+        labelColors = new(Enumerable.Zip(
+            generators, 
+            ColorList.Extend(
+                () => Random.ColorHSV(0, 1, 0.9f, 1)
+            ), (generator, color) => new KeyValuePair<char, Color>(generator, color)
+        ));
+        LabelCount = 2 * labelColors.Count;
         groupColorPanel.updateView(labelColors);
 
     }

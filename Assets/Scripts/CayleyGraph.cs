@@ -41,7 +41,7 @@ public class CayleyGraph : MonoBehaviour, IActivityProvider {
         hyperbolicityMatrix.SetMatrixSize(generators.Length);
     }
 
-    void setRelators(IEnumerable<string> relators) => this.relators = relators.ToArray();
+    void setRelators(IEnumerable<string> relators) => this.relators = relators.ToHashSet().ToArray();
 
     public void setVertexNumber(string vertexNumber) {
         cayleyGraphMaker.setVertexNumber(int.Parse(vertexNumber));

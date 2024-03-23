@@ -31,13 +31,13 @@ public class AngleForce : Force {
             countedArrowAngles[gen1] = new Dictionary<char, int>();
             averageArrowAngles[gen1] = new Dictionary<char, float>();
         }
-        currentIteration = 0;
+        //currentIteration = 0;
     }
 
     
 
-    public int arrowAverageRecalculationIteration = 10;
-    int currentIteration = 0;
+    //public int arrowAverageRecalculationIteration = 10;
+    //int currentIteration = 0;
 
     /**
      * Calculates the stress of a vertex. The stress is a measure of how unusual the angles of the vertex are. It is used to visualize weird spots.

@@ -118,6 +118,7 @@ public class UICamera : Kamera {
         var width = Mathf.RoundToInt(renderRect.width * canvasToScreenScale.x);
         var height = Mathf.RoundToInt(renderRect.height * canvasToScreenScale.y);
         if (renderTexture == null || renderTexture.height != height || renderTexture.width != width) {
+            if (renderTexture != null) Destroy(renderTexture);
             renderTarget.texture = cam.targetTexture = renderTexture = new(width, height, 24);
         }
     }

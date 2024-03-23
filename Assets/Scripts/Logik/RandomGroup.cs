@@ -1,8 +1,9 @@
 
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Random = System.Random;
 using QuikGraph;
 using TaggedGraph = QuikGraph.UndirectedGraph<string, QuikGraph.TaggedEdge<string, EdgeData>>;
@@ -11,6 +12,7 @@ using GeneratorSet = System.Collections.Generic.HashSet<string>;
 public class EdgeData {
     public string generator = string.Empty;
     public string? start;
+    public override string ToString() => $"-{generator}->{start}";
 }
 
 public static class RandomGroups {
@@ -23,36 +25,31 @@ public static class RandomGroups {
 
     static string InvertGenerator(string generator) 
     => string.Concat(generator.Reverse().Select(c => char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c)));
-    static string[] GetGeneratorNames(int k)
+    static List<string> GetGeneratorNames(int k)
     {
-        if (k>26)
+        if (k > 26) k = 26;
             //throw new ArgumentException("k must be <= 26");
-            k = 26;
-        return Enumerable.Range(0, k).Select(i =>
-            ((char)('a' + i)).ToString()
-        ).ToArray();
+        return (
+            from i in Enumerable.Range(0, k)
+            select ((char)('a' + i)).ToString()
+        ).ToList();
     }
 
-    static void AssignRandomGenerators(TaggedGraph graph, string[] generatorNames, Random random) {
+    delegate void LogFunction(string s);
+    static readonly LogFunction Warn = UnityEngine.Debug.LogWarning;
+    static readonly LogFunction Log = UnityEngine.Debug.Log;
+    static bool AssignRandomGenerators(TaggedGraph graph, IEnumerable<string> generatorNames, Random random, int retries = 10) {
         GeneratorSet generators = new(generatorNames);
-        GeneratorSet gensAndInverses = new(generators);
+        GeneratorSet gensAndInverses = new(generatorNames);
         gensAndInverses.UnionWith(generators.Select(InvertGenerator));
+        bool successful = true;
 
-        string RandomGenerator(GeneratorSet blockedGenerators) {
-            var okGenerators = new GeneratorSet(gensAndInverses);
-            okGenerators.ExceptWith(blockedGenerators);
-            return okGenerators.ElementAt(random.Next(0, okGenerators.Count));
-        }
-
-        GeneratorSet AssignedOutgoingGeneratorsAtVertex(string vertex) {
-            return new GeneratorSet(graph.AdjacentEdges(vertex)
-                .Where(e => string.IsNullOrWhiteSpace(e.Tag?.generator))
-                .Select(e => e.Tag!.start == vertex ? e.Tag.generator : InvertGenerator(e.Tag.generator)));
-        }
-
-        const int retries = 10;
         for (int i = 0; i < retries; i++) {
             bool broken = false;
+            foreach (var edge in graph.Edges) 
+                if (edge.Tag != null)
+                    edge.Tag.generator = string.Empty;
+
             foreach (string vertex in graph.Vertices) {
                 GeneratorSet assignedGenerators = AssignedOutgoingGeneratorsAtVertex(vertex);
 
@@ -60,46 +57,58 @@ public static class RandomGroups {
                     if (!string.IsNullOrWhiteSpace(edge.Tag?.generator))
                         continue;
 
-                    GeneratorSet assignedGeneratorsAtTarget = new GeneratorSet(
-                        AssignedOutgoingGeneratorsAtVertex(edge.Target).Select(InvertGenerator));
-                    if (i < retries - 1)
-                        assignedGenerators.UnionWith(assignedGeneratorsAtTarget);
+                    GeneratorSet assignedIngoingGeneratorsAtOtherEnd = AssignedOutgoingGeneratorsAtVertex(edge.Target);
+                    GeneratorSet blockedGenerators = new (assignedIngoingGeneratorsAtOtherEnd.Select(InvertGenerator) );
+                    blockedGenerators.UnionWith(assignedGenerators);
 
-                    if (assignedGenerators.Count == gensAndInverses.Count)
-                    {
-                        Console.WriteLine("Warning: All generators are blocked at edge " + edge.Source + " - " +
-                                          edge.Target);
-                        broken = true;
-                        break;
+                    
+                    if (blockedGenerators.Count == gensAndInverses.Count) {
+                        if (i < retries - 1) {
+                            Log($"Warning: All generators are blocked at edge {edge}");
+                            broken = true;
+                            break;
+                        }
+
+                        Log($"Ignoring generator block at edge {edge}");
+                        blockedGenerators.Remove(blockedGenerators.First());
+                        successful = false;
                     }
 
-                    string randomGenerator = RandomGenerator(assignedGenerators);
+                    string randomGenerator = RandomGenerator(blockedGenerators);
 
                     assignedGenerators.Add(randomGenerator);
                     edge.Tag = new EdgeData { generator = randomGenerator, start = vertex };
                 }
-                if (broken)
-                    break;
+                if (broken) break; // unsuccessful at this vertex
             }
-            if (broken) {
-                if (i == retries - 2) 
-                    Console.WriteLine("Warning: Could not assign all generators, will now ignore remote blocked generators");
-                if (i == retries - 1)
-                    Console.WriteLine("Warning: Could not assign all generators");
-                continue;
-            }
-            break;
+            if (!broken) break; // successful at all vertices
+        }
+        if (!successful)
+            Warn($"Warning: During assignment of random generators to the {graph.EdgeCount} edges of the graph, I could not assign all {generators.Count} generators uniquely to adjacent edges at all {graph.VertexCount} vertices in {retries-1} tries, and had to ignore that in the last try");
+
+        return successful;
+
+        GeneratorSet AssignedOutgoingGeneratorsAtVertex(string vertex) => new ( 
+                from e in graph.AdjacentEdges(vertex)
+                where !string.IsNullOrWhiteSpace(e.Tag?.generator)
+                select e.Tag!.start == vertex ? e.Tag.generator : InvertGenerator(e.Tag.generator)
+            );
+
+        string RandomGenerator(GeneratorSet blockedGenerators) {
+            var okGenerators = new GeneratorSet(gensAndInverses);
+            okGenerators.ExceptWith(blockedGenerators);
+            return okGenerators.ElementAt(random.Next(0, okGenerators.Count));
         }
     }
 
     public static string[] RelatorsFromGraph(TaggedGraph dirGraph) {
-        var loops = 
+        return (
             from nodeCycle in GetSimpleCycles(dirGraph)
             let l = nodeCycle.Count
             where l != 2
             let edgeDataCycle = (
                 from i in Enumerable.Range(0, nodeCycle.Count)
-                select (getEdge(nodeCycle[i], nodeCycle[(i + 1) % nodeCycle.Count]), i)
+                select (GetEdge(nodeCycle[i], nodeCycle[(i + 1) % nodeCycle.Count]), i)
             )
             let generatorCycle = (
                 from tuple in edgeDataCycle
@@ -111,14 +120,13 @@ public static class RandomGroups {
                     : InvertGenerator(edgeData.generator)
                 )
             select string.Join("", generatorCycle)
-            ;
-        return loops.ToArray();
+        ).ToArray();
 
-        EdgeData getEdge(string start, string end)
+        EdgeData GetEdge(string start, string end)
         {
             dirGraph.TryGetEdge(start, end, out var edge);
-            Debug.Assert(edge != null, nameof(edge) + " != null");
-            return edge.Tag ?? new EdgeData();
+            UnityEngine.Debug.Assert(edge != null, nameof(edge) + " != null");
+            return edge?.Tag ?? new EdgeData();
         }
     }
     
@@ -147,11 +155,23 @@ public static class RandomGroups {
 
         AssignRandomOrientation(graph, random);
 
-        int k = (int)Math.Ceiling(maxDegree * proportionOfGenerators);
-        string[] generatorNames = GetGeneratorNames(k);
-        AssignRandomGenerators(graph, generatorNames, random);
+        var preferredGeneratorCount = (int)Math.Ceiling(maxDegree * proportionOfGenerators);
+        var generatorNames = new List<string>(preferredGeneratorCount);
+        for (int k = preferredGeneratorCount; k < preferredGeneratorCount + 3; k++) {
+            generatorNames = GetGeneratorNames(k);
+            if (AssignRandomGenerators(graph, generatorNames, random))
+                break;
+            Log("Retrying with more generators");
+        }
 
-        return (generatorNames, graph);
+        foreach (var generator in generatorNames.ToArray())
+            if (generatorNames.Count > preferredGeneratorCount && (
+                    from edge in graph.Edges
+                    select edge.Tag?.generator == generator
+                ).Any())
+                generatorNames.Remove(generator);
+
+        return (generatorNames.ToArray(), graph);
     }
 
 
@@ -173,6 +193,9 @@ public static class RandomGroups {
             ).ToList()
         );
     }
+}
+
+internal class Logfunction {
 }
 
 
@@ -197,4 +220,21 @@ public static class Converter {
         return taggedGraph;
     }
 
+
+    public static string ToStringF(this TaggedGraph graph) {
+        StringBuilder sb = new();
+        sb.Append("Graph: \n");
+        foreach(var edge in graph.Edges) {
+            bool reverse = edge.Tag?.start == edge.Target;
+            sb.Append(edge.Source);
+            sb.Append(reverse ? " <-" : " --");
+            sb.Append(edge.Tag?.generator ?? "?");
+            sb.Append(reverse ? "-- " : "-> ");
+            sb.Append(edge.Target);
+            sb.Append("\n");
+        }
+
+        sb.Append("End");
+        return sb.ToString();
+    }
 }

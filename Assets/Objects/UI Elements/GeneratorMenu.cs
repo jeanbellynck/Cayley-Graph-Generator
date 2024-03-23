@@ -34,7 +34,8 @@ public class GeneratorMenu : MonoBehaviour
         generatorGameObjects.Clear();
 
         foreach (var generator in generators) 
-            AddGeneratorInput(generator);
+            AddGeneratorInput(generator, true);
+        OnGeneratorsChanged?.Invoke();
     }
 
     public void AddGenerators(IEnumerable<char> generators) {
@@ -42,13 +43,15 @@ public class GeneratorMenu : MonoBehaviour
         foreach (var generator in generators) {
             if (presentGenerators.Contains(generator)) continue;
             presentGenerators.Add(generator);
-            AddGeneratorInput(generator);
+            AddGeneratorInput(generator, true);
         }
+        OnGeneratorsChanged?.Invoke();
     }
 
+    // UI event reference
     public void AddGeneratorInput() => AddGeneratorInput(default);
 
-    public void AddGeneratorInput(char preferredGeneratorName) {
+    public void AddGeneratorInput(char preferredGeneratorName, bool ignoreEvent = false) {
         var selectedGenerators = GetGenerators().Select(a => a - 'a').ToArray();
         int preferredGeneratorNumber = preferredGeneratorName - 'a';
         if (preferredGeneratorNumber is < 0 or >= 26) 
@@ -81,7 +84,7 @@ public class GeneratorMenu : MonoBehaviour
             newGeneratorInputField.text = c.ToString();
             OnGeneratorsChanged?.Invoke();
         });
-        OnGeneratorsChanged?.Invoke();
+        if (!ignoreEvent) OnGeneratorsChanged?.Invoke();
     }
 
 }

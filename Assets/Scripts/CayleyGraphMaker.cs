@@ -5,7 +5,7 @@ using System.Linq;
 
 public class CayleyGraphMaker : MonoBehaviour {
     private GraphManager graphManager;
-    private MeshManager meshManager;
+    [SerializeField] MeshManager meshManager;
     private Physik physik; // I wonder whether the reference to Physics is necessary? 
 
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
@@ -22,10 +22,10 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     [SerializeField] GameObject vertexPrefab;
     [SerializeField] GameObject edgePrefab;
-    [SerializeField] GameObject meshPrefab;
 
 
-    private int simulationDimensionality = 3;
+    [SerializeField] int simulationDimensionality = 3;
+    [SerializeField] int numberOfMeshesPerFrame = 10;
 
 
     // Contains the references to all vertices on the border of the graph, sorted by distance to the center.
@@ -34,10 +34,8 @@ public class CayleyGraphMaker : MonoBehaviour {
     HashSet<GroupVertex> relatorCandidates = new();
     HashSet<GroupVertex> edgeMergeCandidates = new();
 
-
     public void StartVisualization(GraphManager graphManager, char[] generators, string[] relators, int dimension) {
         this.graphManager = graphManager;
-        this.meshManager = new(meshPrefab);
         this.generators = generators;
         this.relators = relators;
         this.simulationDimensionality = dimension;
@@ -68,7 +66,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         relatorCandidates = new();
         edgeMergeCandidates = new();
         if (graphManager != null) graphManager.ResetGraph();
-        meshManager?.resetMeshes();
+        meshManager?.ResetMeshes();
     }
 
 
@@ -104,7 +102,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             MergeAll();
         }
 
-        DrawMesh();
+        DrawMeshes();
         physik.shutDown();
     }
 
@@ -297,8 +295,14 @@ public class CayleyGraphMaker : MonoBehaviour {
     }
 
 
-    void DrawMesh() {
-        foreach (var vertex in graphManager.getVertices()) {
+    void DrawMeshes() {
+        meshManager.UpdateTypes(relators);
+        StartCoroutine(DrawMeshesCoroutine());
+        return;
+
+        IEnumerator DrawMeshesCoroutine() {
+            var drawnMeshes = 0;
+            foreach (var vertex in graphManager.getVertices())
             foreach (string relator in relators) {
                 var vertices = new Vertex[relator.Length];
                 vertices[0] = vertex;
@@ -306,13 +310,18 @@ public class CayleyGraphMaker : MonoBehaviour {
                 bool doInitialize = true;
                 for (int i = 0; i < relator.Length - 1; i++) {
                     vertices[i + 1] = vertices[i].FollowEdge(relator[i]);
-                    if (vertices[i + 1] == null) { doInitialize = false; break; }
+                    if (vertices[i + 1] == null) {
+                        doInitialize = false;
+                        break;
+                    }
                 }
 
-                if (doInitialize) meshManager.AddMesh(vertices, transform);
+                if (doInitialize &&
+                    meshManager.AddMesh(vertices, transform, relator) &&
+                    ++drawnMeshes % numberOfMeshesPerFrame == 0
+                   )
+                    yield return null;
             }
-
-            //if(vertex.name != "") {break;}
         }
 
     }

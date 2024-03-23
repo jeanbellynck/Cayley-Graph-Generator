@@ -8,12 +8,13 @@ public class MeshGenerator : MonoBehaviour
     Mesh mesh;
     Vertex[] vertexElements = { };
     
-    public void Initialize(IEnumerable<Vertex> vertexElements) {
+    public void Initialize(IEnumerable<Vertex> vertexElements, Color color) {
         this.vertexElements = vertexElements.ToArray();
         GetComponent<MeshFilter>().mesh = mesh = new();
         mesh.Clear();
         UpdateVertices();
         UpdateTriangles();
+        GetComponent<MeshRenderer>().material.color = color;
     }   
 
     // Update is called once per frame
