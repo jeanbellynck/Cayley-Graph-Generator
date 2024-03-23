@@ -47,6 +47,7 @@ public class MeshManager : MonoBehaviour {
 
         MeshGenerator meshGen = GameObject.Instantiate(meshPrefab, parent.position, Quaternion.identity, parent).GetComponent<MeshGenerator>();
         meshGen.Initialize(vertices, typeColors.GetValueOrDefault(type, defaultColor));
+        meshGen.gameObject.name = type + " @ " + vertices.First().name;
         meshList.Add(meshGen);
         foreach (var vertexId in vertexIds)
         {
