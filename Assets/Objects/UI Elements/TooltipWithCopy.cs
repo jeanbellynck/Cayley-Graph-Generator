@@ -8,5 +8,6 @@ public class TooltipWithCopy : Tooltip {
     public override void OnClick(Kamera activeKamera) {
         var copyText = string.Join(", ", relatorMenu.GetRelatorStrings());
         GUIUtility.systemCopyBuffer = copyText;
+        // TODO: fix this for mobile or WebGL
     }
 }

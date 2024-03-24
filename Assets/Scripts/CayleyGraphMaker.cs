@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -345,16 +346,16 @@ public class CayleyGraphMaker : MonoBehaviour {
     public void SetHyperbolicityMatrix(float[,] matrix) {
         for (int i = 0; i < matrix.GetLength(0); i++) {
             for (int j = 0; j < matrix.GetLength(1); j++) {
-                float matrixValue = matrix[i, j];
+                var matrixValue = matrix[i, j];
                 if (matrixValue < 0) {
                     // For negative Values the hyperbolic scaling is done in one direction
-                    hyperbolicityMatrix[(generators[i], generators[j])] = -matrix[i, j];
-                    hyperbolicityMatrix[(char.ToUpper(generators[i]), generators[j])] = -1 / matrix[i, j];
+                    hyperbolicityMatrix[(generators[i], generators[j])] = -matrixValue;
+                    hyperbolicityMatrix[(char.ToUpper(generators[i]), generators[j])] = -1 / matrixValue;
                 }
                 else {
                     // For positive Values the hyperbolic scaling is done in both directions
-                    hyperbolicityMatrix[(generators[i], generators[j])] = matrix[i, j];
-                    hyperbolicityMatrix[(char.ToUpper(generators[i]), generators[j])] = matrix[i, j];
+                    hyperbolicityMatrix[(generators[i], generators[j])] = matrixValue;
+                    hyperbolicityMatrix[(char.ToUpper(generators[i]), generators[j])] = matrixValue;
                 }
             }
         }

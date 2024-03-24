@@ -43,7 +43,8 @@ public class CayleyGraph : MonoBehaviour, IActivityProvider {
     void setRelators(IEnumerable<string> relators) => this.relators = relators.ToHashSet().ToArray();
 
     public void setVertexNumber(string vertexNumber) {
-        cayleyGraphMaker.setVertexNumber(int.Parse(vertexNumber));
+        if (int.TryParse(vertexNumber, out int num))
+            cayleyGraphMaker.setVertexNumber(num);
     }
 
     [SerializeField] GeneratorMenu generatorMenu;

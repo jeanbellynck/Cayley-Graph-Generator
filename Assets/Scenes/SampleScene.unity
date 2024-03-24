@@ -9713,6 +9713,7 @@ GameObject:
   - component: {fileID: 820962335}
   - component: {fileID: 820962334}
   - component: {fileID: 820962336}
+  - component: {fileID: 820962337}
   m_Layer: 5
   m_Name: RelatorLabel
   m_TagString: Untagged
@@ -9801,6 +9802,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &820962337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 820962332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd5cef37376da7b4980c92659f4aad22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  relatorMenu: {fileID: 315231447}
 --- !u!1 &825399228
 GameObject:
   m_ObjectHideFlags: 0
@@ -14263,7 +14277,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1244907021}
   - component: {fileID: 1244907022}
-  - component: {fileID: 1244907023}
   m_Layer: 5
   m_Name: Relators
   m_TagString: Untagged
@@ -14318,18 +14331,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &1244907023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1244907020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1259938069
 GameObject:
   m_ObjectHideFlags: 0
@@ -23274,7 +23275,7 @@ MonoBehaviour:
   tooltipText: {fileID: 929252208}
   cameraManager: {fileID: 2061742275}
   hoverTime: 1
-  uicamera: {fileID: 1459450056}
+  uiCamera: {fileID: 0}
 --- !u!1 &2066302227
 GameObject:
   m_ObjectHideFlags: 0
