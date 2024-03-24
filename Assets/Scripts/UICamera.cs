@@ -103,21 +103,24 @@ public class UICamera : Kamera {
             renderRectTransform.position.x,
             renderRectTransform.position.y
         );
-        FixRenderTexture();
-        screenToCameraOutputScale = new(
-            renderRect.width * canvasToScreenScale.x / renderTexture.width,
-            renderRect.height * canvasToScreenScale.y / renderTexture.height
-        );
+        if (FixRenderTexture())
+            screenToCameraOutputScale = new(
+                renderRect.width * canvasToScreenScale.x / renderTexture.width,
+                renderRect.height * canvasToScreenScale.y / renderTexture.height
+            );
     }
 
 
-    void FixRenderTexture() {
+    bool FixRenderTexture() {
         var width = Mathf.RoundToInt(renderRect.width * canvasToScreenScale.x);
         var height = Mathf.RoundToInt(renderRect.height * canvasToScreenScale.y);
-        if (renderTexture == null || renderTexture.height != height || renderTexture.width != width) {
-            if (renderTexture != null) Destroy(renderTexture);
-            renderTarget.texture = cam.targetTexture = renderTexture = new(width, height, 24);
-        }
+        if (width <= 0 || height <= 0 || renderTexture != null && renderTexture.height == height && renderTexture.width == width) return false;
+        if (renderTexture != null) Destroy(renderTexture);
+        renderTexture = new(width, height, 24) {
+            antiAliasing = 4
+        };
+        renderTarget.texture = cam.targetTexture = renderTexture;
+        return true;
     }
 
 }
