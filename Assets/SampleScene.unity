@@ -5181,8 +5181,8 @@ GameObject:
   m_Component:
   - component: {fileID: 491622622}
   - component: {fileID: 491622621}
-  - component: {fileID: 491622620}
   - component: {fileID: 491622619}
+  - component: {fileID: 491622623}
   m_Layer: 0
   m_Name: ExtraGraph
   m_TagString: Untagged
@@ -5202,7 +5202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b079b4273fde3124581601bdca933be1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  graphVisualizer: {fileID: 0}
+  graphVisualizer: {fileID: 491622623}
   physik: {fileID: 491622621}
   vertexPrefab: {fileID: 3096654801577124718, guid: 86e2d47bde719a04a84e2c07a4efb1a5, type: 3}
   edgePrefab: {fileID: 3391233956122432578, guid: 9327380472144334aa02ca4b679501ba, type: 3}
@@ -5215,20 +5215,6 @@ MonoBehaviour:
   normalSideMenu: {fileID: 1223529138}
   normalRelatorMenu: {fileID: 315231447}
   normalGeneratorMenu: {fileID: 1133094773}
---- !u!114 &491622620
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 491622618}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5dab5b5975c94b45a6665a4a841979a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idCounter: 0
-  <LabelCount>k__BackingField: 0
 --- !u!114 &491622621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5276,6 +5262,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &491622623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491622618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8571740f2271c040875e816fcc15fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ColorList:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  groupColorPanel: {fileID: 0}
+  kameras: []
 --- !u!1 &514144067
 GameObject:
   m_ObjectHideFlags: 0
@@ -8403,7 +8408,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 491622620}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GraphManager, Assembly-CSharp
         m_MethodName: SetSplinificationMode
         m_Mode: 0
@@ -19064,9 +19069,9 @@ RectTransform:
   - {fileID: 1100247116}
   m_Father: {fileID: 999882194}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 340, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 340, y: -389.555}
   m_SizeDelta: {x: 680, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1608880886
@@ -20714,9 +20719,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 627319549}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 100, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -20}
   m_SizeDelta: {x: 200, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1741785051

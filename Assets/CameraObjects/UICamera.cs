@@ -112,8 +112,8 @@ public class UICamera : Kamera {
 
 
     bool FixRenderTexture() {
-        var width = Mathf.RoundToInt(renderRect.width * canvasToScreenScale.x);
-        var height = Mathf.RoundToInt(renderRect.height * canvasToScreenScale.y);
+        var width = Mathf.RoundToInt(Mathf.Max(100, renderRect.width * canvasToScreenScale.x));
+        var height = Mathf.RoundToInt(Mathf.Max(100, renderRect.height * canvasToScreenScale.y));
         print(renderTexture.ToString());
         bool b = renderTexture.ToString().Equals("null");
         //if ((width <= 0 || height <= 0 || (renderTexture != null && !renderTexture.ToString().Equals("null"))) && renderTexture.height == height && renderTexture.width == width) return false;

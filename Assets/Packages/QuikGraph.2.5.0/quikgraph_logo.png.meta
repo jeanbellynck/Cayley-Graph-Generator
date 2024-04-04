@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7cfc78bf39c39e64bbe41ec51658064a
+guid: 829938fdf7babba4da1821e1ab58fee0
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -143,8 +143,7 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable:
-      quikgraph_logo_0: -1744787266531016659
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
