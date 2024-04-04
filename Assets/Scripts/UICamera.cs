@@ -70,7 +70,7 @@ public class UICamera : Kamera {
     public override Ray ScreenPointToRay(Vector3 mousePosition) {
         if (Input.GetKeyUp(KeyCode.Alpha1)) FixScale();
         // transform.position is in pixels on the current screen, from the bottom
-        // canvasOffset is in pixels on the canvas (1920×1080)
+        // canvasOffset is in pixels on the canvas (1920ï¿½1080)
         // screenOffset is in pixels on the current screen
         // mousePosition is in pixels on the current screen, from the bottom
         // pos is in pixels on the canvas, from the bottom
@@ -114,7 +114,12 @@ public class UICamera : Kamera {
     bool FixRenderTexture() {
         var width = Mathf.RoundToInt(renderRect.width * canvasToScreenScale.x);
         var height = Mathf.RoundToInt(renderRect.height * canvasToScreenScale.y);
-        if (width <= 0 || height <= 0 || renderTexture != null && renderTexture.height == height && renderTexture.width == width) return false;
+        print(renderTexture.ToString());
+        bool b = renderTexture.ToString().Equals("null");
+        //if ((width <= 0 || height <= 0 || (renderTexture != null && !renderTexture.ToString().Equals("null"))) && renderTexture.height == height && renderTexture.width == width) return false;
+        if (renderTexture != null && !renderTexture.ToString().Equals("null") && renderTexture.height == height && renderTexture.width == width) return false;
+        
+        
         if (renderTexture != null) Destroy(renderTexture);
         renderTexture = new(width, height, 24) {
             antiAliasing = 4
@@ -122,5 +127,4 @@ public class UICamera : Kamera {
         renderTarget.texture = cam.targetTexture = renderTexture;
         return true;
     }
-
 }
