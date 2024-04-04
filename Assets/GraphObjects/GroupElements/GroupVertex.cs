@@ -58,7 +58,7 @@ public class GroupVertex : Vertex {
         return (GroupVertex) base.FollowEdge(op);
     }
 
-    public void Initialize(VectorN position, GraphManager graphManager, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
+    public void Initialize(VectorN position, LabelledGraphManager graphManager, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
         if (!string.IsNullOrEmpty(name)) this.name = name;
         if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
         this.inSubgroup = inSubgroup;

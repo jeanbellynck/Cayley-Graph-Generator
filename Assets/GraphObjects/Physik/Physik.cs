@@ -19,7 +19,7 @@ public class Physik : MonoBehaviour, IActivityProvider {
     private int dimension = 3; // Describes the dimension of the projection. The default is always 4D.
 
 
-    GraphManager graphManager;
+    LabelledGraphManager graphManager;
 
     [SerializeField]
     RepulsionForce repulsionForce;
@@ -31,7 +31,7 @@ public class Physik : MonoBehaviour, IActivityProvider {
     public void Start() {
     }
 
-    public void startUp(GraphManager graphManager, int dimension, int generatorCount) {
+    public void startUp(LabelledGraphManager graphManager, int dimension, int generatorCount) {
         this.graphManager = graphManager;
         alpha = alphaSetting;
         this.dimension = dimension;

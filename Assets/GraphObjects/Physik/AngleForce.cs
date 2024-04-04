@@ -11,7 +11,7 @@ public class AngleForce : Force {
     Dictionary<char, Dictionary<char, int>> countedArrowAngles = new Dictionary<char, Dictionary<char, int>>();
     Dictionary<char, Dictionary<char, float>> averageArrowAngles = new Dictionary<char, Dictionary<char, float>>();
     
-    public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
+    public override IEnumerator ApplyForce(LabelledGraphManager graphManager, float alpha) {
         throw new System.NotImplementedException();
     }
 

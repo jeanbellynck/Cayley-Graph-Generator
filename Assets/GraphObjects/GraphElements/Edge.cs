@@ -33,11 +33,10 @@ public class Edge : MonoBehaviour {
         WhenSimulationHasStopped
     }
 
-    SplinificationType splinificationType => graphManager.splinificationType;
+    SplinificationType splinificationType = SplinificationType.Never; // => graphManager.splinificationType;
     SplinificationType? lastSplinificationType = null;
 
-
-    protected IDictionary<char, Color> LabelColors => graphManager.labelColors;
+    //protected IDictionary<char, Color> LabelColors => graphManager.labelColors;
 
     SplineComputer splineComputer;
     SplineRenderer splineRenderer;
@@ -45,7 +44,7 @@ public class Edge : MonoBehaviour {
     LineRenderer lineRenderer;
 
     public bool finished;
-    public GraphManager graphManager;
+    public GraphVisualizer graphVisualizer;
 
     [SerializeField]
     protected float midDisplacementFactor = 0.18f;
@@ -53,7 +52,7 @@ public class Edge : MonoBehaviour {
     protected float midDirectionFactor = 0.3f;
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
-    public virtual float Activity => graphManager.Activity;
+    public float Activity;// => graphVisualizer.Activity;
 
     [SerializeField] Color startColor, endColor;
 
@@ -61,7 +60,7 @@ public class Edge : MonoBehaviour {
         creationTime = Time.time;
     }
 
-    public void Initialize(Vertex startPoint, Vertex endPoint, char label, GraphManager graphManager) {
+    public void Initialize(Vertex startPoint, Vertex endPoint, char label) {
         this.StartPoint = startPoint;
         this.EndPoint = endPoint;
         this.Label = label;
@@ -73,9 +72,8 @@ public class Edge : MonoBehaviour {
         splineRenderer = GetComponent<SplineRenderer>();
         meshRenderer = GetComponent<MeshRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
-        this.graphManager = graphManager;
 
-        SetColors(LabelColors[char.ToLower(label)]); // TODO: make this more general
+        SetColors(new Color(1, 0, 0));
 
         useSplines = splinificationType == SplinificationType.Always;
 

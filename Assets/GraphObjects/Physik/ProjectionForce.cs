@@ -12,7 +12,7 @@ public class ProjectionForce : Force {
         this.dim = dim;
     }
 
-    public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
+    public override IEnumerator ApplyForce(LabelledGraphManager graphManager, float alpha) {
         if(projectionForceFactor == 0 || alpha == 0) yield return null;
         
         foreach(Vertex vertex in graphManager.getVertices()) {

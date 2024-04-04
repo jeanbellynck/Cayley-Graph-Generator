@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Linq;
 
 public class CayleyGraphMaker : MonoBehaviour {
-    private GraphManager graphManager;
+    private LabelledGraphManager graphManager;
     [SerializeField] MeshManager meshManager;
     private Physik physik; // I wonder whether the reference to Physics is necessary? 
 
@@ -35,7 +35,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     HashSet<GroupVertex> relatorCandidates = new();
     HashSet<GroupVertex> edgeMergeCandidates = new();
 
-    public void StartVisualization(GraphManager graphManager, char[] generators, string[] relators, int dimension) {
+    public void StartVisualization(LabelledGraphManager graphManager, char[] generators, string[] relators, int dimension) {
         this.graphManager = graphManager;
         this.generators = generators;
         this.relators = relators;

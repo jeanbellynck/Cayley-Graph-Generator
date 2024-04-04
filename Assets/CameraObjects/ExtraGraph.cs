@@ -7,7 +7,7 @@ using TaggedGraph = QuikGraph.UndirectedGraph<string, QuikGraph.TaggedEdge<strin
 
 public class ExtraGraph : MonoBehaviour
 {
-    [SerializeField] GraphManager graphManager;
+    [SerializeField] GraphVisualizer graphVisualizer;
     [SerializeField] Physik physik;
     
     [SerializeField] GameObject vertexPrefab;
@@ -23,7 +23,7 @@ public class ExtraGraph : MonoBehaviour
     [SerializeField] TaggedGraph graph;
 
     void Start() {
-        generatorMenu.OnGeneratorsChanged += () => graphManager.UpdateLabels(generatorMenu.Generators.ToArray());
+        generatorMenu.OnGeneratorsChanged += () => graphVisualizer.UpdateLabels(generatorMenu.Generators.ToArray());
     }
 
     public void StartVisualization() {
@@ -38,13 +38,13 @@ public class ExtraGraph : MonoBehaviour
         var generators = generatorMenu.Generators = 
             from generator in generatorStrings select generator.DefaultIfEmpty('?').First();
         DrawGraph(generators, graph);
-        physik.startUp(graphManager, 3, generatorStrings.Length);
+        physik.startUp(graphVisualizer.graphManager, 3, generatorStrings.Length);
         physik.shutDown();
     }
 
     void DrawGraph(IEnumerable<char> generators, TaggedGraph graph) {
-        graphManager.Initialize(generators.ToArray(), physik);
-        graphManager.SetSplinificationMode((int)Edge.SplinificationType.Always);
+        graphVisualizer.Initialize(generators.ToArray(), physik);
+        graphVisualizer.SetSplinificationMode((int)Edge.SplinificationType.Always);
         TaggedGraphToGraphManager(graph);
         Debug.Log(graph.ToStringF());
     }
@@ -52,13 +52,13 @@ public class ExtraGraph : MonoBehaviour
     void TaggedGraphToGraphManager(TaggedGraph graph)
     {
         this.graph = graph;
-        graphManager.ResetGraph();
+        graphVisualizer.graphManager.ResetGraph();
         var vertexDict = new Dictionary<string, Vertex>();
         foreach (var vertexName in graph.Vertices) {
             var newVertex = vertexDict[vertexName] = Instantiate(vertexPrefab, transform).GetComponent<Vertex>();
-            newVertex.Initialize(VectorN.Random(3, 10), graphManager);
+            newVertex.Initialize(VectorN.Random(3, 10), graphVisualizer.graphManager);
             newVertex.name = "Node " + vertexName;
-            graphManager.AddVertex(newVertex);
+            graphVisualizer.graphManager.AddVertex(newVertex);
         }
         foreach (var edge in graph.Edges) {
             var label = edge.Tag?.generator.DefaultIfEmpty('?').First() ?? '?';
@@ -74,18 +74,18 @@ public class ExtraGraph : MonoBehaviour
                 (startPoint, endPoint) = (endPoint, startPoint);
     
             var newEdge = Instantiate(edgePrefab, transform).GetComponent<Edge>();
-            newEdge.Initialize(startPoint, endPoint, label, graphManager);
-            graphManager.AddEdge(newEdge);
+            newEdge.Initialize(startPoint, endPoint, label);
+            graphVisualizer.graphManager.AddEdge(newEdge);
         }
     }
 
     TaggedGraph GraphManagerToTaggedGraph() {
         graph = new TaggedGraph();
-        foreach (var vertex in graphManager.getVertices()) {
+        foreach (var vertex in graphVisualizer.graphManager.getVertices()) {
             graph.AddVertex(vertex.name);
         }
 
-        foreach (var edge in graphManager.GetEdges()) {
+        foreach (var edge in graphVisualizer.graphManager.GetEdges()) {
             graph.AddEdge(new(edge.StartPoint.name, edge.EndPoint.name,
                 new() { generator = edge.Label.ToString(), start = edge.StartPoint.name }));
         }

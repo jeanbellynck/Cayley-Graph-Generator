@@ -65,7 +65,7 @@ public class HyperbolicityMatrix : MonoBehaviour {
      */
     public void UpdateMatrix() {
         // Temporary solution. Matrix is currently disabled
-        cayleyGraph.GetComponent<CayleyGraph>().SetHyperbolicity(hyperbolicityTextField.GetComponent<InputField>().text);
+        cayleyGraph.GetComponent<CayleyGraphMain>().SetHyperbolicity(hyperbolicityTextField.GetComponent<InputField>().text);
         return;
         /**
         // Read Hyperbolicity out of hyperbolicityTextField

@@ -7,11 +7,11 @@ using UnityEngine.UI;
 /**
  * This class is both the main class for the graph and the interface for the UI.
  */
-public class CayleyGraph : MonoBehaviour, IActivityProvider {
+public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
 
     [SerializeField] Physik physik;// = new Physik(10, 100);
 
-    public GraphManager graphManager;
+    public GraphVisualizer graphVisualizer;
 
     public CayleyGraphMaker cayleyGraphMaker;
 
@@ -70,11 +70,11 @@ public class CayleyGraph : MonoBehaviour, IActivityProvider {
         relatorMenu.FixGeneratorMenu();
         setGenerators(generatorMenu.GetGenerators());
         setRelators(relatorMenu.GetRelators());
-        graphManager.Initialize(generators, this);
+        graphVisualizer.Initialize(generators, this);
         int projectionDimension = dimensionInputDD.value + 2;
-        physik.startUp(graphManager, projectionDimension, generators.Length);
+        physik.startUp(graphVisualizer.graphManager, projectionDimension, generators.Length);
         int actualDimension = projectionDimension + 0;
-        cayleyGraphMaker.StartVisualization(graphManager, generators, relators, actualDimension);
+        cayleyGraphMaker.StartVisualization(graphVisualizer.graphManager, generators, relators, actualDimension);
     }
 
 

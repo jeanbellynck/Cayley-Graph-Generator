@@ -27,7 +27,7 @@ public class RepulsionForce : Force {
         this.maximalForce = maximalForce;
     }
 
-    public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
+    public override IEnumerator ApplyForce(LabelledGraphManager graphManager, float alpha) {
         if(repelForceFactor == 0 || alpha == 0) yield return null;
         // Every tick the BarnesQuadtree is recalculated. This is expensive but necessary since the vertices move.
         Profiler.BeginSample("QuadtreeCreation");

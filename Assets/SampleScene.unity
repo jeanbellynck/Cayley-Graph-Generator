@@ -1793,7 +1793,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.23544973
+  m_Size: 0.23337927
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5202,7 +5202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b079b4273fde3124581601bdca933be1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  graphManager: {fileID: 491622620}
+  graphVisualizer: {fileID: 0}
   physik: {fileID: 491622621}
   vertexPrefab: {fileID: 3096654801577124718, guid: 86e2d47bde719a04a84e2c07a4efb1a5, type: 3}
   edgePrefab: {fileID: 3391233956122432578, guid: 9327380472144334aa02ca4b679501ba, type: 3}
@@ -5227,18 +5227,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5dab5b5975c94b45a6665a4a841979a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ColorList:
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 0, g: 0, b: 1, a: 1}
-  - {r: 0, g: 1, b: 0, a: 1}
-  - {r: 1, g: 1, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0.92679024, a: 1}
-  - {r: 0, g: 1, b: 0.70105433, a: 1}
-  - {r: 0, g: 0, b: 0, a: 1}
-  - {r: 0.42396927, g: 0, b: 1, a: 1}
-  groupColorPanel: {fileID: 578893006}
-  kameras:
-  - {fileID: 1459450056}
+  idCounter: 0
+  <LabelCount>k__BackingField: 0
 --- !u!114 &491622621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8401,7 +8391,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 772353319}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GraphManager, Assembly-CSharp
         m_MethodName: SetSplinificationMode
         m_Mode: 0
@@ -9245,8 +9235,8 @@ GameObject:
   - component: {fileID: 772353315}
   - component: {fileID: 772353317}
   - component: {fileID: 772353318}
-  - component: {fileID: 772353319}
   - component: {fileID: 772353320}
+  - component: {fileID: 772353321}
   m_Layer: 0
   m_Name: CayleyGraph
   m_TagString: Untagged
@@ -9267,7 +9257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   physik: {fileID: 772353317}
-  graphManager: {fileID: 772353319}
+  graphVisualizer: {fileID: 772353321}
   cayleyGraphMaker: {fileID: 772353318}
   generators: 
   relators: []
@@ -9344,31 +9334,6 @@ MonoBehaviour:
   edgePrefab: {fileID: 3391233956122432578, guid: ef0b13f8d0b9f39498697181c6d741eb, type: 3}
   simulationDimensionality: 3
   numberOfMeshesPerFrame: 10
---- !u!114 &772353319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 772353314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5dab5b5975c94b45a6665a4a841979a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ColorList:
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 0, g: 0, b: 1, a: 1}
-  - {r: 0, g: 1, b: 0, a: 1}
-  - {r: 1, g: 1, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0.92679024, a: 1}
-  - {r: 0, g: 1, b: 0.70105433, a: 1}
-  - {r: 0, g: 0, b: 0, a: 1}
-  - {r: 0.42396927, g: 0, b: 1, a: 1}
-  groupColorPanel: {fileID: 544445294}
-  kameras:
-  - {fileID: 519420033}
-  - {fileID: 1308226000}
 --- !u!114 &772353320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9391,6 +9356,25 @@ MonoBehaviour:
   - {r: 0.5188679, g: 0.2961463, b: 0.34527606, a: 0.2509804}
   - {r: 0.43666, g: 0.3499911, b: 0.6132076, a: 0.2509804}
   defaultColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 0.2509804}
+--- !u!114 &772353321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 772353314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8571740f2271c040875e816fcc15fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ColorList:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  groupColorPanel: {fileID: 544445294}
+  kameras: []
 --- !u!1 &782188392
 GameObject:
   m_ObjectHideFlags: 0

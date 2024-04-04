@@ -14,7 +14,7 @@ public class LinkForce : Force {
         this.stabilityIterations = stabilityIterations;
     }
 
-    public override IEnumerator ApplyForce(GraphManager graphManager, float alpha) {
+    public override IEnumerator ApplyForce(LabelledGraphManager graphManager, float alpha) {
         if (linkForceFactor == 0 || alpha == 0) yield return null;
         for (int i = 0; i < stabilityIterations; i++) {
             foreach (Edge edge in graphManager.GetEdges()) {

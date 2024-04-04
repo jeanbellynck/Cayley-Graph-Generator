@@ -5,58 +5,26 @@ using UnityEngine;
 /**
  * This class is used to manage the graph. It is responsible for storing the vertices and edges and for keeping track of the idCounter.   
  * It does not contain any logic for the forces or the algebra of the graph.
+ *
+ * The edges are stored in a dictionary, sorted by the label of the edge. This is done to make it easier to find the edges of a certain label.
+ * (It also makes it possible to access the edges of a subgroup)
+ *
+ * ToDo: Move all of the visual stuff to a new class.
  */
-public class GraphManager : MonoBehaviour {
+public class LabelledGraphManager {
     private int idCounter = 0; // Starts by 1 as 0 is reserved for the neutral element
     readonly List<Vertex> vertices = new();
     readonly List<Edge> edges = new();
-    public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
-    IActivityProvider activityProvider;
-    public int LabelCount { get; private set; }
-
-    public Dictionary<char, Color> labelColors = new();
-    [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
-
-    [SerializeField] GroupColorPanel groupColorPanel;
-    [SerializeField] List<Kamera> kameras;
+    public int LabelCount { get; set; }
 
 
-    public float Activity => activityProvider.Activity;
-    //public Kamera kamera { get; protected set; }
-
-    public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
-        this.activityProvider = activityProvider;
-
-        UpdateLabels(generators);
-    }
-
-    public void UpdateLabels(IEnumerable<char> generators)
-    { 
-
-        labelColors = new(Enumerable.Zip(
-            generators, 
-            ColorList.Extend(
-                () => Random.ColorHSV(0, 1, 0.9f, 1)
-            ), (generator, color) => new KeyValuePair<char, Color>(generator, color)
-        ));
-        LabelCount = 2 * labelColors.Count;
-        groupColorPanel.updateView(labelColors);
-
-    }
 
     public List<Vertex> getVertices() {
         return vertices;
     }
 
-    // referred to from event (UI)
-    public void SetSplinificationMode(int t) {
-        splinificationType = (Edge.SplinificationType) t;
-    }
 
     public void AddVertex(Vertex vertex) {
-        if (vertices.IsEmpty())
-            foreach (var kamera in kameras) 
-                kamera.center = vertex.transform;
 
         vertex.Id = idCounter;
         idCounter++;
@@ -73,7 +41,6 @@ public class GraphManager : MonoBehaviour {
 
     public void AddEdge(Edge edge) {
         edges.Add(edge);
-        edge.graphManager = this;
     }
 
     public void RemoveVertex(Vertex vertex) {

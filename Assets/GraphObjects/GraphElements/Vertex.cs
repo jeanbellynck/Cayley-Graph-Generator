@@ -47,9 +47,9 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
 
-    [SerializeField] public GraphManager graphManager;
+    [SerializeField] public LabelledGraphManager graphManager;
     [SerializeField] float maxSpeed;
-    public float Activity => graphManager.Activity;
+    public float Activity;// => graphManager.Activity;
 
 
     // Start is called before the first frame update
@@ -60,7 +60,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         Mr = GetComponent<Renderer>();
     }
 
-    public virtual void Initialize(VectorN position, GraphManager graphManager) {
+    public virtual void Initialize(VectorN position, LabelledGraphManager graphManager) {
         creationTime = Time.time;
 
         this.graphManager = graphManager;

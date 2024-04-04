@@ -67,7 +67,7 @@ public class GroupGallery : MonoBehaviour
             newGroup.transform.SetParent(groupGallery.transform);
 
             // When the button is clicked the setGroupAndStartVisualisation() method of CayleyGraph is called
-            newGroup.GetComponent<Button>().onClick.AddListener(() => cayleyGraph.GetComponent<CayleyGraph>().SelectGroupOption(group.name, string.Join(',', group.generators), string.Join(',', group.relators)));
+            newGroup.GetComponent<Button>().onClick.AddListener(() => cayleyGraph.GetComponent<CayleyGraphMain>().SelectGroupOption(group.name, string.Join(',', group.generators), string.Join(',', group.relators)));
         }
         
         // Add an infinite group label
@@ -82,7 +82,7 @@ public class GroupGallery : MonoBehaviour
             newGroup.transform.SetParent(groupGallery.transform);
 
             // When the button is clicked the setGroupAndStartVisualisation() method of CayleyGraph is called
-            newGroup.GetComponent<Button>().onClick.AddListener(() => cayleyGraph.GetComponent<CayleyGraph>().SelectGroupOption(group.name, string.Join(',', group.generators), string.Join(',', group.relators)));
+            newGroup.GetComponent<Button>().onClick.AddListener(() => cayleyGraph.GetComponent<CayleyGraphMain>().SelectGroupOption(group.name, string.Join(',', group.generators), string.Join(',', group.relators)));
         }
     }
 
