@@ -24,6 +24,7 @@ public class GraphVisualizer : MonoBehaviour {
     public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
 
+        graphManager.onEdgeAdded += edge => UpdateLabel(edge);
         UpdateLabels(generators);
 
         // I took this from the labelledGraphManager
@@ -44,10 +45,12 @@ public class GraphVisualizer : MonoBehaviour {
             ), (generator, color) => new KeyValuePair<char, Color>(generator, color)
         ));
 
-        graphManager.GetEdges().ForEach(edge => edge.SetColors(labelColors[edge.Label]));
+        graphManager.GetEdges().ForEach(edge => UpdateLabel(edge));
         graphManager.LabelCount = 2 * labelColors.Count;
         groupColorPanel.updateView(labelColors);
     }
+
+    public void UpdateLabel(Edge edge) => edge.SetColors(labelColors[edge.Label]);
 
     
     // referred to from event (UI)

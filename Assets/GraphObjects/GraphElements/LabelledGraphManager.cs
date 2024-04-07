@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,7 +18,8 @@ public class LabelledGraphManager {
     readonly List<Edge> edges = new();
     public int LabelCount { get; set; }
 
-
+    public delegate void OnEdgeAdded(Edge edge);
+    public event OnEdgeAdded onEdgeAdded;
 
     public List<Vertex> getVertices() {
         return vertices;
@@ -25,7 +27,6 @@ public class LabelledGraphManager {
 
 
     public void AddVertex(Vertex vertex) {
-
         vertex.Id = idCounter;
         idCounter++;
         vertices.Add(vertex);
@@ -41,6 +42,7 @@ public class LabelledGraphManager {
 
     public void AddEdge(Edge edge) {
         edges.Add(edge);
+        onEdgeAdded?.Invoke(edge);
     }
 
     public void RemoveVertex(Vertex vertex) {
