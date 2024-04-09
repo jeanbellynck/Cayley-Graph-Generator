@@ -103,6 +103,7 @@ public class GroupVertex : Vertex {
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
         Position = (Position + vertex2.Position) / 2;
+        vertex2.centerPointer.center = centerPointer.center; // Some Kamera might reference the old (redundant) Vertex as its center. We now point it to the kept equivalent vertex.
         PathsFromNeutralElement.AddRange(vertex2.PathsFromNeutralElement);
         distanceToNeutralElement = Math.Min(vertex2.distanceToNeutralElement, distanceToNeutralElement);
         calculateVertexMass(hyperbolicity);
@@ -137,5 +138,4 @@ public class GroupVertex : Vertex {
         }
         return mass;**/
     }
-
 }

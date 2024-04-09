@@ -20,6 +20,7 @@ public class LabelledGraphManager {
 
     public delegate void OnEdgeAdded(Edge edge);
     public event OnEdgeAdded onEdgeAdded;
+    public event Action<Vertex, Kamera> OnCenterChanged;
 
     public List<Vertex> getVertices() {
         return vertices;
@@ -31,6 +32,7 @@ public class LabelledGraphManager {
         idCounter++;
         vertices.Add(vertex);
         vertex.graphManager = this;
+        vertex.OnCenter += kamera => OnCenterChanged?.Invoke(vertex, kamera); // Stupid workaround to allow vertex to indirectly change the kamera's centerPointer, since now the vertex has no reference to the kameras anymore.
     }
 
     public void ResetGraph() {
@@ -73,4 +75,5 @@ public class LabelledGraphManager {
     public int getDim() => vertices.Count > 0 ? vertices[0].Position.Size() : 0;
 
     public int GetVertexCount() => vertices.Count;
+
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 
 /**
  * This class was split from LabelledGraphManager to separate the visual stuff from the logic.
@@ -24,15 +25,17 @@ public class GraphVisualizer : MonoBehaviour {
     public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
 
-        graphManager.onEdgeAdded += edge => UpdateLabel(edge);
+        graphManager.onEdgeAdded += UpdateLabel;
+        graphManager.OnCenterChanged += (vertex, activeKamera) => {
+            if (activeKamera != null) 
+                activeKamera.centerPointer = vertex.centerPointer;
+            else
+                foreach (var kamera in kameras) 
+                    kamera.centerPointer = vertex.centerPointer;
+        };
+
         UpdateLabels(generators);
 
-        // I took this from the labelledGraphManager
-        /**
-        if (vertices.IsEmpty())
-            foreach (var kamera in kameras) 
-                kamera.center = vertex.transform;
-        **/
     }
 
 

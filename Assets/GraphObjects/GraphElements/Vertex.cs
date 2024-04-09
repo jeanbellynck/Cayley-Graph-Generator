@@ -33,7 +33,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     public event Action OnEdgeChange;
-    
+
     public VectorN Position { get => _position; set => _position = value; }
 
     public readonly Dictionary<char, Vector3> splineDirections = new();
@@ -51,8 +51,13 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     [SerializeField] float maxSpeed;
     public float Activity;// => graphManager.Activity;
 
+    public event Action<Kamera> OnCenter;
 
-    // Start is called before the first frame update
+    CenterPointer _centerPointer;
+    // this is a workaround for the subclasses where a vertex might get merged with another vertex and the outside would still point to the old vertex (often destroyed at that point)
+    public CenterPointer centerPointer => _centerPointer ??= new() { center = transform }; // lazy initialization
+
+
     protected virtual void Start() {
         if (Mass == 0) {
             Mass = 0.1f;
@@ -73,7 +78,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         splineDirections.Clear();
         preferredRandomDirections.Clear();
         fallbackRandomDirections.Clear();
-
+        
         //StartCoroutine(CalculateSplineDirections()); // weird: in node n, this is at some point never called again // moved to edge
         //OnEdgeChange += RecalculateSplineDirections; // would be ok, but not necessary, as the edges call this method themselves
 
@@ -265,22 +270,12 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     public HashSet<Edge> GetIncomingEdges(char op) {
-        if (LabeledIncomingEdges.ContainsKey(op)) {
-            return LabeledIncomingEdges[op];
-        }
-        else {
-            return new HashSet<Edge>();
-        }
+        return LabeledIncomingEdges.TryGetValue(op, out HashSet<Edge> edges) ? edges : new();
     }
 
 
     public HashSet<Edge> GetOutgoingEdges(char op) {
-        if (LabeledOutgoingEdges.ContainsKey(op)) {
-            return LabeledOutgoingEdges[op];
-        }
-        else {
-            return new HashSet<Edge>();
-        }
+        return LabeledOutgoingEdges.TryGetValue(op, out HashSet<Edge> edges) ? edges : new();
     }
 
 
@@ -365,7 +360,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
 
     public Dictionary<char, List<Edge>> GetEdges() {
-        Dictionary<char, List<Edge>> edges = new Dictionary<char, List<Edge>>();
+        Dictionary<char, List<Edge>> edges = new();
         foreach (char op in LabeledOutgoingEdges.Keys) {
             edges.Add(op, GetOutgoingEdges(op).ToList());
         }
@@ -387,7 +382,8 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     public TooltipContent GetTooltip() => tooltipContent;
-    public void OnClick(Kamera activeKamera) {
-        if (activeKamera != null) activeKamera.center = transform;
-    }
+
+
+    public void OnClick(Kamera activeKamera) => OnCenter?.Invoke(activeKamera);
+    public void Center() => OnCenter?.Invoke(null); // this is a workaround for the fact that events can only be called from the class they are defined in (not even subclasses)
 }

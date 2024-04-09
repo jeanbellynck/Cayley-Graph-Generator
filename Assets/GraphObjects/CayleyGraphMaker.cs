@@ -51,6 +51,8 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         GroupVertex neutralElement = CreateVertex(null, default);
         neutralElement.transform.localScale *= 1.6f;
+        neutralElement.Center();
+        
 
         StartCoroutine(createNewElementsAndApplyRelators());
     }
@@ -205,7 +207,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                 GroupEdge primaryEdge = generatorEdges[0];
                 for (int i = 1; i < generatorEdges.Count; i++) {
                     //edgeMergeCandidates.Add(vertex); // After an edge merge a vertex might be merged with its neighbor meaning its edges can be merged again.
-                    MergesVertices(primaryEdge.GetOpposite(vertex), generatorEdges[i].GetOpposite(vertex));
+                    MergeVertices(primaryEdge.GetOpposite(vertex), generatorEdges[i].GetOpposite(vertex));
                 }
             }
         }
@@ -232,7 +234,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                     }
                 }
                 if (relatorLeadToOtherElement && !currentElement.Equals(startingElement)) {
-                    MergesVertices(startingElement, currentElement);
+                    MergeVertices(startingElement, currentElement);
                     return;
                 }
             }
@@ -256,7 +258,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     /**
     * Merges vertex2 and vertex1. The groupElement with the shorter name is deleted and all edges are redirected to the other groupElement.
     */
-    void MergesVertices(GroupVertex vertex1, GroupVertex vertex2) {
+    void MergeVertices(GroupVertex vertex1, GroupVertex vertex2) {
         if (vertex1.Equals(vertex2)) return;
         // The vertex with the longer name will be deleted. (We don't want to delete the neutral element.)
         if (vertex2.name.Length < vertex1.name.Length) {
@@ -274,8 +276,8 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         // Delete vertex2
-        graphManager.RemoveVertex(vertex2);
-        vertex2.Destroy();
+        graphManager.RemoveVertex(vertex2); // also removes all edges
+        vertex2.Destroy(); // also destroys all edges
 
         // Neuen Knoten nochmal prüfen
         edgeMergeCandidates.Add(vertex1);

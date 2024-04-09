@@ -11,9 +11,9 @@ public class Kamera : MonoBehaviour
     
     [SerializeField] protected Camera cam;
 
-    public Transform center;
+    public CenterPointer centerPointer;
     // Camera movement should only be possible when the sideMenu states are closed
-    [SerializeField] protected SimpleSideMenu[] sideMenues;
+    [SerializeField] SimpleSideMenu[] sideMenues = {};
 
     bool pinching = false;
 
@@ -21,7 +21,7 @@ public class Kamera : MonoBehaviour
     void Update()
     {
         Vector3 mousePosition = Input.touchCount > 0 ? Input.touches.First().position : Input.mousePosition;
-        if (center != null) transform.position = center.position;
+        if (centerPointer?.center != null) transform.position = centerPointer.center.position;
         // Camera movement should only be possible when the sideMenu states are closed
         if (!IsMouseInViewport(mousePosition) ||
             sideMenues.Any(sideMenu => sideMenu.TargetState == State.Open))
@@ -93,4 +93,8 @@ public class Kamera : MonoBehaviour
     public virtual Ray ScreenPointToRay(Vector3 mousePosition) => cam.ScreenPointToRay(mousePosition);
     public int cullingMask => cam.cullingMask;
 
+}
+
+public class CenterPointer {
+    public Transform center;
 }
