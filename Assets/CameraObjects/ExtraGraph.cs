@@ -23,7 +23,7 @@ public class ExtraGraph : MonoBehaviour
     [SerializeField] TaggedGraph graph;
 
     void Start() {
-        generatorMenu.OnGeneratorsChanged += () => graphVisualizer.UpdateLabels(generatorMenu.Generators.ToArray());
+        generatorMenu.OnGeneratorsChanged += () => graphVisualizer.UpdateGeneratorLabels(generatorMenu.Generators.ToArray());
     }
 
     public void StartVisualization() {
@@ -38,7 +38,7 @@ public class ExtraGraph : MonoBehaviour
         var generators = generatorMenu.Generators = 
             from generator in generatorStrings select generator.DefaultIfEmpty('?').First();
         DrawGraph(generators, graph);
-        physik.startUp(graphVisualizer.graphManager, 3, generatorStrings.Length);
+        physik.startUp(graphVisualizer.graphVisualizer, 3, generatorStrings.Length);
         physik.shutDown();
     }
 
@@ -52,13 +52,13 @@ public class ExtraGraph : MonoBehaviour
     void TaggedGraphToGraphManager(TaggedGraph graph)
     {
         this.graph = graph;
-        graphVisualizer.graphManager.ResetGraph();
+        graphVisualizer.graphVisualizer.ResetGraph();
         var vertexDict = new Dictionary<string, Vertex>();
         foreach (var vertexName in graph.Vertices) {
             var newVertex = vertexDict[vertexName] = Instantiate(vertexPrefab, transform).GetComponent<Vertex>();
-            newVertex.Initialize(VectorN.Random(3, 10), graphVisualizer.graphManager);
+            newVertex.Initialize(VectorN.Random(3, 10), graphVisualizer.graphVisualizer);
             newVertex.name = "Node " + vertexName;
-            graphVisualizer.graphManager.AddVertex(newVertex);
+            graphVisualizer.graphVisualizer.AddVertex(newVertex);
         }
         foreach (var edge in graph.Edges) {
             var label = edge.Tag?.generator.DefaultIfEmpty('?').First() ?? '?';
@@ -75,17 +75,17 @@ public class ExtraGraph : MonoBehaviour
     
             var newEdge = Instantiate(edgePrefab, transform).GetComponent<Edge>();
             newEdge.Initialize(startPoint, endPoint, label);
-            graphVisualizer.graphManager.AddEdge(newEdge);
+            graphVisualizer.graphVisualizer.AddEdge(newEdge);
         }
     }
 
     TaggedGraph GraphManagerToTaggedGraph() {
         graph = new TaggedGraph();
-        foreach (var vertex in graphVisualizer.graphManager.getVertices()) {
+        foreach (var vertex in graphVisualizer.graphVisualizer.getVertices()) {
             graph.AddVertex(vertex.name);
         }
 
-        foreach (var edge in graphVisualizer.graphManager.GetEdges()) {
+        foreach (var edge in graphVisualizer.graphVisualizer.GetEdges()) {
             graph.AddEdge(new(edge.StartPoint.name, edge.EndPoint.name,
                 new() { generator = edge.Label.ToString(), start = edge.StartPoint.name }));
         }

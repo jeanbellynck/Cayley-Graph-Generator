@@ -7,10 +7,12 @@ using UnityEngine.Networking;
  * This class was split from LabelledGraphManager to separate the visual stuff from the logic.
  */
 public class GraphVisualizer : MonoBehaviour {
-    public LabelledGraphManager graphManager = new LabelledGraphManager(); 
+    public LabelledGraphManager graphVisualizer = new LabelledGraphManager(); 
     [SerializeField] public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
     [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
     IActivityProvider activityProvider;
+    public List<char> generatorLabels = new();
+    public List<char> subgroupLabels = new();
 
     public Dictionary<char, Color> labelColors = new();
 
@@ -25,31 +27,34 @@ public class GraphVisualizer : MonoBehaviour {
     public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
 
-        graphManager.onEdgeAdded += UpdateLabel;
-        graphManager.OnCenterChanged += (vertex, activeKamera) => {
+        graphVisualizer.onEdgeAdded += UpdateLabel;
+        graphVisualizer.OnCenterChanged += (vertex, activeKamera) => {
             if (activeKamera != null) 
                 activeKamera.centerPointer = vertex.centerPointer;
             else
                 foreach (var kamera in kameras) 
                     kamera.centerPointer = vertex.centerPointer;
         };
+        UpdateGeneratorLabels(generators);
+    }
 
-        UpdateLabels(generators);
-
+    public void UpdateGeneratorLabels(IEnumerable<char> generators) {
+        generatorLabels = generators.ToList();
+        UpdateLabels();
     }
 
 
-    public void UpdateLabels(IEnumerable<char> generators)
+    public void UpdateLabels()
     { 
         labelColors = new(Enumerable.Zip(
-            generators, 
+            generatorLabels, 
             ColorList.Extend(
                 () => Random.ColorHSV(0, 1, 0.9f, 1)
             ), (generator, color) => new KeyValuePair<char, Color>(generator, color)
         ));
 
-        graphManager.GetEdges().ForEach(edge => UpdateLabel(edge));
-        graphManager.LabelCount = 2 * labelColors.Count;
+        graphVisualizer.GetEdges().ForEach(edge => UpdateLabel(edge));
+        graphVisualizer.LabelCount = 2 * labelColors.Count;
         groupColorPanel.updateView(labelColors);
     }
 
