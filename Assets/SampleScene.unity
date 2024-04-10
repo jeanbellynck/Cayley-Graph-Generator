@@ -1736,7 +1736,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.23337927
+  m_Size: 0.16356687
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8964,9 +8964,14 @@ MonoBehaviour:
   - {r: 0, g: 0, b: 1, a: 1}
   - {r: 0, g: 1, b: 0, a: 1}
   - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 0.5351658, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0.47082895, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.8893428, a: 1}
+  - {r: 1, g: 0, b: 0.91821, a: 1}
+  - {r: 0.6434643, g: 1, b: 0, a: 1}
   generatorLabels: 
   subgroupLabels: 
-  groupColorPanel: {fileID: 544445294}
+  groupColorPanel: {fileID: 391100344}
   kameras:
   - {fileID: 519420033}
   - {fileID: 1308226000}
@@ -23581,9 +23586,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2112711615}
-  m_Father: {fileID: 720289555}
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -23630,8 +23634,8 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 1760846715}
-  m_HandleRect: {fileID: 1760846714}
+  m_TargetGraphic: {fileID: 2067155237}
+  m_HandleRect: {fileID: 0}
   m_Direction: 2
   m_Value: 0
   m_Size: 1
@@ -23944,3 +23948,4 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 1308226003}
   - {fileID: 1459450055}
+  - {fileID: 2067155235}
