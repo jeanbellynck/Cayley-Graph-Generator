@@ -5,7 +5,9 @@ using UnityEngine;
 using System.Linq;
 
 public class CayleyGraphMaker : MonoBehaviour {
+    public GraphVisualizer graphVisualizer;
     private LabelledGraphManager graphManager;
+
     [SerializeField] MeshManager meshManager;
     private Physik physik; // I wonder whether the reference to Physics is necessary? 
 
@@ -13,7 +15,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     protected char[] operators; // Like generators but with upper and lower case letters
     protected string[] relators;// = new string[]{"abAB"};
 
-    [SerializeField] float hyperbolicity = 1;
+    [SerializeField] float hyperbolicity = 1; // This might be better off in GraphVisualizer too.
     readonly Dictionary<(char, char), float> hyperbolicityMatrix = new();
 
 
@@ -21,11 +23,8 @@ public class CayleyGraphMaker : MonoBehaviour {
     [SerializeField] int vertexNumber; // Describes the number of vertices the graph should have. It would be better to have a config file with all the data.
     [SerializeField] float drawingSpeed = 1; // Describes the speed at which new vertices should be drawn in vertices per second 
 
-    [SerializeField] GameObject vertexPrefab;
-    [SerializeField] GameObject edgePrefab;
 
 
-    [SerializeField] int simulationDimensionality = 3;
     [SerializeField] int numberOfMeshesPerFrame = 10;
 
 
@@ -35,11 +34,10 @@ public class CayleyGraphMaker : MonoBehaviour {
     HashSet<GroupVertex> relatorCandidates = new();
     HashSet<GroupVertex> edgeMergeCandidates = new();
 
-    public void StartVisualization(LabelledGraphManager graphManager, char[] generators, string[] relators, int dimension) {
-        this.graphManager = graphManager;
+    public void StartVisualization(char[] generators, string[] relators) {
         this.generators = generators;
         this.relators = relators;
-        this.simulationDimensionality = dimension;
+        graphManager = graphVisualizer.graphManager;
         operators = new char[2 * generators.Length];
 
         for (int i = 0; i < generators.Length; i++) {
@@ -114,34 +112,17 @@ public class CayleyGraphMaker : MonoBehaviour {
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
     private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
-        GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
-        if (predecessor == null)
-            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager, "1", new List<string>(){""});
-        else
-            newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
-        graphManager.AddVertex(newVertex);
-
+        GroupVertex newVertex = graphVisualizer.CreateVertex(predecessor, op, hyperbolicity);
         AddBorderVertex(newVertex);
         // Vertex is not the neutral element and an edge need to be created
         if (predecessor != null) 
             CreateEdge(predecessor, newVertex, op);
-
         return newVertex;
     }
 
 
     public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
-        // If the edge already exists, no edge is created and the existing edge is returned
-        foreach (GroupEdge edge in startvertex.GetEdges(op)) {
-            if (edge.GetOpposite(startvertex).Equals(endvertex)) {
-                return edge;
-            }
-        }
-
-        GroupEdge newEdge = Instantiate(edgePrefab, transform).GetComponent<GroupEdge>();
-        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity, graphManager);
-        graphManager.AddEdge(newEdge);
-
+        GroupEdge newEdge = graphVisualizer.CreateEdge(startvertex, endvertex, op, hyperbolicity);
         return newEdge;
     }
 

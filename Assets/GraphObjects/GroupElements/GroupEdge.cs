@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GroupEdge : Edge {
 
-    public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity, LabelledGraphManager graphManager) {
+    public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity) {
 
         if (!char.IsLower(operation)) {
             (startVertex, endVertex) = (endVertex, startVertex);
@@ -12,7 +12,6 @@ public class GroupEdge : Edge {
         }
 
         base.Initialize(startVertex, endVertex, operation);
-
         calculateEdgeLength(hyperbolicity);
     }
 

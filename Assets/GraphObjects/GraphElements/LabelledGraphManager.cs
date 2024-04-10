@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpGraph;
 using UnityEngine;
 
 /**
@@ -15,7 +16,8 @@ using UnityEngine;
 public class LabelledGraphManager {
     private int idCounter = 0; // Starts by 1 as 0 is reserved for the neutral element
     readonly List<Vertex> vertices = new();
-    readonly List<Edge> edges = new();
+    readonly Dictionary<char, List<Edge>> edges = new(); // The edges are stored in a dictionary, sorted by the label of the edge. This is done to make it easier to find the edges of a certain label. (It also makes it possible to access the edges of a subgroup)
+    //readonly List<Edge> edges = new();
     public int LabelCount { get; set; }
 
     public delegate void OnEdgeAdded(Edge edge);
@@ -42,8 +44,12 @@ public class LabelledGraphManager {
         idCounter = 1;
     }
 
+    /**
+     * Adds an edge to the graph. The edge is added to the list of edges and to the dictionary of edges, sorted by the label of the edge.
+     */
     public void AddEdge(Edge edge) {
-        edges.Add(edge);
+        if (!edges.ContainsKey(edge.Label)) edges[edge.Label] = new List<Edge>();
+        edges[edge.Label].Add(edge);
         onEdgeAdded?.Invoke(edge);
     }
 
@@ -64,12 +70,20 @@ public class LabelledGraphManager {
     }
 
     public void RemoveEdge(Edge edge) {
-        edges.Remove(edge);
+        edges[edge.Label].Remove(edge);
     }
 
 
+    public List<Edge> GetEdges(char label) {
+        return edges[label];
+    }
+
     public List<Edge> GetEdges() {
-        return edges;
+        List<Edge> result = new();
+        foreach (List<Edge> edgeList in this.edges.Values) {
+            result.AddRange(edgeList);
+        }
+        return result;
     }
 
     public int getDim() => vertices.Count > 0 ? vertices[0].Position.Size() : 0;

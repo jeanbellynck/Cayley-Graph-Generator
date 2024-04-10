@@ -23,7 +23,7 @@ public class ExtraGraph : MonoBehaviour
     [SerializeField] TaggedGraph graph;
 
     void Start() {
-        generatorMenu.OnGeneratorsChanged += () => graphVisualizer.UpdateLabels(generatorMenu.Generators.ToArray());
+        generatorMenu.OnGeneratorsChanged += () => graphVisualizer.UpdateGeneratorLabels(generatorMenu.Generators.ToArray());
     }
 
     public void StartVisualization() {

@@ -74,7 +74,8 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
         int projectionDimension = dimensionInputDD.value + 2;
         physik.startUp(graphVisualizer.graphManager, projectionDimension, generators.Length);
         int actualDimension = projectionDimension + 0;
-        cayleyGraphMaker.StartVisualization(graphVisualizer.graphManager, generators, relators, actualDimension);
+        graphVisualizer.SetDimension(actualDimension);
+        cayleyGraphMaker.StartVisualization(generators, relators);
     }
 
 
