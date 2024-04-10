@@ -8,7 +8,7 @@ public class GroupColorPanel : MonoBehaviour {
     public TMP_Text textField;
 
     public void updateView(IDictionary<char, Color> colors) {
-        textField.text = string.Concat(
+        textField.text = string.Join(' ',
             from kvp in colors
             let generator = kvp.Key
             let color = kvp.Value
