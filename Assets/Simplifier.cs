@@ -13,13 +13,16 @@ public class Simplifier : MonoBehaviour {
     GAPClient gapClient;
     [SerializeField] string[] lastOptimizedGenerators;
     [SerializeField] string[] lastOptimizedRelators;
+    [SerializeField] float timeout = 5;
 
     void Start() => gapClient = new();
 
     public async void OnClick() {
+        var generators = generatorMenu.Generators.Select(c => c.ToString()).ToArray();
+        var relators = relatorMenu.Relators.ToArray();
         var (worked, optimizedGenerators, optimizedRelators, generatorMap) = await gapClient.OptimizePresentation(
-            generatorMenu.Generators.Select(c => c.ToString()).ToArray(),
-            relatorMenu.Relators.ToArray()
+            generators,
+            relators
         );
         // TODO: Timeouts and not allowing concurrent requests (cancelling)
 
@@ -28,20 +31,40 @@ public class Simplifier : MonoBehaviour {
         lastOptimizedGenerators = optimizedGenerators;
         lastOptimizedRelators = optimizedRelators;
 
-        textField.text = $@"This optimized presentation describes the same group: 
+        textField.text = $@"Optimized presentation for your group using GAP:
+<{string.Join(", ", generators)} | {string.Join(", ", relators)}>
+  \u2245
 <{string.Join(", ", optimizedGenerators)} | {string.Join(", ", optimizedRelators)}>
-with the following mapping: 
-{string.Join(", ", generatorMap.Select(kv => $"{kv.Key} -> {kv.Value}"))}";
+with the following isomorphism: 
+{string.Join(", ", generatorMap.Select(kv => $"{kv.Key} \u2192 {kv.Value}"))}"; // \u21A6 is \mapsto. For some reason the more complex arrows cannot be shown in TMP_Text, even though they are in the font (but not in the TMP_FontAsset). We use \u2192 instead, which is \rightarrow.
 
         panel.SetActive(true);
+        panel.transform.SetAsLastSibling();
 
         StartCoroutine(WaitAndDeactivate());
         return;
 
         IEnumerator WaitAndDeactivate() {
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(timeout);
             panel.SetActive(false);
             yield return null;
+        }
+    }
+
+    public void OnPanelClick(int button) {
+        switch (button)
+        {
+            case 0:
+                panel.SetActive(false);
+                break;
+            case 1:
+                generatorMenu.Generators = lastOptimizedGenerators.Select(c => c[0]).ToArray();
+                relatorMenu.Relators = lastOptimizedRelators;
+                break;
+            case 2: 
+                GUIUtility.systemCopyBuffer = relatorMenu.CopyableString(lastOptimizedRelators, lastOptimizedGenerators);
+                // TODO: fix this for mobile or WebGL
+                break;
         }
     }
 }
