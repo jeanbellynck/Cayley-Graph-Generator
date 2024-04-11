@@ -81,7 +81,7 @@ public class ExtraGraph : MonoBehaviour
 
     TaggedGraph GraphManagerToTaggedGraph() {
         graph = new TaggedGraph();
-        foreach (var vertex in graphVisualizer.graphManager.getVertices()) {
+        foreach (var vertex in graphVisualizer.graphManager.GetVertices()) {
             graph.AddVertex(vertex.name);
         }
 

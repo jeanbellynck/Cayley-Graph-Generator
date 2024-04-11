@@ -24,7 +24,7 @@ public class LabelledGraphManager {
     public event OnEdgeAdded onEdgeAdded;
     public event Action<Vertex, Kamera> OnCenterChanged;
 
-    public List<Vertex> getVertices() {
+    public List<Vertex> GetVertices() {
         return vertices;
     }
 
@@ -73,6 +73,10 @@ public class LabelledGraphManager {
         edges[edge.Label].Remove(edge);
     }
 
+    public void RemoveEdges(char label) {
+        edges.Remove(label);
+    }
+
 
     public List<Edge> GetEdges(char label) {
         return edges[label];
@@ -90,4 +94,7 @@ public class LabelledGraphManager {
 
     public int GetVertexCount() => vertices.Count;
 
+    internal void DeleteSubgraph() {
+        throw new NotImplementedException();
+    }
 }
