@@ -74,7 +74,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     IEnumerator createNewElementsAndApplyRelators() {
         bool firstIteration = true;
 
-        while (vertexNumber > graphManager.getVertices().Count) {
+        while (vertexNumber > graphManager.GetVertices().Count) {
             // Speed is proportional to the number of vertices on the border. This makes knotting less likely
             float waitTime = 1 / (drawingSpeed * Mathf.Max(1, GetBorderVertexCount()));
             if (!firstIteration) {
@@ -286,7 +286,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         IEnumerator DrawMeshesCoroutine() {
             var drawnMeshes = 0;
-            foreach (var vertex in graphManager.getVertices())
+            foreach (var vertex in graphManager.GetVertices())
             foreach (string relator in relators) {
                 var vertices = new Vertex[relator.Length];
                 vertices[0] = vertex;
@@ -356,7 +356,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             if (edge is GroupEdge groupEdge)
                 groupEdge.calculateEdgeLength(hyperbolicity);
 
-        foreach (var vertex in graphManager.getVertices())
+        foreach (var vertex in graphManager.GetVertices())
             if (vertex is GroupVertex groupVertex) 
                 groupVertex.calculateVertexMass(hyperbolicity);
     }

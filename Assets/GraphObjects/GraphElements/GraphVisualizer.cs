@@ -53,14 +53,16 @@ public class GraphVisualizer : MonoBehaviour {
     { 
         labelColors = new(Enumerable.Zip(
             generatorLabels, 
-            ColorList.Extend(
-                () => Random.ColorHSV(0, 1, 0.9f, 1)
-            ), (generator, color) => new KeyValuePair<char, Color>(generator, color)
+            ColorList.Extend(RandomColor), (generator, color) => new KeyValuePair<char, Color>(generator, color)
         ));
 
         graphManager.GetEdges().ForEach(edge => UpdateLabel(edge));
         graphManager.LabelCount = 2 * labelColors.Count;
         groupColorPanel.updateView(labelColors);
+    }
+
+    private Color RandomColor() {
+        return Random.ColorHSV(0, 1, 0.9f, 1);
     }
 
     public void UpdateLabel(Edge edge) => edge.SetColors(labelColors[edge.Label]);
@@ -81,11 +83,20 @@ public class GraphVisualizer : MonoBehaviour {
         return newVertex;
     }
 
+    public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
+        return CreateEdge(startvertex, endvertex, op, 0);
+    }
+
     /**
      * Creates a new edge and adds it to the graph. If the edge already exists, the existing edge is returned.
      * I moved it to the visualizer because the cayley graph maker and subgraph maker need this method.
      **/    
     public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op, float hyperbolicity) {
+        // Check if the edge label has a colour assigned
+        if (!labelColors.ContainsKey(op)) {
+            labelColors[op] = RandomColor();
+        }
+
         // If the edge already exists, no edge is created and the existing edge is returned
         foreach (GroupEdge edge in startvertex.GetEdges(op)) {
             if (edge.GetOpposite(startvertex).Equals(endvertex)) {

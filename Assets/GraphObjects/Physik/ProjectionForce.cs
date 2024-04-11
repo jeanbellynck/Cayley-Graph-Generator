@@ -15,7 +15,7 @@ public class ProjectionForce : Force {
     public override IEnumerator ApplyForce(LabelledGraphManager graphManager, float alpha) {
         if(projectionForceFactor == 0 || alpha == 0) yield return null;
         
-        foreach(Vertex vertex in graphManager.getVertices()) {
+        foreach(Vertex vertex in graphManager.GetVertices()) {
             vertex.Force += projectionForceFactor * vectorToHyperplane(vertex.Position);
         }
     }

@@ -35,7 +35,7 @@ public class RepulsionForce : Force {
         BarnesQuadtree bqb = new BarnesQuadtree(treeDimension, VectorN.Zero(graphManager.getDim()), radius, QuadTreeTheta * QuadTreeTheta, barnesQuadTreeMinimalDistance * barnesQuadTreeMinimalDistance, barnesQuadTreeMaximalDistance * barnesQuadTreeMaximalDistance);
         Profiler.EndSample();
         Profiler.BeginSample("AddVerticesToQuadtree");
-        foreach (Vertex vertex in graphManager.getVertices()) {
+        foreach (Vertex vertex in graphManager.GetVertices()) {
             bqb.Add(vertex);
         }
         Profiler.EndSample();
@@ -45,10 +45,10 @@ public class RepulsionForce : Force {
 
         int vertexIndex = 0;
         int vertexPerBatch = 400;
-        List<Vertex> vertices = graphManager.getVertices();
+        List<Vertex> vertices = graphManager.GetVertices();
         while(vertexIndex < vertices.Count) {
             yield return null;
-            vertices = graphManager.getVertices(); // Since simulation goes over multiple frames the vertices might have changed, so we have to fetch them every frame.
+            vertices = graphManager.GetVertices(); // Since simulation goes over multiple frames the vertices might have changed, so we have to fetch them every frame.
             for(int i = vertexIndex; i < Math.Min(vertexIndex+vertexPerBatch, vertices.Count); i++) {
                 Vertex vertex = vertices[i];
                 Profiler.BeginSample("calculateRepulsionForceOnVertex");
