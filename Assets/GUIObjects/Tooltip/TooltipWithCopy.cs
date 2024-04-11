@@ -6,8 +6,7 @@ public class TooltipWithCopy : Tooltip {
         content = new() { text = "Click to copy!" };
     }
     public override void OnClick(Kamera activeKamera) {
-        var copyText = string.Join(", ", relatorMenu.GetRelatorStrings());
-        GUIUtility.systemCopyBuffer = copyText;
+        GUIUtility.systemCopyBuffer = relatorMenu.CopyableString();
         // TODO: fix this for mobile or WebGL
     }
 }

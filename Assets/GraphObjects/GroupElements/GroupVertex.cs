@@ -21,10 +21,10 @@ public class GroupVertex : Vertex {
 
     void CalculateEdgeCompletion()
     {
-        EdgeCompletion = graphManager.LabelCount > 0 ? 0.8f * (
+        EdgeCompletion = graphVisualizer.LabelCount > 0 ? 0.8f * (
             LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) +
             LabeledOutgoingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty())
-        ) / graphManager.LabelCount + 0.2f : 1f;
+        ) / graphVisualizer.LabelCount + 0.2f : 1f;
     }
 
     protected override void Start() {
@@ -58,7 +58,7 @@ public class GroupVertex : Vertex {
         return (GroupVertex) base.FollowEdge(op);
     }
 
-    public void Initialize(VectorN position, LabelledGraphManager graphManager, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
+    public void Initialize(VectorN position, GraphVisualizer graphVisualizer, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
         if (!string.IsNullOrEmpty(name)) this.name = name;
         if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
         this.inSubgroup = inSubgroup;
@@ -74,13 +74,13 @@ public class GroupVertex : Vertex {
             };
         };
 
-        base.Initialize(position, graphManager);
+        base.Initialize(position, graphVisualizer);
     }
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
         Initialize(
             predecessor.Position, 
-            predecessor.graphManager,
+            predecessor.graphVisualizer,
             predecessor.name == "1" ? op.ToString() : predecessor.name + op,
             from path in predecessor.PathsFromNeutralElement select path + op
         );

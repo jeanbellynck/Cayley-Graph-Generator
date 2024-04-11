@@ -6,11 +6,10 @@ using UnityEngine.Networking;
 /**
  * This class was split from LabelledGraphManager to separate the visual stuff from the logic.
  */
-public class GraphVisualizer : MonoBehaviour {
+public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     public LabelledGraphManager graphManager = new LabelledGraphManager(); 
     [SerializeField] public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
     [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
-    IActivityProvider activityProvider;
     public List<char> generatorLabels = new();
     public List<char> subgroupLabels = new();
 
@@ -23,10 +22,12 @@ public class GraphVisualizer : MonoBehaviour {
     
     [SerializeField] GameObject vertexPrefab;
     [SerializeField] GameObject edgePrefab;
+    [SerializeField] IActivityProvider activityProvider;
 
-    
-    
+
     public float Activity => activityProvider.Activity;
+
+    public int LabelCount => graphManager.LabelCount;
     //public Kamera kamera { get; protected set; }
 
     public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
@@ -75,7 +76,7 @@ public class GraphVisualizer : MonoBehaviour {
     public GroupVertex CreateVertex(GroupVertex predecessor, char op, float hyperbolicity) {
         GroupVertex newVertex = Instantiate(vertexPrefab, transform).GetComponent<GroupVertex>();
         if (predecessor == null)
-            newVertex.Initialize(VectorN.Zero(simulationDimensionality), graphManager, "1", new List<string>(){""});
+            newVertex.Initialize(VectorN.Zero(simulationDimensionality), this, "1", new List<string>(){""});
         else
             newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
         graphManager.AddVertex(newVertex);
@@ -105,7 +106,7 @@ public class GraphVisualizer : MonoBehaviour {
         }
 
         GroupEdge newEdge = Instantiate(edgePrefab, transform).GetComponent<GroupEdge>();
-        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity);
+        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity, this);
         graphManager.AddEdge(newEdge);
 
         return newEdge;

@@ -47,9 +47,10 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
 
-    [SerializeField] public LabelledGraphManager graphManager;
+    [SerializeField] public GraphVisualizer graphVisualizer;
+    [SerializeField] IActivityProvider activityProvider;
     [SerializeField] float maxSpeed;
-    public float Activity;// => graphManager.Activity;
+    float Activity => activityProvider.Activity;
 
     public event Action<Kamera> OnCenter;
 
@@ -65,10 +66,11 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         Mr = GetComponent<Renderer>();
     }
 
-    public virtual void Initialize(VectorN position, LabelledGraphManager graphManager) {
+    public virtual void Initialize(VectorN position, GraphVisualizer graphVisualizer) {
         creationTime = Time.time;
 
-        this.graphManager = graphManager;
+        this.graphVisualizer = graphVisualizer;
+        this.activityProvider = graphVisualizer;
 
         VectorN zero = VectorN.Zero(position.Size());
         Position = position;
@@ -99,8 +101,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         }
         else {
             var movingDirection = VectorN.ToVector3(Position) - transform.position;
-            transform.position += Time.deltaTime * velocityRescaling(movingDirection.magnitude, maxSpeed / Activity) *
-                                  movingDirection;
+            transform.position += Time.deltaTime * velocityRescaling(movingDirection.magnitude, maxSpeed / Activity) * movingDirection;
         }
 
     }

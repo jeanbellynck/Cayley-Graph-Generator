@@ -33,7 +33,7 @@ public class Edge : MonoBehaviour {
         WhenSimulationHasStopped
     }
 
-    SplinificationType splinificationType = SplinificationType.Never; // => graphManager.splinificationType;
+    SplinificationType splinificationType => graphVisualizer.splinificationType;
     SplinificationType? lastSplinificationType = null;
 
     //protected IDictionary<char, Color> LabelColors => graphManager.labelColors;
@@ -52,7 +52,7 @@ public class Edge : MonoBehaviour {
     protected float midDirectionFactor = 0.3f;
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
-    public float Activity;// => graphVisualizer.Activity;
+    public float Activity => graphVisualizer.Activity;
 
     [SerializeField] Color startColor, endColor;
 
@@ -60,10 +60,11 @@ public class Edge : MonoBehaviour {
         creationTime = Time.time;
     }
 
-    public void Initialize(Vertex startPoint, Vertex endPoint, char label) {
+    public void Initialize(Vertex startPoint, Vertex endPoint, char label, GraphVisualizer graphVisualizer) {
         this.StartPoint = startPoint;
         this.EndPoint = endPoint;
         this.Label = label;
+        this.graphVisualizer = graphVisualizer;
         name = StartPoint.name + " --" + Label + "-> " + EndPoint.name;
         startPoint.AddEdge(this);
         endPoint.AddEdge(this);

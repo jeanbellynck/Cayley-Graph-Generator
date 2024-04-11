@@ -105,4 +105,17 @@ public class RelatorMenu : MonoBehaviour {
         relatorInputs.Clear();
         relatorGameObjects.Clear();
     }
+
+    public string CopyableString(IEnumerable<string> relators = null, IEnumerable<string> generators = null) {
+        relators ??= GetRelatorStrings();
+        generators ??= generatorMenu.GetGenerators().Select(c => c.ToString());
+        var presentation = string.Join(", ", relators);
+        presentation += (presentation.Length == 0 ? "" : ", ") +
+                        string.Join(",",
+                            from gen in generators
+                            where !presentation.Contains(gen)
+                            select gen + RelatorDecoder.invertSymbol(gen)
+                        );
+        return presentation;
+    }
 }

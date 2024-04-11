@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class GroupEdge : Edge {
 
-    public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity) {
+    public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity, GraphVisualizer graphVisualizer) {
 
         if (!char.IsLower(operation)) {
             (startVertex, endVertex) = (endVertex, startVertex);
             operation = char.ToLower(operation);
         }
 
-        base.Initialize(startVertex, endVertex, operation);
+        base.Initialize(startVertex, endVertex, operation, graphVisualizer);
         calculateEdgeLength(hyperbolicity);
     }
 

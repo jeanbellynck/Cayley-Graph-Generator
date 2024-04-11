@@ -33,7 +33,7 @@ public class LabelledGraphManager {
         vertex.Id = idCounter;
         idCounter++;
         vertices.Add(vertex);
-        vertex.graphManager = this;
+        //vertex.graphVisualizer = this;
         vertex.OnCenter += kamera => OnCenterChanged?.Invoke(vertex, kamera); // Stupid workaround to allow vertex to indirectly change the kamera's centerPointer, since now the vertex has no reference to the kameras anymore.
     }
 

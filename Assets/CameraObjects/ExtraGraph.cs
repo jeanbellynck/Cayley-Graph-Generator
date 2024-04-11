@@ -56,7 +56,7 @@ public class ExtraGraph : MonoBehaviour
         var vertexDict = new Dictionary<string, Vertex>();
         foreach (var vertexName in graph.Vertices) {
             var newVertex = vertexDict[vertexName] = Instantiate(vertexPrefab, transform).GetComponent<Vertex>();
-            newVertex.Initialize(VectorN.Random(3, 10), graphVisualizer.graphManager);
+            newVertex.Initialize(VectorN.Random(3, 10), graphVisualizer);
             newVertex.name = "Node " + vertexName;
             graphVisualizer.graphManager.AddVertex(newVertex);
         }
@@ -74,7 +74,7 @@ public class ExtraGraph : MonoBehaviour
                 (startPoint, endPoint) = (endPoint, startPoint);
     
             var newEdge = Instantiate(edgePrefab, transform).GetComponent<Edge>();
-            newEdge.Initialize(startPoint, endPoint, label);
+            newEdge.Initialize(startPoint, endPoint, label, graphVisualizer);
             graphVisualizer.graphManager.AddEdge(newEdge);
         }
     }
