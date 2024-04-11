@@ -104,10 +104,11 @@ MonoBehaviour:
   orthogonalSplineDirectionFactor: 0.07
   preferEights: 0
   equalDirectionDisplacementFactor: 0.1
-  graphManager: {fileID: 0}
+  graphVisualizer: {fileID: 0}
   maxSpeed: 8
   distanceToNeutralElement: 0
   pathsFromNeutralElement: []
+  inSubgroup: 1
 --- !u!135 &-7652529086318207544
 SphereCollider:
   m_ObjectHideFlags: 0

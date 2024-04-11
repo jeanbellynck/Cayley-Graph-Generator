@@ -93,6 +93,18 @@ public class Kamera : MonoBehaviour
     public virtual Ray ScreenPointToRay(Vector3 mousePosition) => cam.ScreenPointToRay(mousePosition);
     public int cullingMask => cam.cullingMask;
 
+    // referenced from Dropdown
+    public void SetMask(int mode) {
+        cam.cullingMask = mode switch {
+            0 => // Group & Subgroup
+                LayerMask.GetMask("Default", "Subgroup", "SubgroupOnly"),
+            1 => // Group only
+                LayerMask.GetMask("Default", "Subgroup"),
+            2 => // Subgroup only
+                LayerMask.GetMask("Subgroup", "SubgroupOnly"),
+            _ => cam.cullingMask
+        };
+    }
 }
 
 [Serializable]

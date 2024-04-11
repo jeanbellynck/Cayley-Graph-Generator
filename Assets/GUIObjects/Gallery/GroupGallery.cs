@@ -40,7 +40,7 @@ public class GroupGallery : MonoBehaviour
         new Group("F", "Thompson group F (partial infinite presentation)", "a, b, c, d", "Aba=c, Aca=d, Bcb=d", "The Thompson group F has a finite presentation but it can be easier understood by studying its infinite presentation. Here, a finite subset of the generators is taken for illustrative purposes.", "https://en.wikipedia.org/wiki/Thompson_groups"),
         new Group("²F<sub>4</sub>(2)'", "Tits group", "a; b", "a^2; b^3; (ab)^13; [a, b]^5, [a, bab]^4, ((ab)^4aB)^6"),
         //new RandomGroup(),
-        new RandomGraphGroup(),
+        //new RandomGraphGroup(),
     };
     
     
