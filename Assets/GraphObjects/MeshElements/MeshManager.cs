@@ -18,8 +18,11 @@ public class MeshManager : MonoBehaviour {
         typeColors = new(Enumerable.Zip(
             types,
             ColorList.Extend(
-                () => Random.ColorHSV(0, 1, 0.9f, 1).WithAlpha(defaultColor.a)
-            ), (type, color) => new KeyValuePair<string, Color>(type, color)
+                () => {
+                    var res = Random.ColorHSV(0, 1, 0.9f, 1);
+                    res.a = defaultColor.a;
+                    return res;
+                }), (type, color) => new KeyValuePair<string, Color>(type, color)
         ));
     }
 

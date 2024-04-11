@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using System;
 using AOT;
 using System.Collections;
+using System.Runtime.InteropServices;
 using UnityEngine.EventSystems;
 
 namespace WebGLSupport {

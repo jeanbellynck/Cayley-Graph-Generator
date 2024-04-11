@@ -182,7 +182,7 @@ public static class RandomGroups {
         return (generatorNames, relators);
     }
 
-    static IEnumerable<List<string>> GetSimpleCycles(TaggedGraph taggedGraph)
+    static List<List<string>> GetSimpleCycles(TaggedGraph taggedGraph)
     {
         var sharpGraph = Converter.TaggedToSharpGraph(taggedGraph);
         return (
@@ -191,7 +191,7 @@ public static class RandomGroups {
                 from node in nodeList
                 select node.GetLabel()
             ).ToList()
-        );
+        ).ToList();
     }
 }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class GAPClient
 {
-    readonly string url = "http://192.168.179.20:63910/aosijfoaisdoifnCodnifaoGsinf"; 
+    readonly string url = "http://localhost:63910/aosijfoaisdoifnCodnifaoGsinf"; 
 
     public GAPClient(string url = "") {
         if (!string.IsNullOrWhiteSpace(url))

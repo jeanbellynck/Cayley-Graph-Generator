@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using AOT;
 using System;
+using System.Runtime.InteropServices;
 
 namespace WebGLSupport {
     class WebGLInputMobilePlugin

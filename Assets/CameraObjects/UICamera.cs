@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Dynamic;
 using DanielLochner.Assets.SimpleSideMenu;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,14 +21,13 @@ public class UICamera : Kamera {
     public void SideMenuStateChanged(State a, State b) {
         if (b == State.Open) Activate();
         else Deactivate();
-        stopCheckingTime = Time.time + 0.5f; // coroutine just needed bc the side menu is still slightly shifted when the event is called
+        ContinueCheckingPosition();
+
     }
 
-    public void SideMenuStateChanging(State _, State __) {
+    void ContinueCheckingPosition() {
+        stopCheckingTime = Time.time + 0.5f; // coroutine just needed bc the side menu is still slightly shifted when the event is called
         StartCoroutine(checkPosition());
-        stopCheckingTime = float.MaxValue;
-        return;
-
         IEnumerator checkPosition() {
             while (Time.time <= stopCheckingTime) {
                 yield return null; 
@@ -35,6 +35,8 @@ public class UICamera : Kamera {
             }
         }
     }
+    public void SideMenuStateChanging(State _, State __) => ContinueCheckingPosition();
+
 
     void Activate() {
         //cam.targetTexture.Release();

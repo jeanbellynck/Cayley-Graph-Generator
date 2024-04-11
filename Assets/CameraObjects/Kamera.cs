@@ -95,6 +95,7 @@ public class Kamera : MonoBehaviour
 
 }
 
+[Serializable]
 public class CenterPointer {
     public Transform center;
 }

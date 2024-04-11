@@ -43,8 +43,8 @@ public class ExtraGraph : MonoBehaviour
     }
 
     void DrawGraph(IEnumerable<char> generators, TaggedGraph graph) {
-        graphVisualizer.Initialize(generators.ToArray(), physik);
         graphVisualizer.SetSplinificationMode((int)Edge.SplinificationType.Always);
+        graphVisualizer.Initialize(generators.ToArray(), physik);
         TaggedGraphToGraphManager(graph);
         Debug.Log(graph.ToStringF());
     }
@@ -77,6 +77,7 @@ public class ExtraGraph : MonoBehaviour
             newEdge.Initialize(startPoint, endPoint, label, graphVisualizer);
             graphVisualizer.graphManager.AddEdge(newEdge);
         }
+        vertexDict.Values.FirstOrDefault()?.Center();
     }
 
     TaggedGraph GraphManagerToTaggedGraph() {
