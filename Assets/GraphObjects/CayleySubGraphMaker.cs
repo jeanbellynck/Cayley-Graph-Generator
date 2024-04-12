@@ -32,7 +32,7 @@ public class CayleySubGraphMaker : MonoBehaviour {
             foreach(GroupVertex startVertex in graphVisualizer.graphManager.GetVertices()) {
                 GroupVertex endVertex = FollowGeneratorPath(startVertex, generatorList[genIndex]);
                 if (endVertex != null) {
-                    graphVisualizer.CreateEdge(startVertex, endVertex, (char)(genIndex + '0'));
+                    graphVisualizer.CreateSubgroupEdge(startVertex, endVertex, (char)(genIndex + '0'));
                 }
             }
         }

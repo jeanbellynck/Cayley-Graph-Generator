@@ -88,6 +88,14 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         return CreateEdge(startvertex, endvertex, op, 0);
     }
 
+    public GroupEdge CreateSubgroupEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
+        // Create edge
+        GroupEdge newEdge = CreateEdge(startvertex, endvertex, op, 0);
+        // Set layer to subgroup
+        newEdge.gameObject.layer = LayerMask.NameToLayer("SubgroupOnly");
+        return newEdge;
+    }
+
     /**
      * Creates a new edge and adds it to the graph. If the edge already exists, the existing edge is returned.
      * I moved it to the visualizer because the cayley graph maker and subgraph maker need this method.
