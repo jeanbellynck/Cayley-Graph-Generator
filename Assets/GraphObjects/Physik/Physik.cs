@@ -106,6 +106,22 @@ public class Physik : MonoBehaviour, IActivityProvider {
         StartCoroutine(decayAlpha());
     }
 
+    /**
+     * Similar to shutDown. For a few seconds the physics engine is reactivated
+     **/
+    public void revive() {
+        // Physics is currently disabled
+        if(alpha <= 0) {
+            alpha = alphaSetting;
+            StartCoroutine(LoopPhysics());
+        }
+        // Decay is currently running
+        if(alpha < alphaSetting) {
+            alpha = alphaSetting;
+        }
+    }
+
+
     IEnumerator decayAlpha() {
         while(alpha > 0) {
             alpha -= alphaDecay * Time.deltaTime;

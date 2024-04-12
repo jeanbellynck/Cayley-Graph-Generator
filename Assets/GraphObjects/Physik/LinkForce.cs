@@ -19,8 +19,8 @@ public class LinkForce : Force {
         for (int i = 0; i < stabilityIterations; i++) {
             foreach (Edge edge in graphManager.GetEdges()) {
                 VectorN force = calculateLinkForce(edge);
-                edge.StartPoint.Force += linkForceFactor * alpha * force;
-                edge.EndPoint.Force -= linkForceFactor * alpha * force;
+                edge.StartPoint.Force += linkForceFactor * edge.Strength * alpha * force;
+                edge.EndPoint.Force -= linkForceFactor * edge.Strength * alpha * force;
             }
         }
     }

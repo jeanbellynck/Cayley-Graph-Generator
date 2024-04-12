@@ -67,13 +67,17 @@ public class LabelledGraphManager {
             }
         }
         vertices.Remove(vertex);
+        vertex.Destroy();
     }
 
     public void RemoveEdge(Edge edge) {
         edges[edge.Label].Remove(edge);
+        edge.Destroy();
     }
 
     public void RemoveEdges(char label) {
+        if (!edges.ContainsKey(label)) return;
+        foreach (Edge edge in edges[label]) edge.Destroy();
         edges.Remove(label);
     }
 

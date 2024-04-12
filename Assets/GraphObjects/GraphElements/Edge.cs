@@ -26,6 +26,9 @@ public class Edge : MonoBehaviour {
     public float Length { get => length; protected set => length = value; }
     public Vector3 Direction => EndPoint.transform.position - StartPoint.transform.position;
     
+    [SerializeField] private float strength = 1f;
+    public float Strength { get => strength; set => strength = value; }
+    
     public enum SplinificationType {
         Never,
         Always,

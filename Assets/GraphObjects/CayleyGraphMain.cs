@@ -12,8 +12,8 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     [SerializeField] Physik physik;// = new Physik(10, 100);
 
     public GraphVisualizer graphVisualizer;
-
     public CayleyGraphMaker cayleyGraphMaker;
+    public CayleySubGraphMaker cayleySubGraphMaker;
 
 
     // These values are probably better moved to CayleyGraphMaker entirely
@@ -106,5 +106,16 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
 
     public void SetHyperbolicityMatrix(float[,] matrix) {
         cayleyGraphMaker.SetHyperbolicityMatrix(matrix);
+    }
+
+
+    /**
+     * This method draws a subgroup inside the graph. 
+     * It also sets the strength of the subgroup edges and the ambient edges.
+     */
+    public void DrawSubgroup(IEnumerable<string> generators, float ambientEdgeStrength, float subgroupEdgeStrength) {
+        graphVisualizer.AmbientEdgeStrength = ambientEdgeStrength;
+        graphVisualizer.SubgroupEdgeStrength = subgroupEdgeStrength;
+        cayleySubGraphMaker.RegenerateSubgroup(generators);
     }
 }
