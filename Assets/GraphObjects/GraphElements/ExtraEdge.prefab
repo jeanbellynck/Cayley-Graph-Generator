@@ -59,7 +59,7 @@ MonoBehaviour:
   endPoint: {fileID: 0}
   _label: 0
   finished: 0
-  graphManager: {fileID: 0}
+  graphVisualizer: {fileID: 0}
   midDisplacementFactor: 0.18
   midDirectionFactor: 0.3
   startColor: {r: 0, g: 0, b: 0, a: 0}

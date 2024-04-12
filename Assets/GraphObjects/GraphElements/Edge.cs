@@ -106,7 +106,7 @@ public class Edge : MonoBehaviour {
 
     protected virtual void LateUpdate() {
         if (startPoint == null || endPoint == null) return;
-        if (splinificationType != lastSplinificationType) {
+        if (splinificationType != lastSplinificationType || Activity > 0) {
             lastSplinificationType = splinificationType;
             finished = false;
         }

@@ -141,5 +141,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   content:
-    text: 
+    text: Each cycle of labelled edges defines a relator
     url: 

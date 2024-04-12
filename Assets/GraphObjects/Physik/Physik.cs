@@ -9,7 +9,7 @@ public class Physik : MonoBehaviour, IActivityProvider {
     public float angleForceFactor;
 
     // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
-    public float alpha { get; private set; }
+    [SerializeField] float alpha;
     public float Activity => alpha;
     public float alphaSetting = 1;
     
