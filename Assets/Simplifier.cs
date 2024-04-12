@@ -15,7 +15,10 @@ public class Simplifier : MonoBehaviour {
     [SerializeField] string[] lastOptimizedRelators;
     [SerializeField] float timeout = 5;
 
-    void Start() => gapClient = new();
+    void Start() {
+        gapClient = new();
+        panel.SetActive(false);
+    }
 
     public async void OnClick() {
         var generators = generatorMenu.Generators.Select(c => c.ToString()).ToArray();

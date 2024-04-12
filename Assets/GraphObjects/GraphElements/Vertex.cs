@@ -19,7 +19,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; set; } = new();
     public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; set; } = new();
     protected Renderer Mr { get; private set; }
-    protected TooltipContent tooltipContent = new();
+    [SerializeField] protected TooltipContent tooltipContent = new();
 
     [SerializeField] VectorN _position;
     VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations

@@ -61,6 +61,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         ));
 
         graphManager.GetEdges().ForEach(edge => UpdateLabel(edge));
+        // this throws errors since it wants to update all edges, but some or all of them are to be deleted and may thus have labels that are not in the labelColors dictionary anymore
         graphManager.LabelCount = 2 * labelColors.Count;
         groupColorPanel.updateView(labelColors);
     }
@@ -69,7 +70,10 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         return Random.ColorHSV(0, 1, 0.9f, 1);
     }
 
-    public void UpdateLabel(Edge edge) => edge.SetColors(labelColors[edge.Label]);
+    public void UpdateLabel(Edge edge) {
+        if (labelColors.TryGetValue(edge.Label, out var color))
+            edge.SetColors(color);
+    }
 
 
     /**

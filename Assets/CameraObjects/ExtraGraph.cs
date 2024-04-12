@@ -21,12 +21,15 @@ public class ExtraGraph : MonoBehaviour
     [SerializeField] RelatorMenu normalRelatorMenu;
     [SerializeField] GeneratorMenu normalGeneratorMenu;
     [SerializeField] TaggedGraph graph;
+    bool visualizedAlready;
 
     void Start() {
         generatorMenu.OnGeneratorsChanged += () => graphVisualizer.UpdateGeneratorLabels(generatorMenu.Generators.ToArray());
     }
 
+    // Called from Button
     public void StartVisualization() {
+        visualizedAlready = true;
         if (!int.TryParse(vertexCountInput.text, out int vertexCount) || vertexCount < 0 || vertexCount > 150) return;
         if (!int.TryParse(edgeCountInput.text, out int edgeCount) || edgeCount < 0 || edgeCount > 500) return;
         if (!double.TryParse(proportionOfGeneratorsInput.text.FixDecimalPoint(), out double proportionOfGenerators) || proportionOfGenerators < 0 || proportionOfGenerators > 3) return;
@@ -35,9 +38,9 @@ public class ExtraGraph : MonoBehaviour
 
     public void VisualizeRandomGraph(int vertexCount, int edgeCount, double proportionOfGenerators) {
         var (generatorStrings, graph) = RandomGroups.RandomGraphWithEdgeWords(vertexCount, edgeCount, proportionOfGenerators);
-        var generators = generatorMenu.Generators = 
-            from generator in generatorStrings select generator.DefaultIfEmpty('?').First();
+        var generators = (from generator in generatorStrings select generator.DefaultIfEmpty('?').First()).ToArray();
         DrawGraph(generators, graph);
+        generatorMenu.Generators = generators; // now later than DrawGraph, since this calls an event that updates the graphVisualizers edge labels which in turn updates the old edges with the new label dictionary that may not contain all old labels
         physik.startUp(graphVisualizer.graphManager, 3, generatorStrings.Length);
         physik.shutDown();
     }
@@ -99,5 +102,10 @@ public class ExtraGraph : MonoBehaviour
         normalRelatorMenu.SetRelators(relatorsFromGraph);
         normalGeneratorMenu.SetGenerators(generatorMenu.Generators);
         normalSideMenu.Open();
+    }
+
+    public void OnSideMenuChanged(State a, State b) {
+        if (!visualizedAlready && b == State.Open)
+            StartVisualization();
     }
 }
