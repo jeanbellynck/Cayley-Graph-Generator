@@ -2,61 +2,56 @@ using UnityEngine;
 using System.Collections;
 
 public class Physik : MonoBehaviour, IActivityProvider {
-    public float radius; // Size of the boundingBox
-    private int dim;
+    int dim;
 
-    [Range(0.0f, 20.0f)]
-    public float angleForceFactor;
+    [Range(0.0f, 20.0f)] [SerializeField] float angleForceFactor;
 
     // The actual maximal force is used to reduce the force over time. If this is smaller than usualMaximalForce then the force is reduced over time.
     [SerializeField] float alpha;
+
+    [SerializeField] float radius; // Size of the boundingBox
     public float Activity => alpha;
-    public float alphaSetting = 1;
+    [SerializeField] float alphaSetting = 1;
     
-    public float alphaDecay = 0.1f;
+    [SerializeField] float alphaDecay = 0.1f;
 
-    public float velocityDecay = 0.9f;
-    private int dimension = 3; // Describes the dimension of the projection. The default is always 4D.
+    [SerializeField] float velocityDecay = 0.9f;
+    [SerializeField] bool running;
+    [SerializeField] bool decaying;
 
+    [SerializeField] LabelledGraphManager graphManager;
 
-    LabelledGraphManager graphManager;
+    [SerializeField] RepulsionForce repulsionForce;
+    [SerializeField] LinkForce linkForce;
+    [SerializeField] ProjectionForce projectionForce;
 
-    [SerializeField]
-    RepulsionForce repulsionForce;
-    [SerializeField]
-    LinkForce linkForce;
-    [SerializeField]
-    ProjectionForce projectionForce;
-
-    public void Start() {
-    }
-
-    public void startUp(LabelledGraphManager graphManager, int dimension, int generatorCount) {
+    public void Initialize(LabelledGraphManager graphManager, int dimension, int generatorCount) {
+        Abort();
         this.graphManager = graphManager;
-        alpha = alphaSetting;
-        this.dimension = dimension;
-        this.timeStep = generatorCount > 0 ? 0.5f / generatorCount : 0.1f;
+        timeStep = generatorCount > 0 ? 0.5f / generatorCount : 0.1f;
         
         repulsionForce = new RepulsionForce(radius);
         linkForce = new LinkForce();
         projectionForce = new ProjectionForce(0.5f, dimension);
         //dim = 2*generators.Length + 1;
-        StartCoroutine(LoopPhysics());
+        //alpha = alphaSetting;
+        //StartCoroutine(LoopPhysics());
     }
 
     public void Update() {
-        if(graphManager== null) return;
+        if (graphManager == null) return;
         // The following code interpolate the vertices between the physics steps. This makes the animation smoother.
         if (alpha == 0) return;
         foreach(Vertex vertex in graphManager.GetVertices()) {
-            // The velocity of the pysics engine translated to real velocity (The physics engine is running at a different speed than the game engine)
+            // The velocity of the physics engine translated to real velocity (The physics engine is running at a different speed than the game engine)
             vertex.Position += vertex.Velocity * timeStep / physicsDeltaTime * Time.deltaTime;
         }
     }
 
-    public float physicsDeltaTime = 1f;
+    float physicsDeltaTime = 1f;
 
-    public IEnumerator LoopPhysics() {
+    IEnumerator LoopPhysics() {
+        running = true;
         float startTime = Time.time - 1; // Reduce on to prevent physicsDeltaTime from being 0
         while(alpha > 0) {
             // Measures the time of a physics step
@@ -72,9 +67,10 @@ public class Physik : MonoBehaviour, IActivityProvider {
             UpdateVertices();
             // If physics is set to shut down then reduce the maximal force of the physics engine to 0 over 5 seconds
         }
+        running = false;
     }
 
-    public float timeStep = 0.25f;
+    float timeStep = 0.25f;
 
     void UpdateVertices() {
         float realVelocityDecay = Mathf.Pow(velocityDecay, timeStep);
@@ -102,32 +98,45 @@ public class Physik : MonoBehaviour, IActivityProvider {
     /** 
     * Slowly reduces the maximal force to 0. This is used to stop the simulation.
     */
-    public void shutDown() {
-        StartCoroutine(decayAlpha());
+    public void BeginShutDown() {
+        if (!decaying)
+            StartCoroutine(DecayAlpha());
+    }
+
+    public void Abort() {
+        running = false;
+        decaying = false;
+        alpha = 0;
+        StopAllCoroutines();
     }
 
     /**
-     * Similar to shutDown. For a few seconds the physics engine is reactivated
+     * Similar to BeginShutDown. For a few seconds the physics engine is reactivated
      **/
-    public void revive() {
-        // Physics is currently disabled
-        if(alpha <= 0) {
-            alpha = alphaSetting;
+    public void RunShortly() {
+        Run();
+        BeginShutDown();
+    }
+
+    public void Run() {
+        alpha = alphaSetting;
+        if (!running) 
             StartCoroutine(LoopPhysics());
-        }
-        // Decay is currently running
-        if(alpha < alphaSetting) {
-            alpha = alphaSetting;
-        }
     }
 
 
-    IEnumerator decayAlpha() {
-        while(alpha > 0) {
+    IEnumerator DecayAlpha() {
+        decaying = true;
+        while(true) {
             alpha -= alphaDecay * Time.deltaTime;
+            if (alpha <= 0) {
+                alpha = 0;
+                break;
+            }
             yield return null;
         }
-        alpha = 0;
-        StopAllCoroutines();
+
+        decaying = false;
+        //StopAllCoroutines(); // the Physics Coroutine should stop by itself!
     }
 }

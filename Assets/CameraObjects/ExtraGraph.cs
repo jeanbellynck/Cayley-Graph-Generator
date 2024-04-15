@@ -41,8 +41,8 @@ public class ExtraGraph : MonoBehaviour
         var generators = (from generator in generatorStrings select generator.DefaultIfEmpty('?').First()).ToArray();
         DrawGraph(generators, graph);
         generatorMenu.Generators = generators; // now later than DrawGraph, since this calls an event that updates the graphVisualizers edge labels which in turn updates the old edges with the new label dictionary that may not contain all old labels
-        physik.startUp(graphVisualizer.graphManager, 3, generatorStrings.Length);
-        physik.shutDown();
+        physik.Initialize(graphVisualizer.graphManager, 3, generatorStrings.Length);
+        physik.RunShortly();
     }
 
     void DrawGraph(IEnumerable<char> generators, TaggedGraph graph) {

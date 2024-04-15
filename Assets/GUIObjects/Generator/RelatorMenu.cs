@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RelatorMenu : MonoBehaviour {
     
@@ -11,6 +12,7 @@ public class RelatorMenu : MonoBehaviour {
     [SerializeField] GeneratorMenu generatorMenu;
     readonly Dictionary<string, TMP_InputField> relatorInputs = new();
     readonly Dictionary<string, GameObject> relatorGameObjects = new();
+    [SerializeField] Button generateButton;
 
     public IEnumerable<string> Relators { // this is probably bad practice but fun (not used currently)
         get => GetRelators();
@@ -63,7 +65,7 @@ public class RelatorMenu : MonoBehaviour {
             var newInputField = relatorInputs[newIndex] = newRelatorItemGameObject.GetComponentInChildren<TMP_InputField>();
 
             newInputField.text = relator;
-            newInputField.onEndEdit.AddListener((s) => { AddRelatorString(s, newIndex); });
+            newInputField.onEndEdit.AddListener((s) => { AddRelatorString(s, newIndex); generateButton.Select(); });
 
             // Add the generators that are used in the relator to the generator menu
             foreach (var c in

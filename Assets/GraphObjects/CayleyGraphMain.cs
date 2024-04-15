@@ -11,9 +11,9 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
 
     [SerializeField] Physik physik;// = new Physik(10, 100);
 
-    public GraphVisualizer graphVisualizer;
-    public CayleyGraphMaker cayleyGraphMaker;
-    public CayleySubGraphMaker cayleySubGraphMaker;
+    [SerializeField] GraphVisualizer graphVisualizer;
+    [SerializeField] CayleyGraphMaker cayleyGraphMaker;
+    [SerializeField] CayleySubGraphMaker cayleySubGraphMaker;
 
 
     // These values are probably better moved to CayleyGraphMaker entirely
@@ -23,28 +23,24 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
 
     public float Activity => physik.Activity;
 
-    // Start is called before the first frame update
-    void Start() {
-        cayleyGraphMaker.setPhysics(physik);
-    }
-
-
-    // Update is called once per frame
-    void Update() {
-    }
-
-    void setGenerators(IEnumerable<char> newGenerators) {
+    void SetGenerators(IEnumerable<char> newGenerators) {
         if (newGenerators.SequenceEqual(generators)) return;
         generators = newGenerators.ToArray();
-        cayleyGraphMaker.setGenerators(generators);
+        cayleyGraphMaker.SetGenerators(generators);
         hyperbolicityMatrix.SetMatrixSize(generators.Length);
     }
 
-    void setRelators(IEnumerable<string> relators) => this.relators = relators.ToHashSet().ToArray();
-
-    public void setVertexNumber(string vertexNumber) {
+    // referenced from UI
+    public void SetVertexNumber(string vertexNumber) {
         if (int.TryParse(vertexNumber, out int num))
-            cayleyGraphMaker.setVertexNumber(num);
+            cayleyGraphMaker.SetVertexNumber(num);
+        // TODO: also continue subgroup visualization
+    }
+
+    // referenced from UI
+    public void ToggleActiveState() {
+        cayleyGraphMaker.ToggleActiveState();
+        // TODO: also toggle subgroup visualization
     }
 
     [SerializeField] GeneratorMenu generatorMenu;
@@ -55,27 +51,31 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     [SerializeField] TMP_Dropdown dimensionInputDD;
 
 
-    public void generateButton() {
-        StopVisualization();
+    // referenced from UI
+    public void OnGenerateButton() {
+        //StopVisualization();
         StartVisualization();
     }
 
+    // referenced from UI
     public void StopVisualization() {
-        physik.StopAllCoroutines();
+        physik.BeginShutDown();
         cayleyGraphMaker.StopVisualization();
+        // TODO: Subgroup
     }
 
     public void StartVisualization() {
-        setVertexNumber(vertexNumberInputField.text);
+        SetVertexNumber(vertexNumberInputField.text);
         relatorMenu.FixGeneratorMenu();
-        setGenerators(generatorMenu.GetGenerators());
-        setRelators(relatorMenu.GetRelators());
+        SetGenerators(generatorMenu.GetGenerators());
+        this.relators = relatorMenu.GetRelators().ToHashSet().ToArray();
         graphVisualizer.Initialize(generators, this);
         int projectionDimension = dimensionInputDD.value + 2;
-        physik.startUp(graphVisualizer.graphManager, projectionDimension, generators.Length);
+        physik.Initialize(graphVisualizer.graphManager, projectionDimension, generators.Length); // calls physik.Abort()
         int actualDimension = projectionDimension + 0;
         graphVisualizer.SetDimension(actualDimension);
-        cayleyGraphMaker.StartVisualization(generators, relators);
+        cayleyGraphMaker.Initialize(generators, relators, physik, graphVisualizer); // calls AbortVisualization()
+        cayleyGraphMaker.StartVisualization(); // calls physik.Run() 
     }
 
 
@@ -84,22 +84,24 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
         // Set the generators and relators for the input fields and for the program
         generatorMenu.SetGenerators(generatorString.Where(char.IsLetter));
         relatorMenu.SetRelatorString(relatorString);
-        generateButton();
+        OnGenerateButton();
     }
 
+    // referenced from UI
     public void openHelpPage() {
         Application.OpenURL("https://jeanbellynck.github.io/");
-    }
+    } 
 
+    // referenced from UI
     public void openGitHub() {
         Application.OpenURL("https://github.com/jeanbellynck/Cayley-Graph-Generator");
     }
 
-
+    // referenced from UI
     public void SetHyperbolicity(string hyperbolicityString) {
         print("scaling changed to:" + hyperbolicityString);
         if (float.TryParse(hyperbolicityString.FixDecimalPoint(), out float hyperbolicity) && hyperbolicity != 0) {
-            cayleyGraphMaker.setHyperbolicity(hyperbolicity);
+            cayleyGraphMaker.SetHyperbolicity(hyperbolicity);
         }
     }
 

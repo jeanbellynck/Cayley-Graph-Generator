@@ -152,13 +152,13 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
                     }
                 }
             }
-            physik.revive();
+            physik.RunShortly();
         }
     }
     public float SubgroupEdgeStrength {
         set {
             _subgroupEdgeStrength = value;
-            physik.revive();
+            physik.RunShortly();
         }
     }
 }
