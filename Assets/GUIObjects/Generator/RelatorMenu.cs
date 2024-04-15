@@ -20,7 +20,7 @@ public class RelatorMenu : MonoBehaviour {
     public IEnumerable<string> GetRelators() => GetRelatorStrings().SelectMany(input => RelatorDecoder.DecodeRelatorStrings(input, false));
     public IEnumerable<string> GetRelatorStrings() => from input in relatorInputs.Values select input.text;
 
-    public void Awake() {
+    public void Start() {
         if (generatorMenu == null)
             generatorMenu = FindFirstObjectByType<GeneratorMenu>();
         SetRelatorString("[a,b], a^5");

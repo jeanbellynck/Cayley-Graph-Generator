@@ -1,12 +1,16 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+using UnityEngine.Networking;
+
 
 public class GAPClient
 {
-    readonly string url = "http://localhost:63910/aosijfoaisdoifnCodnifaoGsinf"; 
+    readonly string url = "http://103-13-211-26.cloud-xip.com:63910/aosijfoaisdoifnCodnifaoGsinf"; 
 
     public GAPClient(string url = "") {
         if (!string.IsNullOrWhiteSpace(url))
@@ -15,21 +19,21 @@ public class GAPClient
 
     async Task<string?> CallClient(string body)
     {
-        using HttpClient client = new();
-        try{
-            HttpResponseMessage response = await client.PostAsync(url, new StringContent(body));
+        using UnityWebRequest request = UnityWebRequest.Post(url, body, "text/plain");
+        try {
+            await request.SendWebRequest();
+            var response = request.result;
 
-            if (!response.IsSuccessStatusCode){
-                Debug.WriteLine($"Error {response.StatusCode}: {response.ReasonPhrase}");
-                return null;
-            }
-            return await response.Content.ReadAsStringAsync();
+            if (response == UnityWebRequest.Result.Success) 
+                return request.downloadHandler.text;
+
+            Debug.LogWarning($"Error when calling GAP-server at {url}: {request.responseCode} - {request.error}");
         }
-        catch (HttpRequestException e)
+        catch (Exception e)
         {
-            Debug.WriteLine("Error: " + e);
-            return null;
+            Debug.LogWarning($"Error when calling GAP-server at {url}: {e}, {request.error}");
         }
+        return null;
     }
 
     readonly Dictionary<(string[], string[]), (string[], string[], Dictionary<string, string>)> cache = new();
@@ -58,8 +62,10 @@ public class GAPClient
             select line.Trim().TrimEnd(']').TrimStart('[').Trim()
         ).SkipWhile(line => !line.Contains("->")).ToArray();
 
-        if (resultArray.Length < 3) 
+        if (resultArray.Length < 3) {
+            Debug.LogWarning($"The result of the server didn't have the expected format: {string.Join(", ", resultArray)}");
             return (false, generators, relators, new Dictionary<string, string>(from g in generators select new KeyValuePair<string, string>(g, g)));
+        }
 
         string[] optimizedGenerators = resultArray[1].Split(", ");
         string[] optimizedRelators = (

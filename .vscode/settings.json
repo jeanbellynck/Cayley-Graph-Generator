@@ -52,5 +52,6 @@
         "Temp/": true
     },
     "debug.focusWindowOnBreak": false,
-    "dotnet.defaultSolution": "Cayley Graph Creator.sln"
+    "dotnet.defaultSolution": "Cayley Graph Creator.sln",
+    "dotnet.preferCSharpExtension": true
 }

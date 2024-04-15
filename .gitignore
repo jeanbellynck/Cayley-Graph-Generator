@@ -27,6 +27,7 @@
 .vs/
 .vsconfig
 .idea
+**/Visual Studio**
 
 # Gradle cache directory
 .gradle/
@@ -63,6 +64,8 @@ sysinfo.txt
 *.aab
 # *.unitypackage
 *.app
+*.tar
+*.gz
 
 # Crashlytics generated file
 crashlytics-build.properties
@@ -77,6 +80,8 @@ crashlytics-build.properties
 #IDE settings  / cache
 .idea
 .vsconfig
-# *.png
-# /dockerContainer
-*.tar
+
+#Image maker files
+
+*.pdn
+*.pdn.meta

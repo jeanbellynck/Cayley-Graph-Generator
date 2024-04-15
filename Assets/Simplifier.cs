@@ -29,18 +29,26 @@ public class Simplifier : MonoBehaviour {
         );
         // TODO: Timeouts and not allowing concurrent requests (cancelling)
 
-        if (!worked) return;
+        if (!worked) {
+            Display("Server for simplification couldn't be reached.");
+            return;
+        }
 
         lastOptimizedGenerators = optimizedGenerators;
         lastOptimizedRelators = optimizedRelators;
 
-        textField.text = $@"Optimized presentation for your group using GAP:
+        var text = $@"Optimized presentation for your group using GAP:
 <{string.Join(", ", generators)} | {string.Join(", ", relators)}>
   \u2245
 <{string.Join(", ", optimizedGenerators)} | {string.Join(", ", optimizedRelators)}>
 with the following isomorphism: 
 {string.Join(", ", generatorMap.Select(kv => $"{kv.Key} \u2192 {kv.Value}"))}
 Right click to use this presentation, middle click to copy"; // \u21A6 is \mapsto. For some reason the more complex arrows cannot be shown in TMP_Text, even though they are in the font (but not in the TMP_FontAsset). We use \u2192 instead, which is \rightarrow.
+        Display(text);
+    }
+
+    void Display(string text) {
+        textField.text = text;
 
         panel.SetActive(true);
         panel.transform.SetAsLastSibling();
