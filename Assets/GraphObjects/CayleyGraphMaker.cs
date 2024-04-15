@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Unity.VisualScripting.Dependencies.NCalc;
+using UnityEngine.Events;
 
 public class CayleyGraphMaker : MonoBehaviour {
-    public GraphVisualizer graphVisualizer;
-    private LabelledGraphManager graphManager;
+    [SerializeField] GraphVisualizer graphVisualizer;
+    [SerializeField] LabelledGraphManager graphManager;
 
     [SerializeField] MeshManager meshManager;
-    private Physik physik; // I wonder whether the reference to Physics is necessary? 
+    [SerializeField] Physik physik; // I wonder whether the reference to Physics is necessary? 
 
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
     protected char[] operators; // Like generators but with upper and lower case letters
@@ -19,24 +21,46 @@ public class CayleyGraphMaker : MonoBehaviour {
     readonly Dictionary<(char, char), float> hyperbolicityMatrix = new();
 
 
-    // Konfigurationen
-    [SerializeField] int vertexNumber; // Describes the number of vertices the graph should have. It would be better to have a config file with all the data.
+    [SerializeField] int vertexNumber; // Describes the number of vertices the graph should have.
     [SerializeField] float drawingSpeed = 1; // Describes the speed at which new vertices should be drawn in vertices per second 
-
-
-
+    
     [SerializeField] int numberOfMeshesPerFrame = 10;
 
 
     // Contains the references to all vertices on the border of the graph, sorted by distance to the center.
-    List<List<GroupVertex>> randKnoten = new();
+    readonly List<List<GroupVertex>> boundaryNodes = new();
     // Contains the references of al vertices which need to be checked for relator application.
-    HashSet<GroupVertex> relatorCandidates = new();
-    HashSet<GroupVertex> edgeMergeCandidates = new();
+    readonly HashSet<GroupVertex> relatorCandidates = new();
+    readonly HashSet<GroupVertex> edgeMergeCandidates = new();
+    [SerializeField] UnityEvent<bool> onStateChanged = new();
+    [SerializeField] UnityEvent<string> onWantedVertexNumberChanged = new(); // this should be int, but I'm lazy, and only need this to set text
+    [SerializeField] UnityEvent<string> onCurrentVertexNumberChanged = new();// this should be int, but I'm lazy, and only need this to set text
 
-    public void StartVisualization(char[] generators, string[] relators) {
+    bool _running;
+    public bool Running {
+        get => _running;
+        protected set { _running = value; onStateChanged?.Invoke(value); }
+    }
+
+    public void StartVisualization() {
+
+        //int simulationDimensionality = 2*generators.Length + 1;
+
+        if (graphManager == null) return;
+
+        GroupVertex neutralElement = CreateVertex(null, default);
+        neutralElement.transform.localScale *= 1.6f;
+        neutralElement.Center();
+        
+        ContinueVisualization();
+    }
+
+    public void Initialize(char[] generators, string[] relators, Physik physik, GraphVisualizer graphVisualizer)
+    {
         this.generators = generators;
         this.relators = relators;
+        this.physik = physik;
+        this.graphVisualizer = graphVisualizer;
         graphManager = graphVisualizer.graphManager;
         operators = new char[2 * generators.Length];
 
@@ -44,37 +68,53 @@ public class CayleyGraphMaker : MonoBehaviour {
             operators[i] = char.ToLower(generators[i]);
             operators[i + generators.Length] = char.ToUpper(generators[i]);
         }
-        
-        //int simulationDimensionality = 2*generators.Length + 1;
-
-        GroupVertex neutralElement = CreateVertex(null, default);
-        neutralElement.transform.localScale *= 1.6f;
-        neutralElement.Center();
-        
-
-        StartCoroutine(createNewElementsAndApplyRelators());
+        Reset();
     }
 
-
-    public void setPhysics(Physik physik) {
-        this.physik = physik;
+    public void ContinueVisualization()
+    {
+        if (graphManager == null)
+            return;
+        if (!Running)
+            StartCoroutine(CreateNewElementsAndApplyRelators());
+        physik.Run();
     }
+    
 
+    public void Reset() {
+        AbortVisualization();
 
-    public void StopVisualization() {
-        StopAllCoroutines();
-        randKnoten = new();
-        relatorCandidates = new();
-        edgeMergeCandidates = new();
-        if (graphManager != null) graphManager.ResetGraph();
+        boundaryNodes.Clear();
+        relatorCandidates.Clear();
+        edgeMergeCandidates.Clear();
+        graphManager?.ResetGraph();
         meshManager?.ResetMeshes();
     }
 
+    public void StopVisualization() {
+        Running = false;
+        if (graphManager == null)
+            return;
+        DrawMeshes();
+        physik.BeginShutDown();
+    }
 
-    IEnumerator createNewElementsAndApplyRelators() {
+    public void AbortVisualization() {
+        Running = false;
+        StopAllCoroutines();
+    }
+
+
+    IEnumerator CreateNewElementsAndApplyRelators() {
         bool firstIteration = true;
+        Running = true;
 
-        while (vertexNumber > graphManager.GetVertices().Count) {
+        while (Running) {
+            var currentCount = graphManager.GetVertices().Count;
+            onCurrentVertexNumberChanged?.Invoke(currentCount.ToString());
+            if (vertexNumber <= currentCount) 
+                break;
+
             // Speed is proportional to the number of vertices on the border. This makes knotting less likely
             float waitTime = 1 / (drawingSpeed * Mathf.Max(1, GetBorderVertexCount()));
             if (!firstIteration) {
@@ -102,9 +142,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             }
             MergeAll();
         }
-
-        DrawMeshes();
-        physik.shutDown();
+        StopVisualization();
     }
 
 
@@ -128,16 +166,16 @@ public class CayleyGraphMaker : MonoBehaviour {
 
 
     void AddBorderVertex(GroupVertex vertex) {
-        if (randKnoten.Count <= vertex.DistanceToNeutralElement) {
-            randKnoten.Add(new());
+        if (boundaryNodes.Count <= vertex.DistanceToNeutralElement) {
+            boundaryNodes.Add(new());
         }
 
-        randKnoten[vertex.DistanceToNeutralElement].Add(vertex);
+        boundaryNodes[vertex.DistanceToNeutralElement].Add(vertex);
     }
 
     public GroupVertex GetNextBorderVertex() {
         GroupVertex nextVertex = null;
-        foreach (List<GroupVertex> borderVertices in randKnoten) {
+        foreach (List<GroupVertex> borderVertices in boundaryNodes) {
             borderVertices.RemoveAll(item => item == null);
             if (borderVertices.Count > 0) {
                 nextVertex = borderVertices.First();
@@ -150,7 +188,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     public int GetBorderVertexCount() {
         int count = 0;
-        foreach (List<GroupVertex> borderVertices in randKnoten) {
+        foreach (List<GroupVertex> borderVertices in boundaryNodes) {
             count += borderVertices.Count;
         }
         return count;
@@ -179,6 +217,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             }
             print("Merged all vertices. Adding new Vertex.");
         }
+        onCurrentVertexNumberChanged.Invoke(graphManager.GetVertices().Count.ToString());
     }
 
     void MergeEdges(GroupVertex vertex) {
@@ -301,7 +340,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                 }
 
                 if (doInitialize &&
-                    meshManager.AddMesh(vertices, transform, relator) &&
+                    meshManager.AddMesh(vertices, transform, relator) && // doesn't draw multiply, so even if this is called after continuing, it doesn't matter that old vertices get called again here.
                     ++drawnMeshes % numberOfMeshesPerFrame == 0
                    )
                     yield return null;
@@ -310,11 +349,14 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     }
 
-    public void setVertexNumber(int v) {
+    public void SetVertexNumber(int v) {
+        if (v > vertexNumber) 
+            ContinueVisualization();
         vertexNumber = v;
+        onWantedVertexNumberChanged?.Invoke(vertexNumber.ToString());
     }
 
-    public void setHyperbolicity(float hyperbolicity) {
+    public void SetHyperbolicity(float hyperbolicity) {
         this.hyperbolicity = hyperbolicity;
         // Set all values of the hyperbolicity matrix to the new hyperbolicity
         float[,] matrix = new float[generators.Length, generators.Length];
@@ -362,7 +404,24 @@ public class CayleyGraphMaker : MonoBehaviour {
     }
 
 
-    public void setGenerators(char[] generators) {
+    public void SetGenerators(char[] generators) {
         this.generators = generators;
+    }
+
+    public void ToggleActiveState() {
+        if (Running)
+            StopVisualization();
+        else {
+            var currentVertexCount = graphManager == null ? 0 : graphManager.GetVertices().Count;
+            onCurrentVertexNumberChanged?.Invoke(currentVertexCount.ToString());
+            if (currentVertexCount >= vertexNumber) {
+                vertexNumber = currentVertexCount + 50;
+                onWantedVertexNumberChanged.Invoke(vertexNumber.ToString());
+            }
+            if (currentVertexCount == 0)
+                StartVisualization();
+            else
+                ContinueVisualization();
+        }
     }
 }
