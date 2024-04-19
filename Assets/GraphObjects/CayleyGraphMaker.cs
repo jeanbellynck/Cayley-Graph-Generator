@@ -22,9 +22,6 @@ public class CayleyGraphMaker : MonoBehaviour {
     // Konfigurationen
     [SerializeField] int vertexNumber; // Describes the number of vertices the graph should have. It would be better to have a config file with all the data.
     [SerializeField] float drawingSpeed = 1; // Describes the speed at which new vertices should be drawn in vertices per second 
-
-
-
     [SerializeField] int numberOfMeshesPerFrame = 10;
 
 
