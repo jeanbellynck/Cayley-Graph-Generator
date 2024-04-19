@@ -85,3 +85,6 @@ crashlytics-build.properties
 
 *.pdn
 *.pdn.meta
+
+# Ignore specific files
+Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
