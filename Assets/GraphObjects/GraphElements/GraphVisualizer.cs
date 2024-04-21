@@ -114,11 +114,9 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
             labelColors[op] = RandomColor();
         }
 
-        foreach (var edgeList in startvertex.GetEdges().Values)
-        {
-            foreach (GroupEdge edge in edgeList)
-            {     
-                if(edge.GetOpposite(startvertex).Equals(endvertex)) {
+        foreach (var edgeList in startvertex.GetEdges().Values) {
+            foreach (GroupEdge edge in edgeList) {     
+                if(edge.EndPoint.Equals(endvertex)) {
                     if(edge.Label == op){
                         // If the edge already exists, no edge is created and the existing edge is returned
                         return edge;
@@ -128,15 +126,6 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
                     edge.PhysicsEnabled = false;
                 }
                 
-            }
-        }
-
-        foreach (GroupEdge edge in startvertex.GetEdges(op))
-        {
-            // If the edge already exists, no edge is created and the existing edge is returned
-            if (edge.GetOpposite(startvertex).Equals(endvertex))
-            {
-                return edge;
             }
         }
 
