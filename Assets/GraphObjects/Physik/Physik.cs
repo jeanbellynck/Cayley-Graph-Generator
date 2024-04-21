@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Dreamteck.Splines.Primitives;
 
 public class Physik : MonoBehaviour, IActivityProvider {
     public float radius; // Size of the boundingBox
@@ -113,15 +114,15 @@ public class Physik : MonoBehaviour, IActivityProvider {
     /**
      * Similar to shutDown. For a few seconds the physics engine is reactivated
      **/
-    public void revive() {
+    public void shortRevive(float seconds) {
         // Physics is currently disabled
-        if(alpha <= 0) {
-            alpha = alphaSetting;
-            StartCoroutine(LoopPhysics());
-        }
-        // Decay is currently running
-        if(alpha < alphaSetting) {
-            alpha = alphaSetting;
+        StopAllCoroutines();
+        
+        StartCoroutine(LoopPhysics());
+        if(alpha != alphaSetting) {
+            // Decay is ongoing
+            alpha = seconds * alphaDecay;
+            StartCoroutine(decayAlpha());
         }
     }
 
