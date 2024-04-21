@@ -44,15 +44,17 @@ public class Physik : MonoBehaviour, IActivityProvider {
         StartCoroutine(LoopPhysics());
     }
 
+    
     public void Update() {
         if(graphManager== null) return;
         // The following code interpolate the vertices between the physics steps. This makes the animation smoother.
         if (alpha == 0) return;
         foreach(Vertex vertex in graphManager.GetVertices()) {
-            // The velocity of the pysics engine translated to real velocity (The physics engine is running at a different speed than the game engine)
-            vertex.Position += vertex.Velocity * timeStep / physicsDeltaTime * Time.deltaTime;
+            var movingDirection = VectorN.ToVector3(vertex.Position) - vertex.transform.position;
+            vertex.transform.position += Mathf.Min(Time.deltaTime, 1) * movingDirection;
         }
     }
+
 
     public float physicsDeltaTime = 1f;
 
@@ -84,6 +86,8 @@ public class Physik : MonoBehaviour, IActivityProvider {
             vertex.Position += vertex.Velocity * timeStep + 0.5f * force * timeStep * timeStep;
             vertex.Velocity += force * timeStep;
             vertex.Velocity *= realVelocityDecay;
+
+            //vertex.transform.position = VectorN.ToVector3(vertex.Position);
         }
     }
 
