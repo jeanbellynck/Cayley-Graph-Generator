@@ -42,7 +42,7 @@ public class UICamera : Kamera {
         //cam.targetTexture.Release();
         //cam.targetTexture = null;
         FixScale();
-        cam.enabled = true;
+        Cam.enabled = true;
         //cam.rect = normalizeRectToCanvasViewport(renderRectTransform);
     }
 
@@ -60,8 +60,8 @@ public class UICamera : Kamera {
 
     void Deactivate() {
         FixScale();
-        cam.targetTexture.Create();
-        cam.enabled = false;
+        Cam.targetTexture.Create();
+        Cam.enabled = false;
     }
 
     public override bool IsMouseInViewport(Vector3 mousePosition) {
@@ -82,7 +82,7 @@ public class UICamera : Kamera {
             (mousePosition.y - screenOffset.y) * screenToCameraOutputScale.y - canvasOffset.y);
         
         if (float.IsFinite(pos.x) && float.IsFinite(pos.y))
-            res = cam.ScreenPointToRay(pos);
+            res = Cam.ScreenPointToRay(pos);
 
         if (Input.GetKeyUp(KeyCode.Space))
             Debug.Log("mouse pos:" + mousePosition +
@@ -124,7 +124,7 @@ public class UICamera : Kamera {
         renderTexture = new(width, height, 24) {
             antiAliasing = 4
         };
-        renderTarget.texture = cam.targetTexture = renderTexture;
+        renderTarget.texture = Cam.targetTexture = renderTexture;
         return true;
     }
 }

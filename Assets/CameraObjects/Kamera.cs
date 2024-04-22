@@ -8,8 +8,10 @@ public class Kamera : MonoBehaviour
     [SerializeField] float wheelSensitivity = 1; 
     [SerializeField] float pinchSensitivity = 0.05f; 
     [SerializeField] float rotationSpeed = 1;
-    
-    [SerializeField] protected Camera cam;
+
+    [field: SerializeField] public Camera Cam { get; private set; }
+
+    [SerializeField] Kamera otherKamera;
 
     public CenterPointer centerPointer;
     // Camera movement should only be possible when the sideMenu states are closed
@@ -17,9 +19,20 @@ public class Kamera : MonoBehaviour
 
     bool pinching = false;
 
+    void Awake() {
+        if (Cam == null && TryGetComponent<Camera>(out var cam))
+            Cam = cam;
+    }
 
     void Update()
     {
+        if (otherKamera != null) {
+            transform.position = otherKamera.transform.position;
+            transform.rotation = otherKamera.transform.rotation;
+            Cam.orthographicSize = otherKamera.Cam.orthographicSize;
+            return;
+        }
+
         Vector3 mousePosition = Input.touchCount > 0 ? Input.touches.First().position : Input.mousePosition;
         if (centerPointer?.center != null) transform.position = centerPointer.center.position;
         // Camera movement should only be possible when the sideMenu states are closed
@@ -28,7 +41,7 @@ public class Kamera : MonoBehaviour
             return;
 
         // Zoom by mouse wheel
-        cam.orthographicSize = Math.Max(1, cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel") * wheelSensitivity);
+        Cam.orthographicSize = Math.Max(1, Cam.orthographicSize - Input.GetAxis("Mouse ScrollWheel") * wheelSensitivity);
 
         // Zoom by finger pinch is broken on WebGL. Zoom will be deactivated on mobile devices.
         if (Input.touchCount == 2)
@@ -46,8 +59,8 @@ public class Kamera : MonoBehaviour
                 float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 
                 deltaMagnitudeDiff = Mathf.Clamp(deltaMagnitudeDiff, -5, 5);
-                cam.orthographicSize -= deltaMagnitudeDiff * pinchSensitivity;
-                cam.orthographicSize = Math.Max(1, cam.orthographicSize);
+                Cam.orthographicSize -= deltaMagnitudeDiff * pinchSensitivity;
+                Cam.orthographicSize = Math.Max(1, Cam.orthographicSize);
             }
             
         }
@@ -83,27 +96,31 @@ public class Kamera : MonoBehaviour
 
     public virtual bool IsMouseInViewport(Vector3 mousePosition)
     {
-        return cam.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 };
+        return Cam.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 };
     }
 
-    public void zoomIn() => cam.orthographicSize = Math.Max(1, cam.orthographicSize - 3);
+    public void zoomIn() => Cam.orthographicSize = Math.Max(1, Cam.orthographicSize - 3);
 
-    public void zoomOut() => cam.orthographicSize = Math.Max(1, cam.orthographicSize + 3);
+    public void zoomOut() => Cam.orthographicSize = Math.Max(1, Cam.orthographicSize + 3);
 
-    public virtual Ray ScreenPointToRay(Vector3 mousePosition) => cam.ScreenPointToRay(mousePosition);
-    public int cullingMask => cam.cullingMask;
+    public virtual Ray ScreenPointToRay(Vector3 mousePosition) => Cam.ScreenPointToRay(mousePosition);
+    public int cullingMask => Cam.cullingMask;
 
     // referenced from Dropdown
     public void SetMask(int mode) {
-        cam.cullingMask = mode switch {
+        Cam.cullingMask = mode switch {
             0 => // Group & Subgroup
                 LayerMask.GetMask("Default", "Subgroup", "SubgroupOnly"),
             1 => // Group only
                 LayerMask.GetMask("Default", "Subgroup"),
             2 => // Subgroup only
                 LayerMask.GetMask("Subgroup", "SubgroupOnly"),
-            _ => cam.cullingMask
+            _ => Cam.cullingMask
         };
+    }
+
+    public void LockTo(Kamera other) {
+        otherKamera = other;
     }
 }
 

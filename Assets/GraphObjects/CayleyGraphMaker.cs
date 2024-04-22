@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine.Events;
 
 public class CayleyGraphMaker : MonoBehaviour {
@@ -215,7 +214,7 @@ public class CayleyGraphMaker : MonoBehaviour {
                     MergeByRelator(mergeCandidate);
                 }
             }
-            print("Merged all vertices. Adding new Vertex.");
+            //print("Merged all vertices. Adding new Vertex.");
         }
         onCurrentVertexNumberChanged.Invoke(graphManager.GetVertices().Count.ToString());
     }
