@@ -4,19 +4,8 @@ using UnityEngine;
 public class Screenshotter : MonoBehaviour
 {
     public GameObject canvas;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    // referenced from UI
     public void Screenshot() {
         // Disables the UI and takes a screenshot 
         StartCoroutine(TakeScreenshotAndSave());

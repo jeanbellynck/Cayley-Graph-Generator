@@ -93,8 +93,8 @@ public class CameraManager : MonoBehaviour
             case CameraLockState.SecondaryToMain when !secondaryToMain:
                 LockMainToSecondary();
                 break;
-            case CameraLockState.MainToSecondary or CameraLockState.SecondaryToMain:
-                Unlock();
+            case CameraLockState.MainToSecondary or CameraLockState.SecondaryToMain: // default
+                UnlockCameras();
                 break;
         }
         return;
@@ -109,13 +109,13 @@ public class CameraManager : MonoBehaviour
             cameraLockState = CameraLockState.MainToSecondary;
             secondaryKamera.LockTo(null);
         }
-
-        void Unlock() {
-            mainKamera.LockTo(null);
-            secondaryKamera.LockTo(null);
-            cameraLockState = CameraLockState.Unlocked;
-        }
-
     }
 
+    // referenced from UI
+    public void UnlockCameras()
+    {
+        mainKamera.LockTo(null);
+        secondaryKamera.LockTo(null);
+        cameraLockState = CameraLockState.Unlocked;
+    }
 }

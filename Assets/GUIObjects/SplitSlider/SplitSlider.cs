@@ -15,7 +15,7 @@ public class SplitSlider : MonoBehaviour
         this.active = active;
         handle.SetActive(active);
         if(active) {
-            slider.value = 0.5f;
+            slider.value = 0.7f;
         } else {
             slider.value = 1.0f;
         }

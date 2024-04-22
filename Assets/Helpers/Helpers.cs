@@ -62,6 +62,7 @@ public static class Helpers {
             yield return n;
     }
 
+
     public static bool AllEqual<T>(this IEnumerable<T> enumerable) {
         try {
             var first = enumerable.First();

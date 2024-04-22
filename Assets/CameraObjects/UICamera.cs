@@ -64,8 +64,9 @@ public class UICamera : Kamera {
         Cam.enabled = false;
     }
 
-    public override bool IsMouseInViewport(Vector3 mousePosition) {
-        return renderRect.Contains(renderRectTransform.InverseTransformPoint(mousePosition));
+    public override bool IsMouseInViewport(Vector3 mousePosition, bool ignoreSubCameras = false) {
+        return renderRect.Contains(renderRectTransform.InverseTransformPoint(mousePosition)) || 
+               (!ignoreSubCameras && childKamera != null && childKamera.IsMouseInViewport(mousePosition, true));
     }
 
     

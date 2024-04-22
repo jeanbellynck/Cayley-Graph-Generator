@@ -11,7 +11,8 @@ public class Kamera : MonoBehaviour
 
     [field: SerializeField] public Camera Cam { get; private set; }
 
-    [SerializeField] Kamera otherKamera;
+    [SerializeField] Kamera parentKamera;
+    [SerializeField] protected Kamera childKamera;
 
     public CenterPointer centerPointer;
     // Camera movement should only be possible when the sideMenu states are closed
@@ -26,10 +27,10 @@ public class Kamera : MonoBehaviour
 
     void Update()
     {
-        if (otherKamera != null) {
-            transform.position = otherKamera.transform.position;
-            transform.rotation = otherKamera.transform.rotation;
-            Cam.orthographicSize = otherKamera.Cam.orthographicSize;
+        if (parentKamera != null) {
+            transform.position = parentKamera.transform.position;
+            transform.rotation = parentKamera.transform.rotation;
+            Cam.orthographicSize = parentKamera.Cam.orthographicSize;
             return;
         }
 
@@ -94,9 +95,10 @@ public class Kamera : MonoBehaviour
         }
     }
 
-    public virtual bool IsMouseInViewport(Vector3 mousePosition)
+    public virtual bool IsMouseInViewport(Vector3 mousePosition, bool ignoreSubCameras = false)
     {
-        return Cam.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 };
+        return Cam.ScreenToViewportPoint(mousePosition) is { x: <= 1 and >= 0, y: >= 0 and <= 1 } || 
+               ( !ignoreSubCameras && childKamera != null && childKamera.IsMouseInViewport(mousePosition, true) );
     }
 
     public void zoomIn() => Cam.orthographicSize = Math.Max(1, Cam.orthographicSize - 3);
@@ -120,7 +122,9 @@ public class Kamera : MonoBehaviour
     }
 
     public void LockTo(Kamera other) {
-        otherKamera = other;
+        if (parentKamera != null) parentKamera.childKamera = null;
+        if (other != null) other.childKamera = this;
+        parentKamera = other;
     }
 }
 
