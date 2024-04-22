@@ -6,7 +6,7 @@ public class GroupEdge : Edge {
 
     public void Initialize(GroupVertex startVertex, GroupVertex endVertex, char operation, float hyperbolicity, GraphVisualizer graphVisualizer) {
 
-        if (!char.IsLower(operation)) {
+        if (char.IsUpper(operation)) {
             (startVertex, endVertex) = (endVertex, startVertex);
             operation = char.ToLower(operation);
         }

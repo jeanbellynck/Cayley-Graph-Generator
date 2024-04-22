@@ -14,15 +14,20 @@ If you are of one of the above groups you might like the following features
 
 ### Undergraduate students
 - The gallery contains pretty much all groups which are studied in an algebra class. The generator can be used without understanding what a presentation is
+- Hovering over a group gives a short description in form of a pop-up. A right click refers the user to the Wikipedia article
 - An explanation for what a presentation is, is included in an expandable window
 
 
 ### Graduate students
-- tbd
+- You can study groups visually and gain a new perspective
+- The gallery gives some inspiration on what groups could be studied
+- You can study actions on presentations visually (like HNN-extensions, free products and so on)
 
 ### Researchers
-- tbd
+- There is hardly an other application out there to visualize presentations
+- The application gives you a way to study your own favorite group
 
 ### Visualization enthusiasts
-- tbd
+- Using the app pretty pictures of groups can be generated
+
 

@@ -114,10 +114,18 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
             labelColors[op] = RandomColor();
         }
 
-        // If the edge already exists, no edge is created and the existing edge is returned
-        foreach (GroupEdge edge in startvertex.GetEdges(op)) {
-            if (edge.GetOpposite(startvertex).Equals(endvertex)) {
-                return edge;
+        foreach (var edgeList in startvertex.GetEdges().Values) {
+            foreach (GroupEdge edge in edgeList) {     
+                if(edge.EndPoint.Equals(endvertex)) {
+                    if(edge.Label == op){
+                        // If the edge already exists, no edge is created and the existing edge is returned
+                        return edge;
+                    }
+                    // If an edge between start and end vertex already exists then the force of the new edge is descreased.
+                    // This should reduce jiggling and reduces load on the physics engine.
+                    edge.PhysicsEnabled = false;
+                }
+                
             }
         }
 
@@ -152,13 +160,13 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
                     }
                 }
             }
-            physik.RunShortly();
+            physik.RunShortly(20f);
         }
     }
     public float SubgroupEdgeStrength {
         set {
             _subgroupEdgeStrength = value;
-            physik.RunShortly();
+            physik.RunShortly(20f);
         }
     }
 }

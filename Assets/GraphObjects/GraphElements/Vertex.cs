@@ -88,22 +88,8 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     }
 
-    float velocityRescaling(float x, float v) => x < v ? 1f : (MathF.Sqrt(x - v + 0.25f) + v - 0.5f) / x;
     protected virtual void Update() {
-        if (Activity == 0) {
-            transform.position = VectorN.ToVector3(Position);
-            foreach (var (gen, edges) in GetEdges()) {
-                foreach (var edge in edges) {
-                    edge.finished = false; 
-                    // TODO! This is a stupid workaround since the edges (in LateUpdate) get to see Activity == 0 first and then stop updating.  (this way we get two full spline renders and expose the variable finished
-                }
-            }
-        }
-        else {
-            var movingDirection = VectorN.ToVector3(Position) - transform.position;
-            transform.position += Time.deltaTime * velocityRescaling(movingDirection.magnitude, maxSpeed / Activity) * movingDirection;
-        }
-
+        
     }
 
     public void OnDrawGizmos() {

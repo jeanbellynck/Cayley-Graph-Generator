@@ -28,6 +28,8 @@ public class Edge : MonoBehaviour {
     
     [SerializeField] private float strength = 1f;
     public float Strength { get => strength; set => strength = value; }
+    [SerializeField] private bool physicsEnabled = true; // With this method the pyhsics can be turned off independantly of the value strength
+    public bool PhysicsEnabled { get => physicsEnabled; set => physicsEnabled = value; }
     
     public enum SplinificationType {
         Never,
