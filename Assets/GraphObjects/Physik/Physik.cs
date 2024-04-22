@@ -103,9 +103,9 @@ public class Physik : MonoBehaviour, IActivityProvider {
     /** 
     * Slowly reduces the maximal force to 0. This is used to stop the simulation.
     */
-    public void BeginShutDown() {
+    public void BeginShutDown(float time = -1f) {
         if (!decaying)
-            StartCoroutine(DecayAlpha());
+            StartCoroutine(DecayAlpha(time));
     }
 
     public void Abort() {
@@ -130,7 +130,8 @@ public class Physik : MonoBehaviour, IActivityProvider {
     }
 
 
-    IEnumerator DecayAlpha() {
+    IEnumerator DecayAlpha(float time = -1f) {
+        var decay = time > 0 ? 1 / time : alphaDecay;
         decaying = true;
         while(true) {
             alpha -= alphaDecay * Time.deltaTime;
