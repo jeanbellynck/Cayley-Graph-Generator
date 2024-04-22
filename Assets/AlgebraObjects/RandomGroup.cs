@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using Random = System.Random;
 using QuikGraph;
+using UnityEngine;
+using LabelledEdge = QuikGraph.TaggedEdge<string, EdgeData>;
 using TaggedGraph = QuikGraph.UndirectedGraph<string, QuikGraph.TaggedEdge<string, EdgeData>>;
 using ShGraph = SharpGraph.Graph;
 using GeneratorSet = System.Collections.Generic.HashSet<string>;
@@ -13,6 +15,13 @@ public class EdgeData {
     public string generator = string.Empty;
     public string? start;
     public override string ToString() => $"-{generator}->{start}";
+
+
+    public string OrderedGenerator(string startNode) {
+        return start == startNode
+            ? generator
+            : RandomGroups.InvertGenerator(generator);
+    }
 }
 
 public static class RandomGroups {
@@ -23,7 +32,7 @@ public static class RandomGroups {
         }
     }
 
-    static string InvertGenerator(string generator) 
+    public static string InvertGenerator(string generator) 
     => string.Concat(generator.Reverse().Select(c => char.IsUpper(c) ? char.ToLower(c) : char.ToUpper(c)));
     static List<string> GetGeneratorNames(int k)
     {
@@ -102,34 +111,22 @@ public static class RandomGroups {
     }
 
     public static string[] RelatorsFromGraph(TaggedGraph dirGraph) {
+        var simpleCycles = GetSimpleCycles(dirGraph);
+        Debug.Log(dirGraph.ToStringF());
+        Debug.Log(string.Join(", ", from cycle in simpleCycles select string.Join("|", cycle)));
         return (
-            from nodeCycle in GetSimpleCycles(dirGraph)
-            let l = nodeCycle.Count
-            where l != 2
-            let edgeDataCycle = (
-                from i in Enumerable.Range(0, nodeCycle.Count)
-                select (GetEdge(nodeCycle[i], nodeCycle[(i + 1) % nodeCycle.Count]), i)
-            )
+            from nodeAndEdgeCycle in simpleCycles
             let generatorCycle = (
-                from tuple in edgeDataCycle
-                let edgeData = tuple.Item1
-                let i = tuple.i
-                select
-                    edgeData.start == nodeCycle[i]
-                    ? edgeData.generator
-                    : InvertGenerator(edgeData.generator)
-                )
+                from NodeAndEdge in nodeAndEdgeCycle
+                let edgeData = NodeAndEdge.Item2.Tag
+                select edgeData.OrderedGenerator(NodeAndEdge.Item1)
+            )
             select string.Join("", generatorCycle)
         ).ToArray();
 
-        EdgeData GetEdge(string start, string end)
-        {
-            dirGraph.TryGetEdge(start, end, out var edge);
-            UnityEngine.Debug.Assert(edge != null, nameof(edge) + " != null");
-            return edge?.Tag ?? new EdgeData();
-        }
     }
-    
+
+
     public static (string[] generatorNames, TaggedGraph graph) RandomGraphWithEdgeWords(int vertexCount, int edgeCount, double proportionOfGenerators)
     {
         var random = new Random(); 
@@ -182,25 +179,67 @@ public static class RandomGroups {
         return (generatorNames, relators);
     }
 
-    static List<List<string>> GetSimpleCycles(TaggedGraph taggedGraph)
+    static List<List<(string, LabelledEdge)>> GetSimpleCycles(TaggedGraph taggedGraph)
     {
-        var sharpGraph = Converter.TaggedToSharpGraph(taggedGraph);
-        return (
+        List<List<(string, LabelledEdge)>> nodeAndEdgeCycles = new();
+        Dictionary<(string, string), List<LabelledEdge>> edgeDict = new();
+
+        foreach(var edge in taggedGraph.Edges) {
+            var reverseForDictKey = string.Compare(edge.Source, edge.Target, StringComparison.Ordinal) > 0;
+            var startNode = reverseForDictKey ? edge.Target : edge.Source;
+            var endNode = reverseForDictKey ? edge.Source : edge.Target;
+            edgeDict.TryAdd((startNode, endNode), new ());
+            edgeDict[(startNode, endNode)].Add(edge);
+        }
+
+        foreach (var ((start, end), parallelEdges) in edgeDict) {
+            var firstEdge = parallelEdges.First();
+            nodeAndEdgeCycles.AddRange(
+                from parallelEdge in parallelEdges.Skip(1)    
+                select new List<(string, LabelledEdge)> {
+                    (start, firstEdge),
+                    (end, parallelEdge)
+                }
+            );
+        }
+
+
+        ShGraph sharpGraph3 = new(new List<SharpGraph.Edge> { new("v", "w"), new("w", "v"), new("w", "x"), new("v", "x"), });
+        var a = sharpGraph3.FindSimpleCycles();
+        var sharpGraph = Converter.TaggedQuikGraphToUntaggedSharpGraph(taggedGraph); //Doesn't save parallel edges or edge labels!
+        var nodeCyclesNonParallel = (
             from nodeList in sharpGraph.FindSimpleCycles()
             select (
                 from node in nodeList
                 select node.GetLabel()
             ).ToList()
-        ).ToList();
+        );
+
+        nodeAndEdgeCycles.AddRange(
+            from nodeCycle in nodeCyclesNonParallel
+            let l = nodeCycle.Count
+            where l > 2
+            select (
+                from i in Enumerable.Range(0, l)
+                select (nodeCycle[i], GetEdge(nodeCycle[i], nodeCycle[(i + 1) % l]))
+            ).ToList()
+        ); // Cycles where parallel edges were ignored
+
+
+        return nodeAndEdgeCycles;
+
+        LabelledEdge GetEdge(string start, string end) {
+            if (taggedGraph.TryGetEdge(start, end, out var res))
+                return res;
+            Debug.LogError($"Edge {start} -> {end} couldn't be found in TaggedGraph {taggedGraph}"); // doesn't happen
+            return new(start, end, new());
+        }
     }
 }
 
-internal class Logfunction {
-}
-
-
 public static class Converter {
-    public static ShGraph TaggedToSharpGraph(TaggedGraph quickGraph) =>
+    /* Doesn't save parallel edges or edge labels! */
+    public static ShGraph TaggedQuikGraphToUntaggedSharpGraph(TaggedGraph quickGraph) =>
         new ((
             from edge in quickGraph.Edges
             select new SharpGraph.Edge(edge.Source, edge.Target)

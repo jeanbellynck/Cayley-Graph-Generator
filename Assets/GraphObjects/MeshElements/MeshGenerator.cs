@@ -6,10 +6,14 @@ using UnityEngine;
 public class MeshGenerator : MonoBehaviour
 {
     Mesh mesh;
-    Vertex[] vertexElements = { };
-    
-    public void Initialize(IEnumerable<Vertex> vertexElements, Color color) {
+    public Vertex[] vertexElements = { };
+    MeshManager meshManager;
+    public string type;
+
+    public void Initialize(IEnumerable<Vertex> vertexElements, Color color, MeshManager meshManager, string type) {
+        this.meshManager = meshManager;
         this.vertexElements = vertexElements.ToArray();
+        this.type = type;
         GetComponent<MeshFilter>().mesh = mesh = new();
         mesh.Clear();
         UpdateVertices();
@@ -28,11 +32,22 @@ public class MeshGenerator : MonoBehaviour
         Vector3[] vertices = new Vector3[vertexElements.Length+1];
         Vector3 vectorSum = Vector3.zero;
         for(int i = 0; i < vertexElements.Length; i++) {
-            vectorSum += vertexElements[i].transform.position;
-            vertices[i+1] = vertexElements[i].transform.position;
+            if (vertexElements[i] == null) {
+                Debug.Log($"A Vertex of mesh {name} was destroyed. Destroying the mesh as well!");
+                SelfDestroy();
+                return;
+            }
+            var position = vertexElements[i].transform.position;
+            vectorSum += position;
+            vertices[i+1] = position;
         }
         vertices[0] = vectorSum / vertexElements.Length;
         mesh.vertices = vertices;
+    }
+
+    void SelfDestroy() {
+        meshManager.RemoveMesh(this);
+        Destroy(gameObject);
     }
 
     void UpdateTriangles() {

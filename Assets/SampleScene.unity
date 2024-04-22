@@ -1827,7 +1827,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.23337927
+  m_Size: 0.23544973
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5269,7 +5269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sprites:
-  - {fileID: -5241085961236740850, guid: 716b1fe3b175026428a77f86ddcfcb77, type: 3}
+  - {fileID: 21300000, guid: 716b1fe3b175026428a77f86ddcfcb77, type: 3}
   - {fileID: 21300000, guid: 8b3fcc79349913444b1a161a3863c982, type: 3}
 --- !u!114 &455512309
 MonoBehaviour:
@@ -28566,6 +28566,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: TMPro.TMP_Dropdown, Unity.TextMeshPro
         m_MethodName: set_value
         m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 984086801}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

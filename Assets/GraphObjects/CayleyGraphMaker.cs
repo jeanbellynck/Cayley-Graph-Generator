@@ -325,25 +325,43 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         IEnumerator DrawMeshesCoroutine() {
             var drawnMeshes = 0;
-            foreach (var vertex in graphManager.GetVertices())
-            foreach (string relator in relators) {
-                var vertices = new Vertex[relator.Length];
-                vertices[0] = vertex;
-
-                bool doInitialize = true;
-                for (int i = 0; i < relator.Length - 1; i++) {
-                    vertices[i + 1] = vertices[i].FollowEdge(relator[i]);
-                    if (vertices[i + 1] == null) {
-                        doInitialize = false;
-                        break;
-                    }
+            var vertexEnumerator = graphManager.GetVertices().GetEnumerator();
+            while (true) { // this is a foreach where I catch the InvalidOperationException that is thrown when the collection is modified
+                try {
+                    if (!vertexEnumerator.MoveNext()) break;
+                } catch (InvalidOperationException e) {
+                    vertexEnumerator.Dispose();
+                    if (!e.Message.StartsWith("Collection was modified"))
+                        throw;
+                    vertexEnumerator = graphManager.GetVertices().GetEnumerator();
+                    continue; 
+                    // restart 
                 }
+                
+                var vertex = vertexEnumerator.Current;
+                //if (vertex == null) continue;
 
-                if (doInitialize &&
-                    meshManager.AddMesh(vertices, transform, relator) && // doesn't draw multiply, so even if this is called after continuing, it doesn't matter that old vertices get called again here.
-                    ++drawnMeshes % numberOfMeshesPerFrame == 0
-                   )
-                    yield return null;
+                foreach (var relator in relators) {
+                    var vertices = new Vertex[relator.Length];
+                    vertices[0] = vertex;
+
+                    var doInitialize = true;
+                    for (var i = 0; i < relator.Length - 1; i++) {
+                        vertices[i + 1] = vertices[i].FollowEdge(relator[i]);
+                        if (vertices[i + 1] == null) {
+                            doInitialize = false;
+                            break;
+                        }
+                    }
+
+                    if (doInitialize &&
+                        meshManager.AddMesh(vertices: vertices, parent: transform,
+                            type: relator) && // doesn't draw multiply, so even if this is called after continuing, it doesn't matter that old vertices get called again here.
+                        ++drawnMeshes % numberOfMeshesPerFrame == 0
+                       )
+                        yield return null;
+                }
+         
             }
         }
 

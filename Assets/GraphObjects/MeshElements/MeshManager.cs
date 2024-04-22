@@ -48,7 +48,7 @@ public class MeshManager : MonoBehaviour {
         }
 
         MeshGenerator meshGen = GameObject.Instantiate(meshPrefab, parent.position, Quaternion.identity, parent).GetComponent<MeshGenerator>();
-        meshGen.Initialize(vertices, typeColors.GetValueOrDefault(type, defaultColor));
+        meshGen.Initialize(vertices, typeColors.GetValueOrDefault(type, defaultColor), this, type);
         meshGen.gameObject.name = type + " @ " + vertices.First().name;
         meshList.Add(meshGen);
         foreach (var vertexId in vertexIds)
@@ -66,5 +66,16 @@ public class MeshManager : MonoBehaviour {
             GameObject.Destroy(mesh.gameObject);
         meshList.Clear();
         typesPresentAtVertex.Clear();
+    }
+
+    public void RemoveMesh(MeshGenerator mesh) {
+        meshList.Remove(mesh);
+        foreach (var vertex in mesh.vertexElements)
+        {
+            if (!typesPresentAtVertex.TryGetValue(vertex.Id, out var types)) continue; // should not happen
+            if (!types.TryGetValue(mesh.type, out var meshIds)) continue; // should not happen
+            meshIds.Remove(mesh.GetInstanceID());
+        }
+        
     }
 }

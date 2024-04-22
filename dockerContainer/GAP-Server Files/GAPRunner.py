@@ -38,6 +38,8 @@ STARTUP_SLEEP_TIME = 0.5
 STARTUP_TIMEOUT = 10
 PROCESS_TIMEOUT = 60
 
+ACCESS_CONTROL_ORIGIN = "*"
+
 #endregion
 
 #region GAPRunner class
@@ -196,11 +198,11 @@ def runServer(port):
     async def handle(request):
         """ the request must come as text of the form 'texFile,outdir' """
         query = (await request.text())
-        return web.Response(text=await do_execute(query))
+        return web.Response(text=await do_execute(query), headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
 
     async def handleStopServer(request):
         try:
-            raise KeyboardInterrupt("actually interrupted by call to stopServer")
+            raise KeyboardInterrupt("actually interrupted by call to stopServer", headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
         finally:
             print("Closed by call to /stopServer---")
 
@@ -208,7 +210,8 @@ def runServer(port):
         app = web.Application()
         app.add_routes([
             web.post(f'/{ROUTE_OBFUSCATION}', handle),
-            web.get(f'/stopServer{ROUTE_OBFUSCATION}', handleStopServer)
+            web.get(f'/stopServer{ROUTE_OBFUSCATION}', handleStopServer),
+            web.options(f'/{ROUTE_OBFUSCATION}', lambda x: web.Response(headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN, "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin"}))
         ])
         return app
 
