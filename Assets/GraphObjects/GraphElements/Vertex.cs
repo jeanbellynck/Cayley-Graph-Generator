@@ -13,15 +13,14 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     [SerializeField] float mass = 1;
     public float Mass { get => mass; protected set => mass = value; }
 
-    public VectorN Velocity { get; set; }
-    public VectorN Force { get; set; }
+    [field: SerializeField] public VectorN Velocity { get; set; }
+    [field: SerializeField] public VectorN Force { get; set; }
 
-    public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; set; } = new();
-    public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; set; } = new();
+    public Dictionary<char, HashSet<Edge>> LabeledOutgoingEdges { get; } = new();
+    public Dictionary<char, HashSet<Edge>> LabeledIncomingEdges { get; } = new();
     protected Renderer Mr { get; private set; }
     [SerializeField] protected TooltipContent tooltipContent = new();
 
-    [SerializeField] VectorN _position;
     VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
 
     float creationTime; // = Time.time;
@@ -34,7 +33,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     public event Action OnEdgeChange;
 
-    public VectorN Position { get => _position; set => _position = value; }
+    [field: SerializeField] public VectorN Position { get; set; }
 
     public readonly Dictionary<char, Vector3> splineDirections = new();
     [SerializeField] float splineDirectionFactor = 0.2f; // actually I would like to see these in the inspector AND have them be static
@@ -47,10 +46,10 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     Dictionary<char, Vector3> fixedPreferredRandomDirections = new ();
     readonly Dictionary<char, Vector3> fallbackRandomDirections = new ();
 
-    [SerializeField] public GraphVisualizer graphVisualizer;
+    [SerializeField] protected GraphVisualizer graphVisualizer;
     [SerializeField] IActivityProvider activityProvider;
     [SerializeField] float maxSpeed;
-    float Activity => activityProvider.Activity;
+    protected float Activity => activityProvider.Activity;
 
     public event Action<Kamera> OnCenter;
 
@@ -106,13 +105,13 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     public void Destroy() {
         // Destroy all edges too
         foreach (HashSet<Edge> genEdges in LabeledIncomingEdges.Values) {
-            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
+            List<Edge> genEdgesCopy = new(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 edge.Destroy();
             }
         }
         foreach (HashSet<Edge> genEdges in LabeledOutgoingEdges.Values) {
-            List<Edge> genEdgesCopy = new List<Edge>(genEdges);
+            List<Edge> genEdgesCopy = new(genEdges);
             foreach (Edge edge in genEdgesCopy) {
                 edge.Destroy();
             }
@@ -167,7 +166,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         preferredRandomDirectionsKeys.Sort(); // should be unnecessary as the dict is never changed (overwritten), thus the ordering 'should' be preserved
         if (!randomLabels.SequenceEqual(preferredRandomDirectionsKeys)) {
             var l = randomLabels.Count;
-            preferredRandomDirections = new Dictionary<char, Vector3>(
+            preferredRandomDirections = new(
                 from i in Enumerable.Range(0, l)
                 select new KeyValuePair<char, Vector3>(
                     randomLabels[i], 
@@ -180,7 +179,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         fixedPreferredRandomDirectionsKeys.Sort(); // should be unnecessary as the dict is never changed (overwritten), thus the ordering 'should' be preserved
         if (!labels.SequenceEqual(fixedPreferredRandomDirectionsKeys)) {
             var l = labels.Count;
-            fixedPreferredRandomDirections = new Dictionary<char, Vector3>(
+            fixedPreferredRandomDirections = new(
                 from i in Enumerable.Range(0, l)
                 select new KeyValuePair<char, Vector3>(
                     labels[i],
@@ -278,7 +277,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         else if (edge.EndPoint.Equals(this)) 
             AddIncomingEdge(edge);
         else
-            throw new Exception("The edge does not point to this vertex.");
+            throw new("The edge does not point to this vertex.");
     }
 
     public void RemoveEdge(Edge edge) {
@@ -296,7 +295,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     void AddOutgoingEdge(Edge edge) {
         char generator = edge.Label;
         if (!LabeledOutgoingEdges.ContainsKey(generator)) {
-            LabeledOutgoingEdges.Add(generator, new HashSet<Edge>());
+            LabeledOutgoingEdges.Add(generator, new());
         }
         LabeledOutgoingEdges[generator].Add(edge);
         OnEdgeChange?.Invoke();
@@ -318,9 +317,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
      **/
     void AddIncomingEdge(Edge edge) {
         char label = edge.Label;
-        if (!LabeledIncomingEdges.ContainsKey(label)) {
-            LabeledIncomingEdges.Add(label, new HashSet<Edge>());
-        }
+        LabeledIncomingEdges.TryAdd(label, new());
         LabeledIncomingEdges[label].Add(edge);
         OnEdgeChange?.Invoke();
     }
@@ -329,44 +326,11 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
      * To remove an Edge, use the method removeEdge instead
      **/
     void RemoveIncomingEdge(Edge edge) {
-        char label = edge.Label;
-        if (LabeledIncomingEdges.ContainsKey(label)) {
-            LabeledIncomingEdges[label].Remove(edge);
-        }
+        if (LabeledIncomingEdges.TryGetValue(edge.Label, out HashSet<Edge> incomingEdges)) 
+            incomingEdges.Remove(edge);
         OnEdgeChange?.Invoke();
     }
-
-
-    /**
-    * This method is used to get a neighbouring vertex by following a labelled edge.
-    * WARNING: This always returns the first vertex associated to a generator. All others (if present) are ignored
-    */
-    public Vertex FollowEdge(char op) {
-        return GetEdges(op)?.FirstOrDefault()?.GetOpposite(this);
-    }
-
-
-    public Dictionary<char, List<Edge>> GetEdges() {
-        Dictionary<char, List<Edge>> edges = new();
-        foreach (char op in LabeledOutgoingEdges.Keys) {
-            edges.Add(op, GetOutgoingEdges(op).ToList());
-        }
-        foreach (char op in LabeledIncomingEdges.Keys) {
-            var reverseLabel = ReverseLabel(op);
-            if (!edges.ContainsKey(reverseLabel))
-                edges.Add(reverseLabel, GetIncomingEdges(op).ToList());
-            else
-                edges[reverseLabel].AddRange(GetIncomingEdges(op));
-        }
-        return edges;
-    }
-
-    static char ReverseLabel(char label) => RelatorDecoder.invertGenerator(label); // This should be in the subclass
-    static bool IsReverseLabel(char label) => char.IsUpper(label); // This should be in the subclass
-
-    public IEnumerable<Edge> GetEdges(char label) {
-        return IsReverseLabel(label) ? GetIncomingEdges(ReverseLabel(label)).ToList() : GetOutgoingEdges(label).ToList();
-    }
+    
 
     public TooltipContent GetTooltip() => tooltipContent;
 

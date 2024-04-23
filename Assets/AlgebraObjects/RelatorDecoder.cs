@@ -47,8 +47,11 @@ public class RelatorDecoder {
 
     static string[] DecodeEquation(string equation) {
         string[] sidesOfEquals = equation.Split('=');
-        var leftSide = DecodeOneRelator(sidesOfEquals.FirstOrDefault());
-        var res = from rightSide in sidesOfEquals.Skip(1).DefaultIfEmpty("") select leftSide + invertSymbol(DecodeOneRelator(rightSide));
+        var leftSideInverted = InvertSymbol( DecodeOneRelator(sidesOfEquals.FirstOrDefault()) );
+        var res = sidesOfEquals
+            .Skip(1)
+            .DefaultIfEmpty("")
+            .Select(rightSide => leftSideInverted + DecodeOneRelator(rightSide));
         return res.ToArray();
     }
 
@@ -64,7 +67,7 @@ public class RelatorDecoder {
      **/
     static string DecodeOneRelator(string symbol) 
     {
-        if (string.IsNullOrEmpty(symbol))
+        if (string.IsNullOrWhiteSpace(symbol) || symbol.Trim() == "1")
             return "";
 
         int i = 0;
@@ -77,8 +80,8 @@ public class RelatorDecoder {
                 {
                     int closingBracketIndex = findClosingBracketIndex(symbol, '[', ']', i);
                     int commaIndex = findClosingBracketIndex(symbol, '[', ',', i);
-                    string insideBracket1 = mySubstring(symbol, i + 1, commaIndex);
-                    string insideBracket2 = mySubstring(symbol, commaIndex + 1, closingBracketIndex);
+                    string insideBracket1 = Substring(symbol, i + 1, commaIndex);
+                    string insideBracket2 = Substring(symbol, commaIndex + 1, closingBracketIndex);
                     insideBracket1 = DecodeOneRelator(insideBracket1);
                     insideBracket2 = DecodeOneRelator(insideBracket2);
                 
@@ -88,7 +91,7 @@ public class RelatorDecoder {
                 }
                 // Rule: (abc)^3 -> abCabCabC and (abc) -> abc
                 case '(':
-                    symbol = applyBrackets(symbol, i);
+                    symbol = ApplyBrackets(symbol, i);
                     break;
                 // Rule: a^-1 -> a^1 and a^3 -> aaa
                 default: 
@@ -106,7 +109,7 @@ public class RelatorDecoder {
     /**
      * Takes in a word. Returns the position of the bracket that closes the bracket at the given index 
      **/
-    private static int findClosingBracketIndex(string symbol, char opBracket, char clBracket, int openingBracketIndex)
+    static int findClosingBracketIndex(string symbol, char opBracket, char clBracket, int openingBracketIndex)
     {
         int closingBracketIndex = openingBracketIndex+1;
         int bracketCount = 1;
@@ -125,9 +128,9 @@ public class RelatorDecoder {
         }
         closingBracketIndex--; // Adjust to point to the closing bracket
         return closingBracketIndex;
-    } 
+    }
 
-    private static int findPowerValue(string symbol, int powerIndex)
+    static int findPowerValue(string symbol, int powerIndex)
     {
         int i = powerIndex + 1;
         if(i < symbol.Length && symbol[i] == '-') {
@@ -137,27 +140,27 @@ public class RelatorDecoder {
         {
             i++;
         }
-        return int.Parse(mySubstring(symbol, powerIndex + 1, i));
+        return int.Parse(Substring(symbol, powerIndex + 1, i));
     }
 
     /**
      * Takes a relator consisting of only letters and returns the inverse by big letters small, small letters big and reversing the string order
      **/
-   public static string invertSymbol(string symbol) {
-        var result = (from generator in symbol select invertGenerator(generator));
+   public static string InvertSymbol(string symbol) {
+        var result = (from generator in symbol select InvertGenerator(generator));
         return new string(result.Reverse().ToArray());
     }
 
-    public static char invertGenerator(char symbol) {
+    public static char InvertGenerator(char symbol) {
         return char.IsLower(symbol) ? char.ToUpper(symbol) : char.ToLower(symbol);
     }   
 
     /**
-     * Does logic for brackets, edits the symbol variable
+     * Does logic for brackets
      */
-    private static string applyBrackets(string symbol, int bracketIndex) {
+    static string ApplyBrackets(string symbol, int bracketIndex) {
         int closingParenthesisIndex = findClosingBracketIndex(symbol, '(', ')', bracketIndex);
-        string insideBrackets = mySubstring(symbol, bracketIndex + 1, closingParenthesisIndex);
+        string insideBrackets = Substring(symbol, bracketIndex + 1, closingParenthesisIndex);
         insideBrackets = DecodeOneRelator(insideBrackets);
         // If the bracket was surrounded by a power
         if (closingParenthesisIndex + 1 < symbol.Length && symbol[closingParenthesisIndex + 1] == '^')
@@ -166,21 +169,21 @@ public class RelatorDecoder {
             // If the power is negative invert the inside of the brackets
             if(power < 0) {
                 power = -power;
-                insideBrackets = invertSymbol(insideBrackets);
+                insideBrackets = InvertSymbol(insideBrackets);
                 // Remove minus sign (this code might remove the ^ symbol instead of the minus)
-                symbol = mySubstring(symbol, 0, closingParenthesisIndex + 2) + symbol.Substring(closingParenthesisIndex + 3);
+                symbol = Substring(symbol, 0, closingParenthesisIndex + 2) + symbol.Substring(closingParenthesisIndex + 3);
             }
             // Repeat the inside of the brackets
             insideBrackets = string.Concat(Enumerable.Repeat(insideBrackets, power));
-            symbol = mySubstring(symbol, 0, bracketIndex) + insideBrackets + symbol.Substring(closingParenthesisIndex + 2 + power.ToString().Length);
+            symbol = Substring(symbol, 0, bracketIndex) + insideBrackets + symbol.Substring(closingParenthesisIndex + 2 + power.ToString().Length);
         }
         else {
-            symbol = mySubstring(symbol, 0, bracketIndex) + insideBrackets + symbol.Substring(closingParenthesisIndex + 1);
+            symbol = Substring(symbol, 0, bracketIndex) + insideBrackets + symbol.Substring(closingParenthesisIndex + 1);
         }
         return symbol;
-    }  
+    }
 
-    private static string mySubstring(string s, int startIndex, int endIndex) {
+    static string Substring(string s, int startIndex, int endIndex) {
         return s.Substring(startIndex, endIndex - startIndex);
     }
 }

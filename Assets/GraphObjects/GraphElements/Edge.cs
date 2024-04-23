@@ -1,6 +1,5 @@
 using Dreamteck.Splines;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -10,26 +9,20 @@ public class Edge : MonoBehaviour {
     [SerializeField] protected float PercentHead = 0.1f;
     [SerializeField] protected float vertexRadius = 0.1f;
     [SerializeField] bool useSplines = true;
-
-    [SerializeField] float length = 1f;
-
+    
     float creationTime; // = Time.time;
     public float Age => Time.time - creationTime;
 
-    [SerializeField] Vertex startPoint;
-    [SerializeField] Vertex endPoint;
-
-    [SerializeField] char _label;
-    public char Label { get => _label; protected set => _label = value; }
-    public Vertex StartPoint { get => startPoint; protected set => startPoint = value; }
-    public Vertex EndPoint { get => endPoint; protected set => endPoint = value; }
-    public float Length { get => length; protected set => length = value; }
+    [field:SerializeField] public char Label { get; protected set; }
+    [field: SerializeField] public Vertex StartPoint { get; protected set; }
+    [field: SerializeField] public Vertex EndPoint { get; protected set; }
+    [field: SerializeField] public float Length { get; protected set; }
     public Vector3 Direction => EndPoint.transform.position - StartPoint.transform.position;
+
+    [field:SerializeField] public float Strength { get; set; } = 1f;
     
-    [SerializeField] private float strength = 1f;
-    public float Strength { get => strength; set => strength = value; }
-    [SerializeField] private bool physicsEnabled = true; // With this method the pyhsics can be turned off independantly of the value strength
-    public bool PhysicsEnabled { get => physicsEnabled; set => physicsEnabled = value; }
+    // With this method the Physics can be turned off independently of the value strength
+    [field:SerializeField] public bool PhysicsEnabled { get; set; }
     
     public enum SplinificationType {
         Never,
@@ -48,13 +41,11 @@ public class Edge : MonoBehaviour {
     MeshRenderer meshRenderer;
     LineRenderer lineRenderer;
 
-    public bool finished;
-    public GraphVisualizer graphVisualizer;
+    [SerializeField] bool finished;
+    [SerializeField] GraphVisualizer graphVisualizer;
 
-    [SerializeField]
-    protected float midDisplacementFactor = 0.18f;
-    [SerializeField]
-    protected float midDirectionFactor = 0.3f;
+    [SerializeField] protected float midDisplacementFactor = 0.18f;
+    [SerializeField] protected float midDirectionFactor = 0.3f;
     //Vector3 vectorForOldRandomMidDisplacement = Vector3.zero;
     //Vector3 oldRandomMidDisplacement = Vector3.zero;
     public float Activity => graphVisualizer.Activity;
@@ -79,7 +70,7 @@ public class Edge : MonoBehaviour {
         meshRenderer = GetComponent<MeshRenderer>();
         lineRenderer = GetComponent<LineRenderer>();
 
-        SetColors(new Color(1, 0, 0));
+        SetColors(new(1, 0, 0));
 
         useSplines = splinificationType == SplinificationType.Always;
 
@@ -110,7 +101,7 @@ public class Edge : MonoBehaviour {
 
 
     protected virtual void LateUpdate() {
-        if (startPoint == null || endPoint == null) return;
+        if (StartPoint == null || EndPoint == null) return;
         if (splinificationType != lastSplinificationType || Activity > 0) {
             lastSplinificationType = splinificationType;
             finished = false;
@@ -226,7 +217,7 @@ public class Edge : MonoBehaviour {
     public virtual Vertex GetOpposite(Vertex vertex) {
         if (vertex.Equals(StartPoint)) return EndPoint;
         if (vertex.Equals(EndPoint)) return StartPoint;
-        throw new Exception("Vertex is not part of this edge.");
+        throw new("Vertex is not part of this edge.");
     }
 
     //public virtual char ReverseLabel => RelatorDecoder.invertGenerator(Label); // This should be in the subclass

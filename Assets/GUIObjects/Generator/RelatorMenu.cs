@@ -116,7 +116,7 @@ public class RelatorMenu : MonoBehaviour {
                         string.Join(",",
                             from gen in generators
                             where !presentation.Contains(gen)
-                            select gen + RelatorDecoder.invertSymbol(gen)
+                            select gen + RelatorDecoder.InvertSymbol(gen)
                         );
         return presentation;
     }

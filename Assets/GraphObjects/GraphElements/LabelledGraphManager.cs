@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using SharpGraph;
-using UnityEngine;
 
 /**
  * This class is used to manage the graph. It is responsible for storing the vertices and edges and for keeping track of the idCounter.   
@@ -14,7 +11,7 @@ using UnityEngine;
  * ToDo: Move all of the visual stuff to a new class.
  */
 public class LabelledGraphManager {
-    private int idCounter = 0; // Starts by 1 as 0 is reserved for the neutral element
+    int idCounter = 0; // Starts by 1 as 0 is reserved for the neutral element
     readonly List<Vertex> vertices = new();
     readonly Dictionary<char, List<Edge>> edges = new(); // The edges are stored in a dictionary, sorted by the label of the edge. This is done to make it easier to find the edges of a certain label. (It also makes it possible to access the edges of a subgroup)
     //readonly List<Edge> edges = new();
@@ -48,7 +45,7 @@ public class LabelledGraphManager {
      * Adds an edge to the graph. The edge is added to the list of edges and to the dictionary of edges, sorted by the label of the edge.
      */
     public void AddEdge(Edge edge) {
-        if (!edges.ContainsKey(edge.Label)) edges[edge.Label] = new List<Edge>();
+        if (!edges.ContainsKey(edge.Label)) edges[edge.Label] = new();
         edges[edge.Label].Add(edge);
         onEdgeAdded?.Invoke(edge);
     }
@@ -76,14 +73,14 @@ public class LabelledGraphManager {
     }
 
     public void RemoveEdges(char label) {
-        if (!edges.ContainsKey(label)) return;
-        foreach (Edge edge in edges[label]) edge.Destroy();
+        if (!edges.TryGetValue(label, out List<Edge> edgeList)) return;
+        foreach (Edge edge in edgeList) edge.Destroy();
         edges.Remove(label);
     }
 
 
     public List<Edge> GetEdges(char label) {
-        return edges[label];
+        return edges.TryGetValue(label, out var res) ? res : new();
     }
 
     public List<Edge> GetEdges() {

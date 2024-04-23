@@ -7,8 +7,7 @@ public class HyperbolicityMatrix : MonoBehaviour {
     public GameObject hyperbolicityTextField;
     public GameObject cayleyGraph;
 
-    [SerializeField]
-    private GameObject[,] textFields = new GameObject[0, 0];
+    [SerializeField] GameObject[,] textFields = new GameObject[0, 0];
 
     // Start is called before the first frame update
     void Start() {

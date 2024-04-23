@@ -54,10 +54,12 @@ MonoBehaviour:
   PercentHead: 0.1
   vertexRadius: 0.1
   useSplines: 0
-  length: 1
-  startPoint: {fileID: 0}
-  endPoint: {fileID: 0}
-  _label: 0
+  <Label>k__BackingField: 0
+  <StartPoint>k__BackingField: {fileID: 0}
+  <EndPoint>k__BackingField: {fileID: 0}
+  <Length>k__BackingField: 0
+  <Strength>k__BackingField: 1
+  <PhysicsEnabled>k__BackingField: 1
   finished: 0
   graphVisualizer: {fileID: 0}
   midDisplacementFactor: 0.18

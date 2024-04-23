@@ -75,7 +75,7 @@ public class GroupOption : MonoBehaviour
         transform.GetChild(0).GetChild(1).GetChild(1).GetComponent<TMP_Text>().text = presentation;
     }
 
-    private static int findPowerValue(string symbol, int powerIndex)
+    static int findPowerValue(string symbol, int powerIndex)
     {
         int i = 1;
         if(powerIndex+i < symbol.Length && symbol[powerIndex+i] == '-') {

@@ -15,7 +15,9 @@ public class CayleyGraphMaker : MonoBehaviour {
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
     protected char[] operators; // Like generators but with upper and lower case letters
     protected string[] relators;// = new string[]{"abAB"};
-
+    HashSet<string> relatorVariants;
+    
+    
     [SerializeField] float hyperbolicity = 1; // This might be better off in GraphVisualizer too.
     readonly Dictionary<(char, char), float> hyperbolicityMatrix = new();
 
@@ -28,12 +30,15 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     // Contains the references to all vertices on the border of the graph, sorted by distance to the center.
     readonly List<List<GroupVertex>> boundaryNodes = new();
-    // Contains the references of al vertices which need to be checked for relator application.
+    // Contains the references of all vertices which need to be checked for relator application.
     readonly HashSet<GroupVertex> relatorCandidates = new();
     readonly HashSet<GroupVertex> edgeMergeCandidates = new();
     [SerializeField] UnityEvent<bool> onStateChanged = new();
     [SerializeField] UnityEvent<string> onWantedVertexNumberChanged = new(); // this should be int, but I'm lazy, and only need this to set text
     [SerializeField] UnityEvent<string> onCurrentVertexNumberChanged = new();// this should be int, but I'm lazy, and only need this to set text
+
+    public enum GroupMode { Group, Monoid, SemiGroup }
+    [SerializeField] GroupMode groupMode = GroupMode.Group;
 
     bool _running;
     public bool Running {
@@ -47,26 +52,35 @@ public class CayleyGraphMaker : MonoBehaviour {
 
         if (graphManager == null) return;
 
+        if (groupMode == GroupMode.SemiGroup) 
+            Debug.LogWarning("Semigroups without neutral element aren't implemented yet!");
+
         GroupVertex neutralElement = CreateVertex(null, default);
+        neutralElement.semiGroup = groupMode != GroupMode.Group; 
+        // todo: to Initialize (it is currently just a weird way of initializing the neutral element)
         neutralElement.transform.localScale *= 1.6f;
         neutralElement.Center();
         
+
         ContinueVisualization();
     }
 
-    public void Initialize(char[] generators, string[] relators, Physik physik, GraphVisualizer graphVisualizer)
+    public void Initialize(IEnumerable<char> generators, string[] relators, Physik physik, GraphVisualizer graphVisualizer)
     {
-        this.generators = generators;
+        this.generators = generators.Select(char.ToLower).ToArray();
         this.relators = relators;
         this.physik = physik;
         this.graphVisualizer = graphVisualizer;
+        this.groupMode = groupMode;
         graphManager = graphVisualizer.graphManager;
-        operators = new char[2 * generators.Length];
+        this.relatorVariants = relators.SelectMany(GenerateRelatorVariants).ToHashSet();
 
-        for (int i = 0; i < generators.Length; i++) {
-            operators[i] = char.ToLower(generators[i]);
-            operators[i + generators.Length] = char.ToUpper(generators[i]);
+        if (groupMode == GroupMode.Group) {
+            this.operators = this.generators.Concat(this.generators.Select(char.ToUpper)).ToArray();
         }
+        else
+            this.operators = this.generators;
+
         Reset();
     }
 
@@ -129,15 +143,10 @@ public class CayleyGraphMaker : MonoBehaviour {
                 break;
             }
 
-            foreach (char gen in generators) {
-                if (borderVertex.FollowEdge(gen) == null) {
-                    GroupVertex newVertex = CreateVertex(borderVertex, gen);
-                    relatorCandidates.Add(newVertex);
-                }
-                if (borderVertex.FollowEdge(char.ToUpper(gen)) == null) {
-                    GroupVertex newVertex = CreateVertex(borderVertex, char.ToUpper(gen));
-                    relatorCandidates.Add(newVertex);
-                }
+            foreach (char gen in operators) {
+                if (borderVertex.FollowEdge(gen) != null) continue;
+                // Vertex creation!
+                relatorCandidates.Add(CreateVertex(borderVertex, gen));
             }
             MergeAll();
         }
@@ -148,7 +157,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     /**
     * Creates a new vertex and adds it to the graph. Also creates an edge between the new vertex and the predecessor.
     */
-    private GroupVertex CreateVertex(GroupVertex predecessor, char op) {
+    GroupVertex CreateVertex(GroupVertex predecessor, char op) {
         GroupVertex newVertex = graphVisualizer.CreateVertex(predecessor, op, hyperbolicity);
         AddBorderVertex(newVertex);
         // Vertex is not the neutral element and an edge need to be created
@@ -158,9 +167,12 @@ public class CayleyGraphMaker : MonoBehaviour {
     }
 
 
-    public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
-        GroupEdge newEdge = graphVisualizer.CreateEdge(startvertex, endvertex, op, hyperbolicity);
-        return newEdge;
+    GroupEdge CreateEdge(GroupVertex startVertex, GroupVertex endVertex, char op) {
+        if (GroupVertex.IsReverseLabel(op)) {
+            (startVertex, endVertex) = (endVertex, startVertex);
+            op = GroupVertex.ReverseLabel(op);
+        }
+        return graphVisualizer.CreateEdge(startVertex, endVertex, op, hyperbolicity);
     }
 
 
@@ -173,14 +185,11 @@ public class CayleyGraphMaker : MonoBehaviour {
     }
 
     public GroupVertex GetNextBorderVertex() {
-        GroupVertex nextVertex = null;
         foreach (List<GroupVertex> borderVertices in boundaryNodes) {
             borderVertices.RemoveAll(item => item == null);
-            if (borderVertices.Count > 0) {
-                nextVertex = borderVertices.First();
-                borderVertices.RemoveAt(0);
-                return nextVertex;
-            }
+            var nextBorderVertex = borderVertices.Pop();
+            if (nextBorderVertex != null)
+                return nextBorderVertex;
         }
         return null;
     }
@@ -196,25 +205,21 @@ public class CayleyGraphMaker : MonoBehaviour {
     /**
     * Applies the relators to all groupElements in the mergeCandidates list.
     */
-    private void MergeAll() {
-        while (edgeMergeCandidates.Count > 0 || relatorCandidates.Count > 0) {
-            GroupVertex mergeCandidate;
-            // If two edges of the same generator lead to the different vertices, they need to be merged as fast as possible. Otherwise following generators is yucky.
-            if (edgeMergeCandidates.Count > 0) {
-                mergeCandidate = edgeMergeCandidates.First();
-                edgeMergeCandidates.Remove(mergeCandidate);
-                if (mergeCandidate != null) { // Might not be necessary
-                    MergeEdges(mergeCandidate);
-                }
+    void MergeAll() {
+        while (true) {
+                // If two edges of the same generator lead to the different vertices, they need to be merged as fast as possible. Otherwise, following generators is yucky.
+            var mergeCandidate = edgeMergeCandidates.Pop();
+            if (mergeCandidate != null) { 
+                MergeEdges(mergeCandidate);
+                continue;
             }
-            else {
-                mergeCandidate = relatorCandidates.First();
-                relatorCandidates.Remove(mergeCandidate);
-                if (mergeCandidate != null) {
-                    MergeByRelator(mergeCandidate);
-                }
+
+            mergeCandidate = relatorCandidates.Pop();
+            if (mergeCandidate != null) {
+                MergeByRelators(mergeCandidate);
+                continue;
             }
-            //print("Merged all vertices. Adding new Vertex.");
+            break;
         }
         onCurrentVertexNumberChanged.Invoke(graphManager.GetVertices().Count.ToString());
     }
@@ -222,41 +227,30 @@ public class CayleyGraphMaker : MonoBehaviour {
     void MergeEdges(GroupVertex vertex) {
         foreach (char op in operators) {
             List<GroupEdge> generatorEdges = vertex.GetEdges(op);
-            if (generatorEdges.Count > 1) {
-                GroupEdge primaryEdge = generatorEdges[0];
-                for (int i = 1; i < generatorEdges.Count; i++) {
-                    //edgeMergeCandidates.Add(vertex); // After an edge merge a vertex might be merged with its neighbor meaning its edges can be merged again.
-                    MergeVertices(primaryEdge.GetOpposite(vertex), generatorEdges[i].GetOpposite(vertex));
-                }
+            var primaryEdge = generatorEdges.Pop();
+
+            foreach (var otherEdge in generatorEdges) {
+                //edgeMergeCandidates.Add(vertex); // After an edge merge a vertex might be merged with its neighbor meaning its edges can be merged again.
+                MergeVertices(primaryEdge.GetOpposite(vertex), otherEdge.GetOpposite(vertex));
             }
+            
         }
     }
 
 
     /**
-    * Applies the relator to the given groupElement. For that the relator is followed, starting at a different string index each time. 
-    * If the relator leads to an other group element, the two groupElements are merged.
+    * Follows the relators from the startingElement until it finds  and tries to merge the resulting element with the startingElement.
     */
-    void MergeByRelator(GroupVertex startingElement) {
+    void MergeByRelators(GroupVertex startingElement) {
         // Der Code ist ein wenig unoptimiert. Nach dem Anwenden eines Relators versucht er wieder alle anzuwenden. 
-        // Dadurch steigt die Komplexität im Worst-Case zu n^2 falls alle Relatoren genutzt werden. (Was natürlichunwahrscheinlich ist)
-        foreach (string relator in relators) {
-            List<string> relatorVariants = generateRelatorVariants(relator);
-            foreach (string relatorVariant in relatorVariants) {
-                GroupVertex currentElement = startingElement;
-                bool relatorLeadToOtherElement = true;
-                foreach (char op in relatorVariant) {
-                    currentElement = currentElement.FollowEdge(op);
-                    if (currentElement == null) {
-                        relatorLeadToOtherElement = false;
-                        break;
-                    }
-                }
-                if (relatorLeadToOtherElement && !currentElement.Equals(startingElement)) {
-                    MergeVertices(startingElement, currentElement);
-                    return;
-                }
-            }
+        // Dadurch steigt die Komplexität im Worst-Case zu n^2 falls alle Relatoren genutzt werden. (Was natürlich unwahrscheinlich ist)
+        foreach (string relatorVariant in relatorVariants) {
+
+            var otherElement = startingElement.FollowGeneratorPath(relatorVariant);
+            if (otherElement == null || otherElement.Equals(startingElement)) 
+                continue;
+            MergeVertices(startingElement, otherElement);
+            return;
         }
     }
 
@@ -264,10 +258,33 @@ public class CayleyGraphMaker : MonoBehaviour {
      * Generates all possible variants of the given relator.
      * Variants are generated by rotating or inverting the relator string.
      **/
-    public List<string> generateRelatorVariants(string relator) {
-        string relatorInverse = RelatorDecoder.invertSymbol(relator);
-        List<string> variants = new();
-        for (int i = 0; i < relator.Length; i++) {
+    List<string> GenerateRelatorVariants(string relator) {
+        if (groupMode != GroupMode.Group) {
+            // we assume that all relators have the form v w^-1 or w^-1 v for two positive words v and w (they come in this form if they were written as v=w or [x,y])
+            string v, wInv; 
+            if (char.IsUpper(relator[^1])) {
+                int i = relator.Length;
+                while ( i > 0 && char.IsUpper(relator[i-1]) )
+                    i--;
+
+                v = relator[..i];
+                wInv = relator[i..];
+            }
+            else {
+                int i = 0;
+                while (i < relator.Length && char.IsUpper(relator[i]))
+                    i++;
+                v = relator[i..];
+                wInv = relator[..i];
+                // actually equivalent: return new() { relator, RelatorDecoder.InvertSymbol(relator) }
+            }
+            return new() { wInv + v, RelatorDecoder.InvertSymbol(v) + RelatorDecoder.InvertSymbol(wInv) };
+            // the equivalence relation in the monoid presentation is such that we only need to check these two variants of the relator; going backwards, then forwards
+        }
+
+        string relatorInverse = RelatorDecoder.InvertSymbol(relator);
+        List<string> variants = new() {relator, relatorInverse};
+        for (int i = 1; i < relator.Length; i++) { 
             variants.Add(relator[i..] + relator[..i]);
             variants.Add(relatorInverse[i..] + relatorInverse[..i]);
         }
@@ -287,11 +304,10 @@ public class CayleyGraphMaker : MonoBehaviour {
         vertex1.Merge(vertex2, hyperbolicity);
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
-        foreach (char op in vertex2.GetEdges().Keys) {
-            List<GroupEdge> generatorEdgesCopy = new(vertex2.GetEdges(op));
-            foreach (GroupEdge edge in generatorEdgesCopy) {
+        var edges = vertex2.GetEdges();
+        foreach (char op in edges.Keys) {
+            foreach (GroupEdge edge in edges[op]) 
                 CreateEdge(vertex1, edge.GetOpposite(vertex2), op);
-            }
         }
 
         // Delete vertex2
@@ -325,7 +341,9 @@ public class CayleyGraphMaker : MonoBehaviour {
         IEnumerator DrawMeshesCoroutine() {
             var drawnMeshes = 0;
             var vertexEnumerator = graphManager.GetVertices().GetEnumerator();
-            while (true) { // this is a foreach where I catch the InvalidOperationException that is thrown when the collection is modified
+            while (true) { 
+                // this is foreach(vertex in graphManager.GetVertices())
+                // where I catch the InvalidOperationException that is thrown when the collection is modified
                 try {
                     if (!vertexEnumerator.MoveNext()) break;
                 } catch (InvalidOperationException e) {
@@ -341,21 +359,15 @@ public class CayleyGraphMaker : MonoBehaviour {
                 //if (vertex == null) continue;
 
                 foreach (var relator in relators) {
-                    var vertices = new Vertex[relator.Length];
-                    vertices[0] = vertex;
 
-                    var doInitialize = true;
-                    for (var i = 0; i < relator.Length - 1; i++) {
-                        vertices[i + 1] = vertices[i].FollowEdge(relator[i]);
-                        if (vertices[i + 1] == null) {
-                            doInitialize = false;
-                            break;
-                        }
-                    }
+                    if (vertex is not GroupVertex groupVertex) continue; // shouldn't happen
 
-                    if (doInitialize &&
-                        meshManager.AddMesh(vertices: vertices, parent: transform,
-                            type: relator) && // doesn't draw multiply, so even if this is called after continuing, it doesn't matter that old vertices get called again here.
+                    var path = groupVertex.GeneratorPath(relator); 
+                    // this is a list of vertices, and is shorter than relator.Length + 1 only if the path exited the graph
+
+                    if (path.Count > relator.Length &&
+                        meshManager.AddMesh(path.Take(relator.Length), parent: transform, type: relator) && 
+                        // doesn't draw multiply, so even if this is called after continuing, it doesn't matter that old vertices get called again here.
                         ++drawnMeshes % numberOfMeshesPerFrame == 0
                        )
                         yield return null;
@@ -425,6 +437,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         this.generators = generators;
     }
 
+    // referenced from UI
     public void ToggleActiveState() {
         if (Running)
             StopVisualization();
@@ -440,5 +453,10 @@ public class CayleyGraphMaker : MonoBehaviour {
             else
                 ContinueVisualization();
         }
+    }
+
+    //referenced from UI
+    public void SetGroupMode(int mode) {
+        groupMode = (GroupMode)mode;
     }
 }

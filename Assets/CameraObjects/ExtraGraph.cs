@@ -47,7 +47,7 @@ public class ExtraGraph : MonoBehaviour
 
     void DrawGraph(IEnumerable<char> generators, TaggedGraph graph) {
         graphVisualizer.SetSplinificationMode((int)Edge.SplinificationType.Always);
-        graphVisualizer.Initialize(generators.ToArray(), physik);
+        graphVisualizer.Initialize(generators.ToArray(), activityProvider: physik);
         TaggedGraphToGraphManager(graph);
         Debug.Log(graph.ToStringF());
     }
@@ -70,7 +70,7 @@ public class ExtraGraph : MonoBehaviour
             bool reverseOrientation = (edge.Tag?.start == edge.Target);
             bool reverseLabel = char.IsUpper(label);
             if ( reverseLabel )
-                label = RelatorDecoder.invertGenerator(label);
+                label = RelatorDecoder.InvertGenerator(label);
 
             if ( reverseOrientation != reverseLabel )
                 // xor (minus mal minus)

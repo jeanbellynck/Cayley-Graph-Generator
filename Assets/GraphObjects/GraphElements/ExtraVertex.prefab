@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 8930971666199616475}
   - component: {fileID: -7652529086318207544}
   - component: {fileID: -1074582867738048411}
-  - component: {fileID: -1691834102966914753}
   m_Layer: 9
   m_Name: ExtraVertex
   m_TagString: Untagged
@@ -122,24 +121,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mass: 1
+  tooltipContent:
+    text: Each cycle of labelled edges defines a relator
+    url: 
   splineDirectionFactor: 0.2
   orthogonalSplineDirectionFactor: 0.07
   preferEights: 0
   equalDirectionDisplacementFactor: 0.1
   graphVisualizer: {fileID: 0}
   maxSpeed: 8
---- !u!114 &-1691834102966914753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3096654801577124718}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc6a547472565af40aeec347085b26aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content:
-    text: Each cycle of labelled edges defines a relator
-    url: 

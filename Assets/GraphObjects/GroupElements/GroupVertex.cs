@@ -17,7 +17,26 @@ public class GroupVertex : Vertex {
 
     public override float EdgeCompletion { get; protected set; }
 
-    [SerializeField] bool inSubgroup = true;
+    [SerializeField] public bool semiGroup;
+
+    public void Initialize(VectorN position, GraphVisualizer graphVisualizer, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool semiGroup = false) {
+        if (!string.IsNullOrEmpty(name)) this.name = name;
+        if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
+        this.semiGroup = semiGroup;
+
+        OnEdgeChange += CalculateEdgeCompletion;
+        OnEdgeChange += () => {
+            tooltipContent = new() {
+                text = this.name == "1"
+                    ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
+                    : PathsFromNeutralElement.Count > 20 
+                        ? string.Join("=\n", PathsFromNeutralElement.GetRange(0, 20)) + "\n..." 
+                        : string.Join("=\n", PathsFromNeutralElement)
+            };
+        };
+
+        base.Initialize(position, graphVisualizer);
+    }
 
     void CalculateEdgeCompletion()
     {
@@ -46,46 +65,71 @@ public class GroupVertex : Vertex {
         //Mr.material.SetColor("_BaseColor", new Color(Stress, 0, 0, EdgeCompletion));
     }
 
-    public new Dictionary<char, List<GroupEdge>> GetEdges() {
-        return base.GetEdges().ToDictionary(kvp=> kvp.Key, kvp => kvp.Value.Cast<GroupEdge>().ToList());
+    public Dictionary<char, List<GroupEdge>> GetEdges() {
+        Dictionary<char, List<GroupEdge>> edges = LabeledOutgoingEdges.Keys.ToDictionary(op => op, op => GetOutgoingEdges(op).Cast<GroupEdge>().ToList());
+        //if (semiGroup) return edges;
+        foreach (char op in LabeledIncomingEdges.Keys) {
+            var reverseLabel = ReverseLabel(op);
+            if (!edges.ContainsKey(reverseLabel))
+                edges.Add(reverseLabel, GetIncomingEdges(op).Cast<GroupEdge>().ToList());
+            else
+                edges[reverseLabel].AddRange(GetIncomingEdges(op).Cast<GroupEdge>());
+        }
+        return edges;
     }
 
-    public new List<GroupEdge> GetEdges(char op) {
-        return base.GetEdges(op).Cast<GroupEdge>().ToList();
+    public static char ReverseLabel(char label) => RelatorDecoder.InvertGenerator(label);
+    public static bool IsReverseLabel(char label) => char.IsUpper(label);
+
+    public List<GroupEdge> GetEdges(char label) {
+        //if (semiGroup) return GetOutgoingEdges(label).Cast<GroupEdge>().ToList();
+        // in semigroups, this will only be called for reverse labels when backwards-following edges
+        return IsReverseLabel(label) ? GetIncomingEdges(ReverseLabel(label)).Cast<GroupEdge>().ToList() : GetOutgoingEdges(label).Cast<GroupEdge>().ToList();
+    }
+    
+    public GroupVertex FollowEdge(char op) {
+        return GetEdges(op).FirstOrDefault()?.GetOpposite(this);
     }
 
-    public new GroupVertex FollowEdge(char op) {
-        return (GroupVertex) base.FollowEdge(op);
+    /**
+     * Takes in a vertex and a string and follows the path as given by the generator string.
+     * Returns the vertex at the end of the path.
+     * Returns null if the path is not valid or leaves the ambient graph.
+     **/
+    public GroupVertex FollowGeneratorPath(string word) {
+        GroupVertex currentVertex = this;
+        foreach (char op in word) {
+            currentVertex = currentVertex.FollowEdge(op);
+            if (currentVertex == null)
+                return null;
+        }
+        return currentVertex;
     }
 
-    public void Initialize(VectorN position, GraphVisualizer graphVisualizer, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool inSubgroup = true) {
-        if (!string.IsNullOrEmpty(name)) this.name = name;
-        if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
-        this.inSubgroup = inSubgroup;
-
-        OnEdgeChange += CalculateEdgeCompletion;
-        OnEdgeChange += () => {
-            tooltipContent = new() {
-                text = this.name == "1"
-                    ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
-                    : PathsFromNeutralElement.Count > 20 
-                        ? string.Join("=\n", PathsFromNeutralElement.GetRange(0, 20)) + "\n..." 
-                        : string.Join("=\n", PathsFromNeutralElement)
-            };
-        };
-
-        base.Initialize(position, graphVisualizer);
+    public List<GroupVertex> GeneratorPath(string word) {
+        List<GroupVertex> path = new(capacity: word.Length + 1) {this};
+        GroupVertex currentVertex = this;
+        foreach (var op in word) {
+            currentVertex = currentVertex.FollowEdge(op);
+            if (currentVertex == null)
+                return path;
+            path.Add(currentVertex);
+        }
+        return path;
+    
     }
+
 
     public void InitializeFromPredecessor(GroupVertex predecessor, char op, float hyperbolicScaling) {
         Initialize(
             predecessor.Position, 
             predecessor.graphVisualizer,
             predecessor.name == "1" ? op.ToString() : predecessor.name + op,
-            from path in predecessor.PathsFromNeutralElement select path + op
+            from path in predecessor.PathsFromNeutralElement select path + op,
+            predecessor.semiGroup
         );
 
-        GroupVertex prepredecessor = predecessor.FollowEdge(RelatorDecoder.invertGenerator(op));
+        GroupVertex prepredecessor = predecessor.FollowEdge(RelatorDecoder.InvertGenerator(op));
         if (prepredecessor != null) {
             VectorN diff = predecessor.Position - prepredecessor.Position;
             if (diff.MagnitudeSquared() > 0) diff = diff.Normalize();

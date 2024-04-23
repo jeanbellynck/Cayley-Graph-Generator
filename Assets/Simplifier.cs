@@ -14,6 +14,7 @@ public class Simplifier : MonoBehaviour {
     [SerializeField] string[] lastOptimizedGenerators;
     [SerializeField] string[] lastOptimizedRelators;
     [SerializeField] float timeout = 5;
+    [SerializeField] bool currentlyFetching;
 
     void Start() {
         gapClient = new();
@@ -21,6 +22,11 @@ public class Simplifier : MonoBehaviour {
     }
 
     public async void OnClick() {
+        if (currentlyFetching) {
+            Display("Please wait for the last request to finish");
+        }
+        currentlyFetching = true;
+        //Display("");
         var generators = generatorMenu.Generators.Select(c => c.ToString()).ToArray();
         var relators = relatorMenu.Relators.ToArray();
         var (worked, optimizedGenerators, optimizedRelators, generatorMap) = await gapClient.OptimizePresentation(
@@ -28,6 +34,7 @@ public class Simplifier : MonoBehaviour {
             relators
         );
         // TODO: Timeouts and not allowing concurrent requests (cancelling)
+        currentlyFetching = false;
 
         if (!worked) {
             Display("Server for simplification couldn't be reached.");
@@ -70,7 +77,7 @@ Right click to use this presentation, middle click to copy"; // \u21A6 is \mapst
                 panel.SetActive(false);
                 break;
             case 1:
-                generatorMenu.Generators = lastOptimizedGenerators.Select(c => c[0]).ToArray();
+                generatorMenu.Generators = lastOptimizedGenerators.Where(s => !string.IsNullOrWhiteSpace(s)).Select(c => c[0]).ToArray();
                 relatorMenu.Relators = lastOptimizedRelators;
                 break;
             case 2: 

@@ -30,7 +30,7 @@ public class CayleySubGraphMaker : MonoBehaviour {
         // Add edges to the subgraph
         for (int genIndex = 0; genIndex < generatorList.Count; genIndex++) {
             foreach(GroupVertex startVertex in graphVisualizer.graphManager.GetVertices()) {
-                GroupVertex endVertex = FollowGeneratorPath(startVertex, generatorList[genIndex]);
+                GroupVertex endVertex = startVertex.FollowGeneratorPath(generatorList[genIndex]);
                 if (endVertex != null) {
                     graphVisualizer.CreateSubgroupEdge(startVertex, endVertex, (char)(genIndex + '0'));
                 }
@@ -42,7 +42,7 @@ public class CayleySubGraphMaker : MonoBehaviour {
      * Deletes the subgraph from the graphManager.
      * This is done by deleting all edges with a number as label.
      **/
-    private void ResetSubgraph(IEnumerable<string> generators) {
+    void ResetSubgraph(IEnumerable<string> generators) {
         // Delete all edges from the previous subgraph
         for(int i = 0; i < generatorList.Count; i++) {
             graphVisualizer.graphManager.RemoveEdges((char)(i + '0'));
@@ -52,21 +52,5 @@ public class CayleySubGraphMaker : MonoBehaviour {
         generatorList = new List<string>(generators);
     }
 
-    /**
-     * Takes in a vertex and a string and follows the path as given by the generator string.
-     * Returns the vertex at the end of the path.
-     * Returns null if the path is not valid or leaves the ambient graph.
-     **/
-    private GroupVertex FollowGeneratorPath(GroupVertex startVertex, string generator) {
-        // For each lettern in the string
-        GroupVertex currentVertex = startVertex;
-        foreach (char op in generator) {
-            currentVertex = currentVertex.FollowEdge(op);
-            if (currentVertex == null) {
-                return null;
-            } 
-        }
-        return currentVertex; 
-    }
 
 }

@@ -20,7 +20,7 @@ public class ProjectionForce : Force {
         }
     }
 
-    private VectorN vectorToHyperplane(VectorN position) {
+    VectorN vectorToHyperplane(VectorN position) {
         VectorN result = VectorN.Zero(position.Size());
         for(int i = dim; i < position.Size(); i++) {
             result[i] = -position[i];

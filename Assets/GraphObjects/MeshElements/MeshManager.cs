@@ -22,7 +22,8 @@ public class MeshManager : MonoBehaviour {
                     var res = Random.ColorHSV(0, 1, 0.9f, 1);
                     res.a = defaultColor.a;
                     return res;
-                }), (type, color) => new KeyValuePair<string, Color>(type, color)
+                }), 
+            (type, color) => new KeyValuePair<string, Color>(type, color)
         ));
     }
 

@@ -125,7 +125,7 @@ public class Physik : MonoBehaviour, IActivityProvider {
 
     public void Run() {
         alpha = alphaSetting;
-        if (!running) 
+        if (!running && graphManager != null) 
             StartCoroutine(LoopPhysics());
     }
 

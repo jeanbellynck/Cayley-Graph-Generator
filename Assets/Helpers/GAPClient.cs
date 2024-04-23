@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 
 public class GAPClient
 {
-    readonly string url = "http://103-13-211-26.cloud-xip.com:63910/aosijfoaisdoifnCodnifaoGsinf"; 
+    readonly string url = "http://103.13.211.26:63910/aosijfoaisdoifnCodnifaoGsinf"; 
 
     public GAPClient(string url = "") {
         if (!string.IsNullOrWhiteSpace(url))

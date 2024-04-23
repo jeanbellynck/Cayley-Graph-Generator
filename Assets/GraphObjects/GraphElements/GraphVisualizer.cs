@@ -1,20 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 /**
  * This class was split from LabelledGraphManager to separate the visual stuff from the logic.
  */
 public class GraphVisualizer : MonoBehaviour, IActivityProvider {
-    public LabelledGraphManager graphManager = new LabelledGraphManager(); 
-    [SerializeField] private Physik physik;
-    [SerializeField] public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
+    public readonly LabelledGraphManager graphManager = new(); 
+    [SerializeField] Physik physik;
+    [field: SerializeField] public Edge.SplinificationType splinificationType { get; protected set; } = Edge.SplinificationType.WhenSimulationHasStopped;
     [SerializeField] Color[] ColorList = { new(1, 0, 0), new(0, 0, 1), new(0, 1, 0), new(1, 1, 0) };
-    public List<char> generatorLabels = new();
+    [SerializeField] List<char> generatorLabels = new();
 
-    public Dictionary<char, Color> labelColors = new();
+    [SerializeField] Dictionary<char, Color> labelColors = new();
 
     [SerializeField] GroupColorPanel groupColorPanel;
     [SerializeField] List<Kamera> kameras;
@@ -24,7 +24,33 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     [SerializeField] GameObject vertexPrefab;
     [SerializeField] GameObject edgePrefab;
     [SerializeField] IActivityProvider activityProvider;
-
+    float _ambientEdgeStrength, _subgroupEdgeStrength;
+    public float AmbientEdgeStrength {
+        get => _ambientEdgeStrength;
+        set {
+            if (Math.Abs(_ambientEdgeStrength - value) > 1e-6) {
+                _ambientEdgeStrength = value;
+                foreach (char label in generatorLabels) {
+                    foreach (Edge edge in graphManager.GetEdges(label)) {
+                        edge.Strength = value;
+                    }
+                }
+            }
+            physik.RunShortly(20f);
+        }
+    }
+    public float SubgroupEdgeStrength {
+        get => _subgroupEdgeStrength;
+        set {
+            _subgroupEdgeStrength = value;
+            physik.RunShortly(20f);
+            for (int i = 0; i < 10; i++) {
+                foreach (Edge edge in graphManager.GetEdges((char)(i + '0'))) {
+                    edge.Strength = value;
+                }
+            }
+        }
+    }
 
     public float Activity => activityProvider.Activity;
 
@@ -57,7 +83,8 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     { 
         labelColors = new(Enumerable.Zip(
             generatorLabels, 
-            ColorList.Extend(RandomColor), (generator, color) => new KeyValuePair<char, Color>(generator, color)
+            ColorList.Extend(RandomColor),
+            (generator, color) => new KeyValuePair<char, Color>(generator, color)
         ));
 
         graphManager.GetEdges().ForEach(edge => UpdateLabel(edge));
@@ -66,7 +93,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         groupColorPanel.updateView(labelColors);
     }
 
-    private Color RandomColor() {
+    Color RandomColor() {
         return Random.ColorHSV(0, 1, 0.9f, 1);
     }
 
@@ -91,14 +118,10 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         return newVertex;
     }
 
-    public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
-        return CreateEdge(startvertex, endvertex, op);
-    }
-
     public GroupEdge CreateSubgroupEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
         // Create edge
         GroupEdge newEdge = CreateEdge(startvertex, endvertex, op, 1);
-        newEdge.Strength = _subgroupEdgeStrength;
+        newEdge.Strength = SubgroupEdgeStrength;
         // Set layer to subgroup
         newEdge.gameObject.layer = LayerMask.NameToLayer("SubgroupOnly");
         return newEdge;
@@ -131,7 +154,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
 
         GroupEdge newEdge = Instantiate(edgePrefab, transform).GetComponent<GroupEdge>();
         newEdge.Initialize(startvertex, endvertex, op, hyperbolicity, this);
-        newEdge.Strength = _ambientEdgeStrength;
+        newEdge.Strength = AmbientEdgeStrength;
         graphManager.AddEdge(newEdge);
 
         return newEdge;
@@ -147,26 +170,5 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         simulationDimensionality = dim;
     }
 
-
-    // Float ambientEdgeStrength getSet property
-    private float _ambientEdgeStrength, _subgroupEdgeStrength;
-    public float AmbientEdgeStrength {
-        set {
-            if(_ambientEdgeStrength != value) {
-                _ambientEdgeStrength = value;
-                foreach (char label in generatorLabels) {
-                    foreach (Edge edge in graphManager.GetEdges(label)) {
-                        edge.Strength = _ambientEdgeStrength;
-                    }
-                }
-            }
-            physik.RunShortly(20f);
-        }
-    }
-    public float SubgroupEdgeStrength {
-        set {
-            _subgroupEdgeStrength = value;
-            physik.RunShortly(20f);
-        }
-    }
+    
 }

@@ -69,7 +69,7 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
         relatorMenu.FixGeneratorMenu();
         SetGenerators(generatorMenu.GetGenerators());
         this.relators = relatorMenu.GetRelators().ToHashSet().ToArray();
-        graphVisualizer.Initialize(generators, this);
+        graphVisualizer.Initialize(generators, activityProvider: this);
         int projectionDimension = dimensionInputDD.value + 2;
         physik.Initialize(graphVisualizer.graphManager, projectionDimension, generators.Length); // calls physik.Abort()
         int actualDimension = projectionDimension + 0;

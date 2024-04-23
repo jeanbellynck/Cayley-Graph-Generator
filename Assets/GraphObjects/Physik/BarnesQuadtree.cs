@@ -5,20 +5,20 @@ using UnityEngine;
 public class BarnesQuadtree {
 
     // Konstruktorvariablen
-    private VectorN position;
-    private float radius; // Radius of the BarnesQuadbaum cube.
+    VectorN position;
+    float radius; // Radius of the BarnesQuadbaum cube.
 
     // Baumvariablen
-    private BarnesQuadtree[] subtrees;
-    private List<Vertex> points = new List<Vertex>();
+    BarnesQuadtree[] subtrees;
+    List<Vertex> points = new List<Vertex>();
     public VectorN schwerpunkt;
     public float mass; // Mass is somewhat misleading since the points repel each other.
-    private float thetaSquared; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. Is apparently usually set to a value 0.9
-    private float minimalDistanceSquared; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
-    private float maximalDistanceSquared;
-    private bool isLeaf = true;
-    private int treeDim = 3; // The dimension can by smaller than the dimension of the vertices. Thin should be ok, since the force always scales to the sqare of the distance.
-    private int vertexDim;
+    float thetaSquared; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. Is apparently usually set to a value 0.9
+    float minimalDistanceSquared; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
+    float maximalDistanceSquared;
+    bool isLeaf = true;
+    int treeDim = 3; // The dimension can by smaller than the dimension of the vertices. Thin should be ok, since the force always scales to the sqare of the distance.
+    int vertexDim;
 
     public BarnesQuadtree(int dimension, VectorN position, float radius, float theta, float minimalDistanceSquared, float maximalDistanceSquared) {
         this.treeDim = dimension;
@@ -73,7 +73,7 @@ public class BarnesQuadtree {
         points = null;
     }
 
-    private bool punktInBounds(Vertex vertex) {
+    bool punktInBounds(Vertex vertex) {
         VectorN punkt = vertex.Position;
         if(punkt.IsNaN) {
             return false;
@@ -174,15 +174,15 @@ public class BarnesQuadtree {
     /**
      * Does the same as above but uses the center of mass of the cube instead of a second vertex
      **/
-    private VectorN CalculateForce(VectorN diff, float distanceSquared) {
+    VectorN CalculateForce(VectorN diff, float distanceSquared) {
         return CalculateForceWithMass(diff, distanceSquared, mass);
     }
 
-    private VectorN CalculateForceWithMass(VectorN diff, float distanceSquared, float mass) {
+    VectorN CalculateForceWithMass(VectorN diff, float distanceSquared, float mass) {
         return diff.Normalize().Multiply((-1) * mass / distanceSquared);
     }
 
-    private VectorN quadrantToVector(int[] quadrant) {
+    VectorN quadrantToVector(int[] quadrant) {
         VectorN result = new VectorN(vertexDim);
         for (int i = 0; i < treeDim; i++) {
             result[i] = quadrant[i] == 0 ? -1 : 1;

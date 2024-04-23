@@ -34,6 +34,21 @@ public static class Helpers {
         }
     }
 
+    public static T Pop<T>(this List<T> list) {
+        T res = default;
+        try {
+            res = list[0];
+            list.RemoveAt(0);
+        } catch (ArgumentOutOfRangeException) {}
+        return res;
+    }
+
+    public static T Pop<T>(this HashSet<T> list) {
+        var item = list.FirstOrDefault();
+        list.Remove(item);
+        return item;
+    }
+
     public static Color Desaturate(this Color color, float f) {
         // Copilot
         //Color.RGBToHSV(color, out var h, out var s, out var v);

@@ -11,14 +11,14 @@ public class OpenHyperlinks : MonoBehaviour, IPointerClickHandler {
     public bool doesColorChangeOnHover = true;
     public Color hoverColor = new Color(60f / 255f, 120f / 255f, 1f);
 
-    private TextMeshProUGUI pTextMeshPro;
-    private Canvas pCanvas;
-    private UnityEngine.Camera pCamera;
+    TextMeshProUGUI pTextMeshPro;
+    Canvas pCanvas;
+    UnityEngine.Camera pCamera;
 
     public bool isLinkHighlighted { get { return pCurrentLink != -1; } }
 
-    private int pCurrentLink = -1;
-    private List<Color32[]> pOriginalVertexColors = new List<Color32[]>();
+    int pCurrentLink = -1;
+    List<Color32[]> pOriginalVertexColors = new List<Color32[]>();
 
     protected virtual void Awake() {
         pTextMeshPro = GetComponent<TextMeshProUGUI>();

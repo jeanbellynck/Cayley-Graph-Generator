@@ -11,7 +11,7 @@ public class Screenshotter : MonoBehaviour
         StartCoroutine(TakeScreenshotAndSave());
     }
 
-    private IEnumerator TakeScreenshotAndSave() {
+    IEnumerator TakeScreenshotAndSave() {
         canvas.SetActive(false);
         yield return new WaitForEndOfFrame();
         
