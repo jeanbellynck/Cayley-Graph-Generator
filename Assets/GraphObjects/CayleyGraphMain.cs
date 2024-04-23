@@ -88,16 +88,6 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     }
 
     // referenced from UI
-    public void openHelpPage() {
-        Application.OpenURL("https://jeanbellynck.github.io/");
-    } 
-
-    // referenced from UI
-    public void openGitHub() {
-        Application.OpenURL("https://github.com/jeanbellynck/Cayley-Graph-Generator");
-    }
-
-    // referenced from UI
     public void SetHyperbolicity(string hyperbolicityString) {
         print("scaling changed to:" + hyperbolicityString);
         if (float.TryParse(hyperbolicityString.FixDecimalPoint(), out float hyperbolicity) && hyperbolicity != 0) {
