@@ -1,4 +1,4 @@
-public class TorusGroup : Group
+public class TorusGroup : PresentationExample
 {
     public TorusGroup()
     {

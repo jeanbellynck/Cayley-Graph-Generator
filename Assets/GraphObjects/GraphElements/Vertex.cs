@@ -255,13 +255,13 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         }
     }
 
-    public HashSet<Edge> GetIncomingEdges(char op) {
-        return LabeledIncomingEdges.TryGetValue(op, out HashSet<Edge> edges) ? edges : new();
+    public IEnumerable<Edge> GetIncomingEdges(char op) {
+        return LabeledIncomingEdges.TryGetValue(op, out var edges) ? edges : new();
     }
 
 
-    public HashSet<Edge> GetOutgoingEdges(char op) {
-        return LabeledOutgoingEdges.TryGetValue(op, out HashSet<Edge> edges) ? edges : new();
+    public IEnumerable<Edge> GetOutgoingEdges(char op) {
+        return LabeledOutgoingEdges.TryGetValue(op, out var edges) ? edges : new();
     }
 
 

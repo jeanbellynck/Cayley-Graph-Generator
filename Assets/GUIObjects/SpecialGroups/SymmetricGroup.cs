@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class SymmetricGroup : Group
+public class SymmetricGroup : PresentationExample
 {
     public SymmetricGroup()
     {

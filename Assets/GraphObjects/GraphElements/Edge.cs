@@ -14,7 +14,8 @@ public class Edge : MonoBehaviour {
     public float Age => Time.time - creationTime;
 
     [field:SerializeField] public char Label { get; protected set; }
-    [field: SerializeField] public Vertex StartPoint { get; protected set; }
+    [field: SerializeField] public Vertex StartPoint { get;
+        protected set; }
     [field: SerializeField] public Vertex EndPoint { get; protected set; }
     [field: SerializeField] public float Length { get; protected set; }
     public Vector3 Direction => EndPoint.transform.position - StartPoint.transform.position;

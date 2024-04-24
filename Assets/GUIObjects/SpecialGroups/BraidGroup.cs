@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class BraidGroup : Group
+public class BraidGroup : PresentationExample
 {
     public BraidGroup()
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class DihedralGroup : Group
+public class DihedralGroup : PresentationExample
 {
     public DihedralGroup()
     {

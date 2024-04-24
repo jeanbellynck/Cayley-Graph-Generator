@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class MonsterGroup : Group
+public class MonsterGroup : PresentationExample
 {
     public MonsterGroup()
     {

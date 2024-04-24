@@ -1,4 +1,4 @@
-public class BSGroup : Group
+public class BSGroup : PresentationExample
 {
     public BSGroup()
     {

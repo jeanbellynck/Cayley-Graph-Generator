@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class LatticeGroup : Group
+public class LatticeGroup : PresentationExample
 {
     public LatticeGroup()
     {
@@ -18,13 +18,13 @@ public class LatticeGroup : Group
         if (int.TryParse(parameters[0].value, out int n) && n >= 0)
         {
             List<string> gen = new List<string>();
-            List<string> Gen = new List<string>(); // Uppercase
+            //List<string> Gen = new List<string>(); // Uppercase
             List<string> rel = new List<string>();
             
             for (int i = 0; i < n; i++)
             {
                 gen.Add(((char) ('a' + i)).ToString()) ;
-                Gen.Add(((char) ('A' + i)).ToString()) ;
+                //Gen.Add(((char) ('A' + i)).ToString()) ;
             }
             for (int i = 0; i < n; i++)
             {

@@ -81,10 +81,11 @@ public class GroupVertex : Vertex {
     public static char ReverseLabel(char label) => RelatorDecoder.InvertGenerator(label);
     public static bool IsReverseLabel(char label) => char.IsUpper(label);
 
-    public List<GroupEdge> GetEdges(char label) {
+    public IEnumerable<GroupEdge> GetEdges(char label) {
         //if (semiGroup) return GetOutgoingEdges(label).Cast<GroupEdge>().ToList();
         // in semigroups, this will only be called for reverse labels when backwards-following edges
-        return IsReverseLabel(label) ? GetIncomingEdges(ReverseLabel(label)).Cast<GroupEdge>().ToList() : GetOutgoingEdges(label).Cast<GroupEdge>().ToList();
+        return (IsReverseLabel(label) ? GetIncomingEdges(ReverseLabel(label)) : GetOutgoingEdges(label)
+            ).Cast<GroupEdge>();
     }
     
     public GroupVertex FollowEdge(char op) {

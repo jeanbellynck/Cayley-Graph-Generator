@@ -1,6 +1,6 @@
 using System.Linq;
 
-public class SurfaceFundamentalGroup : Group
+public class SurfaceFundamentalGroup : PresentationExample
 {
     public SurfaceFundamentalGroup()
     {

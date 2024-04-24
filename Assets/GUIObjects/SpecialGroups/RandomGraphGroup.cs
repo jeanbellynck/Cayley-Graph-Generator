@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Linq;
 
-public class RandomGraphGroup : Group {
+public class RandomGraphGroup : PresentationExample {
     public RandomGraphGroup() {
         name = "RG<sub>v, e, g</sub>";
         description = "A group defined by loops in a random graph with labels in the generating set";

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class FreeGroup : Group
+public class FreeGroup : PresentationExample
 {
     public FreeGroup()
     {

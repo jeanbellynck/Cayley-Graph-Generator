@@ -79,11 +79,11 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     }
 
 
-    public void SelectGroupOption(string name, string generatorString, string relatorString) {
-        Debug.Log("Set Group: " + name);
-        // Set the generators and relators for the input fields and for the program
+    public void SelectGroupOption(string name, string generatorString, string relatorString,
+        CayleyGraphMaker.GroupMode presentationExampleSemiGroup) {
         generatorMenu.SetGenerators(generatorString.Where(char.IsLetter));
         relatorMenu.SetRelatorString(relatorString);
+        cayleyGraphMaker.SetGroupMode((int) presentationExampleSemiGroup);
         OnGenerateButton();
     }
 

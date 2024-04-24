@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class DicyclicGroup : Group
+public class DicyclicGroup : PresentationExample
 {
     public DicyclicGroup()
     {

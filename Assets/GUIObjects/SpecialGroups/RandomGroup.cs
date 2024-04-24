@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class RandomGroup : Group
+public class RandomGroup : PresentationExample
 {
     public RandomGroup()
     {

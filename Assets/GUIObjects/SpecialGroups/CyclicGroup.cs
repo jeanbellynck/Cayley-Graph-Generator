@@ -1,4 +1,4 @@
-public class CyclicGroup : Group
+public class CyclicGroup : PresentationExample
 {
     public CyclicGroup()
     {

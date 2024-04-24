@@ -4,7 +4,7 @@ using TMPro;
 
 public class GroupOption : MonoBehaviour
 {
-    public Group group;
+    public PresentationExample group;
 
     [SerializeField] GameObject groupParameterPrefab;
     [SerializeField] Tooltip tooltip;

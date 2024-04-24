@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-public class SurfaceMappingClassGroup : Group
+public class SurfaceMappingClassGroup : PresentationExample
 {
     public SurfaceMappingClassGroup()
     {
