@@ -314,8 +314,8 @@ public class CayleyGraphMaker : MonoBehaviour {
         }
 
         // Delete vertex2
-        graphManager.RemoveVertex(vertex2); // also removes all edges
-        vertex2.Destroy(); // also destroys all edges
+        graphManager.RemoveVertex(vertex2); // also calls Destroy on the vertex
+        // vertex2.Destroy(); // also destroys all edges
 
         // Neuen Knoten nochmal prüfen
         edgeMergeCandidates.Add(vertex1);

@@ -35,7 +35,8 @@ public class LabelledGraphManager {
     }
 
     public void ResetGraph() {
-        foreach (Vertex vertex in new List<Vertex>(vertices)) vertex.Destroy();
+        foreach (Vertex vertex in new List<Vertex>(vertices))
+            vertex.Destroy(true);
         vertices.Clear();
         edges.Clear();
         idCounter = 1;
@@ -51,18 +52,6 @@ public class LabelledGraphManager {
     }
 
     public void RemoveVertex(Vertex vertex) {
-        foreach (HashSet<Edge> genEdges in vertex.LabeledIncomingEdges.Values) {
-            HashSet<Edge> genEdgesCopy = new HashSet<Edge>(genEdges);
-            foreach (Edge edge in genEdgesCopy) {
-                RemoveEdge(edge);
-            }
-        }
-        foreach (HashSet<Edge> genEdges in vertex.LabeledOutgoingEdges.Values) {
-            HashSet<Edge> genEdgesCopy = new HashSet<Edge>(genEdges);
-            foreach (Edge edge in genEdgesCopy) {
-                RemoveEdge(edge);
-            }
-        }
         vertices.Remove(vertex);
         vertex.Destroy();
     }

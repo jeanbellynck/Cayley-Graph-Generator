@@ -78,12 +78,13 @@ public class Edge : MonoBehaviour {
         LateUpdate();
     }
 
-    public void Destroy() {
+    public void Destroy(bool simply = false) {
+        GameObject.Destroy(gameObject);
+        if (simply) return;
         StartPoint.RemoveEdge(this);
         EndPoint.RemoveEdge(this);
-        StartPoint = null;
+        StartPoint = null; 
         EndPoint = null;
-        Destroy(gameObject);
     }
 
     public void SetColors(Color startColor, Color? endColor = null) {

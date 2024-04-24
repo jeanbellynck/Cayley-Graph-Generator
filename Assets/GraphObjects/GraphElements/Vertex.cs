@@ -102,22 +102,22 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         Gizmos.DrawSphere(VectorN.ToVector3(Position), 0.1f);
     }
     
-    public void Destroy() {
+    public void Destroy(bool simply = false) {
         // Destroy all edges too
         foreach (HashSet<Edge> genEdges in LabeledIncomingEdges.Values) {
             List<Edge> genEdgesCopy = new(genEdges);
             foreach (Edge edge in genEdgesCopy) {
-                edge.Destroy();
+                edge.Destroy(simply);
             }
         }
         foreach (HashSet<Edge> genEdges in LabeledOutgoingEdges.Values) {
             List<Edge> genEdgesCopy = new(genEdges);
             foreach (Edge edge in genEdgesCopy) {
-                edge.Destroy();
+                edge.Destroy(simply);
             }
         }
         StopAllCoroutines();
-        Destroy(gameObject);
+        GameObject.Destroy(gameObject);
     }
 
     public bool Equals(Vertex other) {
