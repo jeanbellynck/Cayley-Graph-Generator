@@ -9,6 +9,7 @@ public class PlacticMonoid : PresentationExample
         description = "The plactic monoid with n generators";
         parameters = new GroupParameter[] {new() {name = "n", value = "2", description = "Number of generators"}};
         tooltipURL = "https://en.wikipedia.org/wiki/Plactic_monoid";
+        groupMode = CayleyGraphMaker.GroupMode.Monoid;
         updatePresentation();
     }
 

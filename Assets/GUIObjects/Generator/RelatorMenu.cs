@@ -13,6 +13,7 @@ public class RelatorMenu : MonoBehaviour {
     readonly Dictionary<string, TMP_InputField> relatorInputs = new();
     readonly Dictionary<string, GameObject> relatorGameObjects = new();
     [SerializeField] Button generateButton;
+    [SerializeField] string startRelators = "[a,b], a^5";
 
     public IEnumerable<string> Relators { // this is probably bad practice but fun (not used currently)
         get => GetRelators();
@@ -25,7 +26,7 @@ public class RelatorMenu : MonoBehaviour {
     public void Start() {
         if (generatorMenu == null)
             generatorMenu = FindFirstObjectByType<GeneratorMenu>();
-        SetRelatorString("[a,b], a^5");
+        SetRelatorString(startRelators);
     }
 
     public void AddRelatorString([CanBeNull] string relatorString) =>

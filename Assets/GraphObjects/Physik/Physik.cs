@@ -112,29 +112,32 @@ public class Physik : MonoBehaviour, IActivityProvider {
         running = false;
         decaying = false;
         alpha = 0;
-        StopAllCoroutines();
+        StopAllCoroutines(); // shouldn't be necessary
     }
 
     /**
      * Similar to BeginShutDown. For a few seconds the physics engine is reactivated
      **/
     public void RunShortly(float time = -1f) {
-        Run();
+        Run(false);
         BeginShutDown(time);
     }
 
-    public void Run() {
+    public void Run(bool stopDecay = true) {
         alpha = alphaSetting;
         if (!running && graphManager != null) 
             StartCoroutine(LoopPhysics());
+        if (stopDecay)
+            decaying = false;
     }
 
 
     IEnumerator DecayAlpha(float time = -1f) {
         var decay = time > 0 ? 1 / time : alphaDecay;
+        //yield return null; // Wait for the next frame (so that decaying = true doesn't stop the other instances of the coroutine from being stopped)
         decaying = true;
-        while(true) {
-            alpha -= alphaDecay * Time.deltaTime;
+        while(decaying) {
+            alpha -= decay * Time.deltaTime;
             if (alpha <= 0) {
                 alpha = 0;
                 break;
