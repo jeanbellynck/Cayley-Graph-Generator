@@ -226,13 +226,16 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     void MergeEdges(GroupVertex vertex) {
         foreach (char op in operators) {
-            List<GroupEdge> generatorEdges = vertex.GetEdges(op);
-            var primaryEdge = generatorEdges.Pop();
-
-            foreach (var otherEdge in generatorEdges) {
-                //edgeMergeCandidates.Add(vertex); // After an edge merge a vertex might be merged with its neighbor meaning its edges can be merged again.
-                MergeVertices(primaryEdge.GetOpposite(vertex), otherEdge.GetOpposite(vertex));
+            while (true) {
+                // this way we don't try to merge on edges that were actually destroyed or iterate over a list that gets modified
+                var edges = vertex.GetEdges(op).Take(2).ToArray();
+                
+                if (edges.Length < 2)
+                    break;
+                
+                MergeVertices(edges[0].GetOpposite(vertex), edges[1].GetOpposite(vertex));
             }
+            //edgeMergeCandidates.Add(vertex); // After an edge merge a vertex might be merged with its neighbor meaning its edges can be merged again.
             
         }
     }
