@@ -6,4 +6,7 @@ docker run --name gap_server -p 63910:63910 --restart=unless_stopped gap_server:
 ```
 The build process takes a long time (the compilation of GAP's packages takes > 1000 s on my PC) but only needs to be done once.
 This built container can be run on a server, like Kamatera for example.
-If you want to be able to update the server files add `--mount type=bind,source=<path to GAP-Server Files>,target=/files`.
+If you want to be able to update the server files add `--mount type=bind,source=<path to GAP-Server Files>,target=/files`, i.e. 
+```[bash]
+docker run --name gap_server -p 63910:63910 --restart=unless_stopped --mount type=bind,source="/root/GAP-Server Files",target=/files gap_server:1.0 
+```
