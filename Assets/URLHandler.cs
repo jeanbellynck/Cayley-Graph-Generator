@@ -20,12 +20,5 @@ public class URLHandler : MonoBehaviour
     // referenced from UI
     public void openPage(string url) {
         Application.OpenURL(url);
-        Application.OpenURL("https://jeanbellynck.github.io/");
     } 
-
-    // referenced from UI
-    public void openGitHub() {
-        Application.OpenURL("https://github.com/jeanbellynck/Cayley-Graph-Generator");
-    }
-
 }
