@@ -26,7 +26,8 @@ public class LinkForce : Force {
     }
 
     VectorN calculateLinkForce(Edge edge) {
-        if(edge.PhysicsEnabled == false || edge.Strength == 0) return VectorN.Zero(edge.StartPoint.Position.Size());
+        if(edge.PhysicsEnabled == false || edge.Strength == 0)
+            return VectorN.Zero(edge.StartPoint.Position.Size());
         
         Vertex source = edge.StartPoint;
         Vertex target = edge.EndPoint;

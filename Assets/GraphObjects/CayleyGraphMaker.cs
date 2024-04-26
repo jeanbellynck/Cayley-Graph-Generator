@@ -13,7 +13,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     [SerializeField] Physik physik; // I wonder whether the reference to Physics is necessary? 
 
     protected char[] generators;// = new char[]{'a', 'b', 'c'};
-    protected char[] operators; // Like generators but with upper and lower case letters
+    protected char[] operators; // Like generators but with upper and lower case letters, unless in a semigroup!
     protected string[] relators;// = new string[]{"abAB"};
     HashSet<string> relatorVariants;
     
@@ -37,7 +37,6 @@ public class CayleyGraphMaker : MonoBehaviour {
     [SerializeField] UnityEvent<string> onWantedVertexNumberChanged = new(); // this should be int, but I'm lazy, and only need this to set text
     [SerializeField] UnityEvent<string> onCurrentVertexNumberChanged = new();// this should be int, but I'm lazy, and only need this to set text
 
-    public enum GroupMode { Group, Monoid, SemiGroup }
     [SerializeField] GroupMode groupMode = GroupMode.Group;
 
     bool _running;
@@ -65,7 +64,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         ContinueVisualization();
     }
 
-    public void Initialize(IEnumerable<char> generators, string[] relators, Physik physik, GraphVisualizer graphVisualizer)
+    public void Initialize(IEnumerable<char> generators, string[] relators, Physik physik, GraphVisualizer graphVisualizer, GroupMode groupMode)
     {
         this.generators = generators.Select(char.ToLower).ToArray();
         this.relators = relators;
@@ -130,12 +129,10 @@ public class CayleyGraphMaker : MonoBehaviour {
 
             // Speed is proportional to the number of vertices on the border. This makes knotting less likely
             float waitTime = 1 / (drawingSpeed * Mathf.Max(1, GetBorderVertexCount()));
-            if (!firstIteration) {
-                yield return new WaitForSeconds(waitTime);
-            }
-            else {
+            if (firstIteration)
                 firstIteration = false;
-            }
+            else
+                yield return new WaitForSeconds(waitTime);
 
             GroupVertex borderVertex = GetNextBorderVertex();
             if (borderVertex == null) {
@@ -208,6 +205,7 @@ public class CayleyGraphMaker : MonoBehaviour {
     void MergeAll() {
         while (true) {
                 // If two edges of the same generator lead to the different vertices, they need to be merged as fast as possible. Otherwise, following generators is yucky.
+                var edgeMergeCandidatesCount = edgeMergeCandidates.Count;
             var mergeCandidate = edgeMergeCandidates.Pop();
             if (mergeCandidate != null) { 
                 MergeEdges(mergeCandidate);
@@ -299,23 +297,26 @@ public class CayleyGraphMaker : MonoBehaviour {
     */
     void MergeVertices(GroupVertex vertex1, GroupVertex vertex2) {
         if (vertex1.Equals(vertex2)) return;
-        // The vertex with the longer name will be deleted. (We don't want to delete the neutral element.)
-        if (vertex2.name.Length < vertex1.name.Length) {
+        // The vertex that was further from the identity will be deleted. (We don't want to delete the neutral element.)
+        if (vertex2.DistanceToNeutralElement < vertex1.DistanceToNeutralElement) 
             (vertex1, vertex2) = (vertex2, vertex1);
-        }
 
         vertex1.Merge(vertex2, hyperbolicity);
 
         // Alle ausgehenden und eingehenden Kanten auf den neuen Knoten umleiten.
-        var edges = vertex2.GetEdges();
-        foreach (char op in edges.Keys) {
-            foreach (GroupEdge edge in edges[op]) 
-                CreateEdge(vertex1, edge.GetOpposite(vertex2), op);
+        foreach (char op in generators) {
+            foreach (GroupEdge edge in vertex2.GetIncomingEdges(op).Concat(vertex2.GetOutgoingEdges(op)).Cast<GroupEdge>()) {
+                // todo: actually, we should be able to just reuse the existing edges!!!
+                var startVertex = edge.StartPoint == vertex2 ? vertex1 : (GroupVertex) edge.StartPoint;
+                var endVertex = edge.EndPoint == vertex2 ? vertex1 : (GroupVertex) edge.EndPoint;
+                if (startVertex.GetOutgoingEdges(op).All(edge1 => !edge1.EndPoint.Equals(endVertex))) // don't create duplicate edges, because then they will be merged again!
+                    CreateEdge(startVertex, endVertex, op);
+            }
         }
 
         // Delete vertex2
-        graphManager.RemoveVertex(vertex2); // also calls Destroy on the vertex
-        // vertex2.Destroy(); // also destroys all edges
+        graphManager.RemoveVertex(vertex2);
+        vertex2.Destroy(); // also destroys all edges
 
         // Neuen Knoten nochmal prüfen
         edgeMergeCandidates.Add(vertex1);
@@ -463,3 +464,5 @@ public class CayleyGraphMaker : MonoBehaviour {
         groupMode = (GroupMode)mode;
     }
 }
+
+public enum GroupMode { Group, Monoid, SemiGroup }

@@ -21,7 +21,8 @@ public class GroupVertex : Vertex {
 
     public void Initialize(VectorN position, GraphVisualizer graphVisualizer, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool semiGroup = false) {
         if (!string.IsNullOrEmpty(name)) this.name = name;
-        if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.ToList();
+        if (pathsFromNeutralElement != null) PathsFromNeutralElement = pathsFromNeutralElement.Take(equivalentWordsMax).ToList();
+        // in some cases, the pathsFromNeutralElement are extremely many and this slowed down the program significantly!
         this.semiGroup = semiGroup;
 
         OnEdgeChange += CalculateEdgeCompletion;
@@ -29,14 +30,15 @@ public class GroupVertex : Vertex {
             tooltipContent = new() {
                 text = this.name == "1"
                     ? "The neutral element, often denoted as 1 or e, or 0 in an Abelian group."
-                    : PathsFromNeutralElement.Count > 20 
-                        ? string.Join("=\n", PathsFromNeutralElement.GetRange(0, 20)) + "\n..." 
-                        : string.Join("=\n", PathsFromNeutralElement)
+                    : string.Join("=\n", PathsFromNeutralElement.Take(equivalentWordsMax-1)) 
+                      + (PathsFromNeutralElement.Count >= equivalentWordsMax ? "\n..." : "")
             };
         };
 
         base.Initialize(position, graphVisualizer);
     }
+
+    const int equivalentWordsMax = 30;
 
     void CalculateEdgeCompletion()
     {
@@ -149,9 +151,27 @@ public class GroupVertex : Vertex {
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
         Position = (Position + vertex2.Position) / 2;
         vertex2.centerPointer.center = centerPointer.center; // Some Kamera might reference the old (redundant) Vertex as its center. We now point it to the kept equivalent vertex.
-        PathsFromNeutralElement.AddRange(vertex2.PathsFromNeutralElement);
         distanceToNeutralElement = Math.Min(vertex2.distanceToNeutralElement, distanceToNeutralElement);
         calculateVertexMass(hyperbolicity);
+
+        // the following is just to merge the pathsFromNeutralElement without saving too many (we assume PathsFromNeutralElement is sorted by length)
+        var oldPathCount = PathsFromNeutralElement.Count;
+        var newPathCount = vertex2.PathsFromNeutralElement.Count;
+        int goalOldPathCount = equivalentWordsMax / 2;
+        int goalNewPathCount = goalOldPathCount;
+        if (oldPathCount < equivalentWordsMax / 2) {
+            goalNewPathCount = equivalentWordsMax - oldPathCount;
+            goalOldPathCount = oldPathCount;
+        }
+        else if (newPathCount < equivalentWordsMax / 2) {
+            goalOldPathCount = Math.Min(oldPathCount, equivalentWordsMax - newPathCount);
+            goalNewPathCount = newPathCount;
+        }
+
+        PathsFromNeutralElement.RemoveRange(goalOldPathCount, oldPathCount - goalOldPathCount);
+        PathsFromNeutralElement.AddRange(vertex2.PathsFromNeutralElement.Take(goalNewPathCount));
+        // this is the only place where we add paths to the vertex, so we only need to sort here
+        PathsFromNeutralElement.Sort((s, t) => s.Length - t.Length);
     }
 
     public void calculateVertexMass(float hyperbolicity) {

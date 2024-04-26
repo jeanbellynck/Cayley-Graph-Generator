@@ -14,7 +14,7 @@ public class PresentationExample {
     public string tooltipURL = "";
 
     public GroupParameter[] parameters;
-    public CayleyGraphMaker.GroupMode groupMode = CayleyGraphMaker.GroupMode.Group;
+    public GroupMode groupMode = GroupMode.Group;
 
     public PresentationExample() {
         this.name = "Group";
@@ -24,12 +24,12 @@ public class PresentationExample {
         this.parameters = new GroupParameter[]{};
     }
     
-    public PresentationExample(string name, string description, string generators, string relators, string tooltipInfo, string tooltipURL, CayleyGraphMaker.GroupMode groupMode = CayleyGraphMaker.GroupMode.Group) : this (name, description, generators, relators, groupMode){
+    public PresentationExample(string name, string description, string generators, string relators, string tooltipInfo, string tooltipURL, GroupMode groupMode = GroupMode.Group) : this (name, description, generators, relators, groupMode){
         this.tooltipInfo = tooltipInfo;
         this.tooltipURL = tooltipURL;
     }      
 
-    public PresentationExample(string name, string description, string generators, string relators, CayleyGraphMaker.GroupMode groupMode = CayleyGraphMaker.GroupMode.Group)
+    public PresentationExample(string name, string description, string generators, string relators, GroupMode groupMode = GroupMode.Group)
     {
         this.name = name;
         this.description = description;

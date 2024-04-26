@@ -45,7 +45,7 @@ public class CayleySubGraphMaker : MonoBehaviour {
     void ResetSubgraph(IEnumerable<string> generators) {
         // Delete all edges from the previous subgraph
         for(int i = 0; i < generatorList.Count; i++) {
-            graphVisualizer.graphManager.RemoveEdges((char)(i + '0'));
+            graphVisualizer.graphManager.DestroyEdges((char)(i + '0'));
         }
 
         // Set the generatorList to the new generators

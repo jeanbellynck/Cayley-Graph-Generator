@@ -20,6 +20,13 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     [SerializeField] char[] generators = new char[0];
     [SerializeField] string[] relators = new string[0];
 
+    [SerializeField] GeneratorMenu generatorMenu;
+    [SerializeField] RelatorMenu relatorMenu;
+    [SerializeField] InputField vertexNumberInputField;
+    [SerializeField] InputField hyperbolicityInputField;
+    [SerializeField] HyperbolicityMatrix hyperbolicityMatrix;
+    [SerializeField] TMP_Dropdown dimensionInputDD;
+    [SerializeField] TMP_Dropdown groupModeDropdown;
 
     public float Activity => physik.Activity;
 
@@ -42,13 +49,6 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
         cayleyGraphMaker.ToggleActiveState();
         // TODO: also toggle subgroup visualization
     }
-
-    [SerializeField] GeneratorMenu generatorMenu;
-    [SerializeField] RelatorMenu relatorMenu;
-    [SerializeField] InputField vertexNumberInputField;
-    [SerializeField] InputField hyperbolicityInputField;
-    [SerializeField] HyperbolicityMatrix hyperbolicityMatrix;
-    [SerializeField] TMP_Dropdown dimensionInputDD;
 
 
     // referenced from UI
@@ -74,16 +74,16 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
         physik.Initialize(graphVisualizer.graphManager, projectionDimension, generators.Length); // calls physik.Abort()
         int actualDimension = projectionDimension + 0;
         graphVisualizer.SetDimension(actualDimension);
-        cayleyGraphMaker.Initialize(generators, relators, physik, graphVisualizer); // calls AbortVisualization()
+        cayleyGraphMaker.Initialize(generators, relators, physik, graphVisualizer, (GroupMode) groupModeDropdown.value); // calls AbortVisualization()
         cayleyGraphMaker.StartVisualization(); // calls physik.Run() 
     }
 
 
     public void SelectGroupOption(string name, string generatorString, string relatorString,
-        CayleyGraphMaker.GroupMode presentationExampleSemiGroup) {
+        GroupMode groupMode) {
         generatorMenu.SetGenerators(generatorString.Where(char.IsLetter));
         relatorMenu.SetRelatorString(relatorString);
-        cayleyGraphMaker.SetGroupMode((int) presentationExampleSemiGroup);
+        groupModeDropdown.value = (int) groupMode;
         OnGenerateButton();
     }
 
