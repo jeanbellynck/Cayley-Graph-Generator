@@ -10,7 +10,6 @@ public class Edge : MonoBehaviour {
     [SerializeField] protected float splineWidth = 0.07f;
     [SerializeField] protected float arrowWidth = 0.14f;
     [SerializeField] protected float PercentHead = 0.1f;
-    [SerializeField] protected float vertexRadius = 0.1f;
     [SerializeField] bool useSplines = true;
     
     float creationTime; // = Time.time;
@@ -146,8 +145,8 @@ public class Edge : MonoBehaviour {
         Vector3 startPosition = StartPoint.transform.position;
         Vector3 endPosition = EndPoint.transform.position;
         Vector3 lineDirection = (endPosition - startPosition).normalized;
-        Vector3 startPointWithSpacing = startPosition + lineDirection * vertexRadius;
-        Vector3 endPointWithSpacing = endPosition - lineDirection * vertexRadius;
+        Vector3 startPointWithSpacing = startPosition + lineDirection * EndPoint.radius;
+        Vector3 endPointWithSpacing = endPosition - lineDirection * StartPoint.radius;
 
         startColor.a = StartPoint.EdgeCompletion;
         endColor.a = EndPoint.EdgeCompletion;
