@@ -124,6 +124,7 @@ MonoBehaviour:
   tooltipContent:
     text: Each cycle of labelled edges defines a relator
     url: 
+  <radius>k__BackingField: 0.13
   splineDirectionFactor: 0.2
   orthogonalSplineDirectionFactor: 0.07
   preferEights: 0

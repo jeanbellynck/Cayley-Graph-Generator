@@ -24,9 +24,11 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
 
     float creationTime; // = Time.time;
+
+    [field:SerializeField] public float radius { get; protected set; }
     public float Age => Time.time - creationTime;
 
-    readonly List<HighlightType> activeHighlightTypes = new();
+    protected readonly List<HighlightType> activeHighlightTypes = new();
 
     public virtual float EdgeCompletion {
         get => 1f;
@@ -86,11 +88,9 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         //OnEdgeChange += RecalculateSplineDirections; // would be ok, but not necessary, as the edges call this method themselves
 
         OnEdgeChange?.Invoke();
-
     }
 
     protected virtual void Update() {
-        
     }
 
     public void OnDrawGizmos() {
@@ -352,7 +352,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
         var (outLabels, inLabels) = followEdges(path);
         foreach (var label in outLabels) {
-            foreach (var edge in GetOutgoingEdges(label)) {
+            foreach (var edge in GetOutgoingEdges(label)) { // todo: only highlight the first edge? in a monoid there might actually be more than one here, but only one leads back to the identity!
                 edge.Highlight(mode, removeHighlight);
                 edge.EndPoint.Highlight(mode, followEdges, path + label, removeHighlight, keepGoingWhenAlreadyDone);
             }
@@ -365,7 +365,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
                 // here, we call ToUpper also for the generators of the subgroup (0,1,2,...) but it doesn't matter, since in this case the input to FollowEdges is ignored anyway
             }
         }
-
+        // todo: Make this a coroutine, so it doesn't block the main thread
     }
 
     Color unhighlightedColor;
@@ -393,4 +393,8 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         return true;
     }
 
+    public virtual void SetRadius(float radius) {
+        this.radius = radius;
+        transform.localScale = Vector3.one * radius * 2;
+    }
 }

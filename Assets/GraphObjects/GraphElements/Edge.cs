@@ -6,8 +6,9 @@ using Random = UnityEngine.Random;
 
 
 public class Edge : MonoBehaviour {
-    [SerializeField] protected float lineWidth = 0.1f;
-    [SerializeField] protected float arrowWidth = 0.2f;
+    [SerializeField] protected float lineWidth = 0.07f;
+    [SerializeField] protected float splineWidth = 0.07f;
+    [SerializeField] protected float arrowWidth = 0.14f;
     [SerializeField] protected float PercentHead = 0.1f;
     [SerializeField] protected float vertexRadius = 0.1f;
     [SerializeField] bool useSplines = true;
@@ -76,7 +77,7 @@ public class Edge : MonoBehaviour {
         SetColors(new(1, 0, 0));
 
         useSplines = splinificationType == SplinificationType.Always;
-
+        splineRenderer.size = splineWidth;
         LateUpdate();
     }
 
@@ -168,6 +169,7 @@ public class Edge : MonoBehaviour {
     }
 
     void UpdateSpline() {
+        // todo: make arrow (size modifier) in absolute units (not relative to the spline length)
         lineRenderer.enabled = false;
         meshRenderer.enabled = true;
         var startPoint = StartPoint;
@@ -191,10 +193,11 @@ public class Edge : MonoBehaviour {
         Vector3 endDirection = endPoint.splineDirections[Label];
 
         Vector3 midDisplacementDirectionNonOrthogonal = startDirection - endDirection;
-        Vector3 midDisplacementDirection;
+        Vector3 midDisplacementDirection = Vector3.one;
         if (vector.sqrMagnitude < 1e-6 && midDisplacementDirectionNonOrthogonal.sqrMagnitude < 1e-6) {
-            while (true) {
-                midDisplacementDirection = Vector3.Cross(midDisplacementDirectionNonOrthogonal, Random.onUnitSphere);
+            var randomStartDirection = startDirection.sqrMagnitude < 1e-6 ? Random.onUnitSphere : startDirection;
+            foreach (var v in new[] { Vector3.up, Vector3.forward, Vector3.right }) {
+                midDisplacementDirection = Vector3.Cross(randomStartDirection, v);
                 if (midDisplacementDirection.sqrMagnitude < 1e-6) continue;
                 midDisplacementDirection = midDisplacementDirection.normalized * midDisplacementDirectionNonOrthogonal.magnitude;
                 break;
@@ -237,11 +240,9 @@ public class Edge : MonoBehaviour {
 
     //public virtual char ReverseLabel => RelatorDecoder.invertGenerator(Label); // This should be in the subclass
 
-    float unhighlightedWidthMultiplier, unhighlightedSplineSize;
+    float unhighlightedWidthMultiplier; // will be 1 unless we use that somewhere else
     int currentType = -1;
     public void Highlight(HighlightType mode, bool removeHighlight) {
-        if (unhighlightedSplineSize <= 0)
-            unhighlightedSplineSize = splineRenderer.size;
         if (unhighlightedWidthMultiplier <= 0)
             unhighlightedWidthMultiplier = lineRenderer.widthMultiplier;
         if (!removeHighlight && currentType > (int)mode) // don't overwrite with a lower highlight mode
@@ -258,7 +259,7 @@ public class Edge : MonoBehaviour {
             };
 
         lineRenderer.widthMultiplier = unhighlightedWidthMultiplier * a;
-        splineRenderer.size = unhighlightedSplineSize * a;
+        splineRenderer.size = splineWidth * a;
     }
 
 

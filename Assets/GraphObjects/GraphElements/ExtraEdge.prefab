@@ -49,10 +49,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b17ec35f63f0dd478eac2d0eb110884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineWidth: 0.1
+  lineWidth: 0.08
+  splineWidth: 0.14
   arrowWidth: 0.2
   PercentHead: 0.1
-  vertexRadius: 0.1
+  vertexRadius: 0.14
   useSplines: 0
   <Label>k__BackingField: 0
   <StartPoint>k__BackingField: {fileID: 0}
@@ -262,8 +263,8 @@ MonoBehaviour:
     blend: 0.447
     useClippedPercent: 0
     keys:
-    - _featherStart: 0.8775613903999329
-      _featherEnd: 0.9865665435791016
+    - _featherStart: 0.75
+      _featherEnd: 0.9300000071525574
       _centerStart: 0.11031632125377655
       _centerEnd: 0.033953920006752014
       interpolation:
@@ -316,7 +317,7 @@ MonoBehaviour:
   buildOnEnable: 0
   _baked: 0
   _markDynamic: 1
-  _size: 0.05
+  _size: 0.53
   _color: {r: 1, g: 1, b: 1, a: 1}
   _offset: {x: 0, y: 0, z: 0}
   _normalMethod: 1

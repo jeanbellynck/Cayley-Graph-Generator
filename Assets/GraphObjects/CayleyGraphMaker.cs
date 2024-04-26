@@ -59,7 +59,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         neutralElement = CreateVertex(null, default);
         neutralElement.semiGroup = groupMode != GroupMode.Group; 
         // todo: to Initialize (it is currently just a weird way of initializing the neutral element)
-        neutralElement.transform.localScale *= 1.6f;
+        neutralElement.SetRadius( 1.6f * neutralElement.radius );
         neutralElement.Center();
         
 

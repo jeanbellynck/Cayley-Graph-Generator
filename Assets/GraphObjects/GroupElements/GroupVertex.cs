@@ -46,6 +46,7 @@ public class GroupVertex : Vertex {
             LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) +
             LabeledOutgoingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty())
         ) / graphVisualizer.LabelCount + 0.2f : 1f;
+        SetRadius();
     }
 
     protected override void Start() {
@@ -56,16 +57,24 @@ public class GroupVertex : Vertex {
     // Update is called once per frame
     protected override void Update() {
         base.Update();
-
+        //if (activeHighlightTypes.Count > 0) return;
         //Stress = (from generator in LabeledOutgoingEdges.Keys
-        //    let inEdge = GetIncomingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
-        //    let outEdge = GetOutgoingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
-        //    select Vector3.Angle(inEdge, outEdge) / 180
+        //          let inEdge = GetIncomingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
+        //          let outEdge = GetOutgoingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
+        //          select Vector3.Angle(inEdge, outEdge) / 180
         //).DefaultIfEmpty(0).Max();
         //Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
-        // todo: Implement stress properly! (also make this not clash with highlight)
+        //todo: Implement stress properly!(also make this not clash with highlight)
+        //todo: find a material / shader that works like diffuse fast but with transparency
 
     }
+
+    public override void SetRadius(float radius) {
+        base.SetRadius(radius);
+        transform.localScale = Vector3.one * EdgeCompletion * radius * 2;
+    }
+
+    void SetRadius() => SetRadius(radius);
 
     public Dictionary<char, List<GroupEdge>> GetEdges() {
         Dictionary<char, List<GroupEdge>> edges = LabeledOutgoingEdges.Keys.ToDictionary(op => op, op => GetOutgoingEdges(op).Cast<GroupEdge>().ToList());
