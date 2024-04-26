@@ -1,6 +1,7 @@
 using Dreamteck.Splines;
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 public class Edge : MonoBehaviour {
@@ -81,9 +82,10 @@ public class Edge : MonoBehaviour {
     public void Destroy(bool simply = false) {
         GameObject.Destroy(gameObject);
         if (simply) return;
+        graphVisualizer.graphManager.RemoveEdge(this);
         StartPoint.RemoveEdge(this);
         EndPoint.RemoveEdge(this);
-        StartPoint = null; 
+        StartPoint = null; // not necessary, but makes other code throw errors when an edge that is to be destroyed is still used
         EndPoint = null;
     }
 
@@ -188,7 +190,17 @@ public class Edge : MonoBehaviour {
         Vector3 endDirection = endPoint.splineDirections[Label];
 
         Vector3 midDisplacementDirectionNonOrthogonal = startDirection - endDirection;
-        Vector3 midDisplacementDirection = Vector3.ProjectOnPlane(midDisplacementDirectionNonOrthogonal, vector.normalized);
+        Vector3 midDisplacementDirection;
+        if (vector.sqrMagnitude < 1e-6 && midDisplacementDirectionNonOrthogonal.sqrMagnitude < 1e-6) {
+            while (true) {
+                midDisplacementDirection = Vector3.Cross(midDisplacementDirectionNonOrthogonal, Random.onUnitSphere);
+                if (midDisplacementDirection.sqrMagnitude < 1e-6) continue;
+                midDisplacementDirection = midDisplacementDirection.normalized * midDisplacementDirectionNonOrthogonal.magnitude;
+                break;
+            }
+        }
+        else
+            midDisplacementDirection = Vector3.ProjectOnPlane(midDisplacementDirectionNonOrthogonal, vector.normalized);
         float l = midDisplacementDirection.magnitude;
         float lambda = MathF.Sqrt(startDirection.sqrMagnitude + endDirection.sqrMagnitude);
         /* overly complicated (and non-working) way to get a random vector orthogonal to vector and not needed bc. the midDisplacement doesn't have to be large.

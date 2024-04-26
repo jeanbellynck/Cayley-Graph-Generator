@@ -53,15 +53,13 @@ public class LabelledGraphManager {
 
     public void RemoveVertex(Vertex vertex) {
         vertices.Remove(vertex);
-        vertex.Destroy();
     }
 
     public void RemoveEdge(Edge edge) {
         edges[edge.Label].Remove(edge);
-        edge.Destroy();
     }
 
-    public void RemoveEdges(char label) {
+    public void DestroyEdges(char label) {
         if (!edges.TryGetValue(label, out List<Edge> edgeList)) return;
         foreach (Edge edge in edgeList) edge.Destroy();
         edges.Remove(label);

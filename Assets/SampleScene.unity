@@ -2168,7 +2168,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.18665291
+  m_Size: 0.18854494
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13682,6 +13682,7 @@ MonoBehaviour:
   hyperbolicityInputField: {fileID: 1102333883}
   hyperbolicityMatrix: {fileID: 1144551278}
   dimensionInputDD: {fileID: 1416641884}
+  groupModeDropdown: {fileID: 1048272416}
 --- !u!4 &772353316
 Transform:
   m_ObjectHideFlags: 0
@@ -18596,7 +18597,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &1048272417
 MonoBehaviour:
