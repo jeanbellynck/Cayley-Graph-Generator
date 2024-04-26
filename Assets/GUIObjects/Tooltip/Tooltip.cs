@@ -10,10 +10,13 @@ public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     }
 
     public void OnPointerExit(PointerEventData eventData) {
-        TooltipManager.Instance?.OnHoverEnd();
+        TooltipManager.Instance?.OnHoverEnd(this);
     }
 
     public TooltipContent GetTooltip() => content;
 
     public virtual void OnClick(Kamera activeKamera) {}
+
+    public void OnHover(Kamera activeKamera) { }
+    public void OnHoverEnd() { }
 }

@@ -61,7 +61,9 @@ public class LabelledGraphManager {
 
     public void DestroyEdges(char label) {
         if (!edges.TryGetValue(label, out List<Edge> edgeList)) return;
-        foreach (Edge edge in edgeList) edge.Destroy();
+        foreach (Edge edge in new List<Edge>(edgeList))
+            if (edge != null)
+                edge.Destroy();
         edges.Remove(label);
     }
 

@@ -1,5 +1,6 @@
 using Dreamteck.Splines;
 using System;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -235,4 +236,30 @@ public class Edge : MonoBehaviour {
     }
 
     //public virtual char ReverseLabel => RelatorDecoder.invertGenerator(Label); // This should be in the subclass
+
+    float unhighlightedWidthMultiplier, unhighlightedSplineSize;
+    int currentType = -1;
+    public void Highlight(HighlightType mode, bool removeHighlight) {
+        if (unhighlightedSplineSize <= 0)
+            unhighlightedSplineSize = splineRenderer.size;
+        if (unhighlightedWidthMultiplier <= 0)
+            unhighlightedWidthMultiplier = lineRenderer.widthMultiplier;
+        if (!removeHighlight && currentType > (int)mode) // don't overwrite with a lower highlight mode
+            return;
+
+        currentType = removeHighlight ? -1 : (int)mode;
+
+        var a = removeHighlight ? 1f :
+            mode switch {
+                HighlightType.PrimaryPath => 3,
+                HighlightType.Path => 1.5f,
+                HighlightType.Subgroup => 2,
+                _ => 1
+            };
+
+        lineRenderer.widthMultiplier = unhighlightedWidthMultiplier * a;
+        splineRenderer.size = unhighlightedSplineSize * a;
+    }
+
+
 }

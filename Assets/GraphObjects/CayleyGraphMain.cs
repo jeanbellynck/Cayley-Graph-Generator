@@ -108,6 +108,6 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     public void DrawSubgroup(IEnumerable<string> generators, float ambientEdgeStrength, float subgroupEdgeStrength) {
         graphVisualizer.AmbientEdgeStrength = ambientEdgeStrength;
         graphVisualizer.SubgroupEdgeStrength = subgroupEdgeStrength;
-        cayleySubGraphMaker.RegenerateSubgroup(generators);
+        cayleySubGraphMaker.RegenerateSubgroup(generators, cayleyGraphMaker.neutralElement);
     }
 }

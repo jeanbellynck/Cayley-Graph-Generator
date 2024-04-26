@@ -3,6 +3,8 @@
 public interface ITooltipOnHover {
     TooltipContent GetTooltip();
     void OnClick(Kamera activeKamera);
+    void OnHover(Kamera activeKamera);
+    void OnHoverEnd();
 }
 
 [Serializable]

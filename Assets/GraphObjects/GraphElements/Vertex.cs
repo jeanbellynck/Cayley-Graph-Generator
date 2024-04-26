@@ -26,6 +26,8 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     float creationTime; // = Time.time;
     public float Age => Time.time - creationTime;
 
+    readonly List<HighlightType> activeHighlightTypes = new();
+
     public virtual float EdgeCompletion {
         get => 1f;
         protected set => throw new NotImplementedException();
@@ -331,10 +333,64 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         OnEdgeChange?.Invoke();
     }
     
-
+    // ITooltipOnHover
     public TooltipContent GetTooltip() => tooltipContent;
 
+    public virtual void OnClick(Kamera activeKamera) => OnCenter?.Invoke(activeKamera);
+    public virtual void OnHover(Kamera activeKamera) { }
 
-    public void OnClick(Kamera activeKamera) => OnCenter?.Invoke(activeKamera);
+    public virtual void OnHoverEnd() { }
+
     public void Center() => OnCenter?.Invoke(null); // this is a workaround for the fact that events can only be called from the class they are defined in (not even subclasses)
+
+    public void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges, string path, bool removeHighlight, bool keepGoingWhenAlreadyDone) {
+        // I only split the in and out labels in followEdges bc. I want to implement this for Vertices, not GroupVertices AND we don't have the "toUpper" for inverses of the generators of the subgroup!
+
+        var wasAlreadyDone = removeHighlight ? !UnHighlight(mode) : !Highlight(mode);
+        if (wasAlreadyDone && !keepGoingWhenAlreadyDone) 
+            return;
+
+        var (outLabels, inLabels) = followEdges(path);
+        foreach (var label in outLabels) {
+            foreach (var edge in GetOutgoingEdges(label)) {
+                edge.Highlight(mode, removeHighlight);
+                edge.EndPoint.Highlight(mode, followEdges, path + label, removeHighlight, keepGoingWhenAlreadyDone);
+            }
+        }
+
+        foreach (var label in inLabels) {
+            foreach (var edge in GetIncomingEdges(label)) {
+                edge.Highlight(mode, removeHighlight);
+                edge.StartPoint.Highlight(mode, followEdges, path + char.ToUpper(label), removeHighlight, keepGoingWhenAlreadyDone); 
+                // here, we call ToUpper also for the generators of the subgroup (0,1,2,...) but it doesn't matter, since in this case the input to FollowEdges is ignored anyway
+            }
+        }
+
+    }
+
+    Color unhighlightedColor;
+    public bool Highlight(HighlightType mode) {
+
+        if (activeHighlightTypes.Contains(mode))
+            return false;
+        activeHighlightTypes.Add(mode);
+        unhighlightedColor = Mr.material.color;
+        switch (mode) { // todo
+            case HighlightType.Subgroup:
+                Mr.material.color = Color.red;
+                break;
+        }
+        return true;
+    }
+
+    public bool UnHighlight(HighlightType mode) {
+
+        if (!activeHighlightTypes.Contains(mode))
+            return false;
+        activeHighlightTypes.Remove(mode);
+        // todo
+        Mr.material.color = unhighlightedColor;
+        return true;
+    }
+
 }

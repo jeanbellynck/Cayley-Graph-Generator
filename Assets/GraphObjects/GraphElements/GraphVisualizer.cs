@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Interpolation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -118,9 +119,9 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         return newVertex;
     }
 
-    public GroupEdge CreateSubgroupEdge(GroupVertex startvertex, GroupVertex endvertex, char op) {
+    public GroupEdge CreateSubgroupEdge(GroupVertex startVertex, GroupVertex endVertex, char op) {
         // Create edge
-        GroupEdge newEdge = CreateEdge(startvertex, endvertex, op, 1);
+        GroupEdge newEdge = CreateEdge(startVertex, endVertex, op, 1);
         newEdge.Strength = SubgroupEdgeStrength;
         // Set layer to subgroup
         newEdge.gameObject.layer = LayerMask.NameToLayer("SubgroupOnly");
@@ -171,4 +172,10 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     }
 
     
+}
+
+public enum HighlightType {
+    Subgroup,
+    Path,
+    PrimaryPath
 }

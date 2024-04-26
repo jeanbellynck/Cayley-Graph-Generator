@@ -57,14 +57,14 @@ public class GroupVertex : Vertex {
     protected override void Update() {
         base.Update();
 
-        Stress = (from generator in LabeledOutgoingEdges.Keys
-            let inEdge = GetIncomingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
-            let outEdge = GetOutgoingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
-            select Vector3.Angle(inEdge, outEdge) / 180
-        ).DefaultIfEmpty(0).Max();
-        Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
+        //Stress = (from generator in LabeledOutgoingEdges.Keys
+        //    let inEdge = GetIncomingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
+        //    let outEdge = GetOutgoingEdges(generator).FirstOrDefault()?.Direction ?? Vector3.zero
+        //    select Vector3.Angle(inEdge, outEdge) / 180
+        //).DefaultIfEmpty(0).Max();
+        //Mr.material.color = new Color(Stress, 0, 0, EdgeCompletion);
+        // todo: Implement stress properly! (also make this not clash with highlight)
 
-        //Mr.material.SetColor("_BaseColor", new Color(Stress, 0, 0, EdgeCompletion));
     }
 
     public Dictionary<char, List<GroupEdge>> GetEdges() {
@@ -202,5 +202,50 @@ public class GroupVertex : Vertex {
             }
         }
         return mass;**/
+    }
+
+
+    public void HighlightPathsFromIdentity(bool removeHighlight) {
+        var primaryPathsToIdentity =
+            from path in PathsFromNeutralElement.Take(1) 
+            select RelatorDecoder.InvertSymbol(path);
+        var secondaryPathsToNeutralElement = 
+            from path in PathsFromNeutralElement.Skip(1).Take(4)
+            select RelatorDecoder.InvertSymbol(path);
+
+        Highlight(HighlightType.PrimaryPath, FollowPaths(primaryPathsToIdentity), "", removeHighlight, true);
+        Highlight(HighlightType.Path, FollowPaths(secondaryPathsToNeutralElement), "", removeHighlight, true);
+        return;
+
+        Func<string, (IEnumerable<char>, IEnumerable<char>)> FollowPaths(IEnumerable<string> pathsToFollow) {
+            pathsToFollow = pathsToFollow.ToArray();
+            return path => {
+                var nextOperations = (
+                    from pathToNeutralElement in pathsToFollow
+                    where pathToNeutralElement.Length > path.Length && pathToNeutralElement.StartsWith(path)
+                    select pathToNeutralElement[path.Length]
+                ).ToArray();
+                return (
+                    from op in nextOperations
+                    where !IsReverseLabel(op)
+                    select op,
+                    // follow the outgoing edges for normal labels
+                    from op in nextOperations
+                    where IsReverseLabel(op)
+                    select ReverseLabel(op)
+                    // follow the ingoing edges for reverse labels (we traverse the pathToFollow)
+                );
+            };
+        }
+    }
+
+    public override void OnHover(Kamera activeKamera) {
+        base.OnHover(activeKamera);
+        HighlightPathsFromIdentity(false);
+    }
+
+    public override void OnHoverEnd() {
+        base.OnHoverEnd();
+        HighlightPathsFromIdentity(true);
     }
 }

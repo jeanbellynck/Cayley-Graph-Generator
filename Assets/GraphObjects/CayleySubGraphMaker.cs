@@ -10,8 +10,10 @@ using System.Linq;
  * Differently to normal generators, the subgraph generators are enumerators by numbers, not letters.
  */
 public class CayleySubGraphMaker : MonoBehaviour {
-    public List<string> generatorList = new List<string>();
+    List<string> generatorList = new();
+    List<char> generatorNames = new();
     public GraphVisualizer graphVisualizer; // In the best case this would actually be a graphManager, but that would require a lot of changes.
+    GroupVertex neutralElement;
 
     // Method for drawing/changing the subgraph
     /**
@@ -20,20 +22,27 @@ public class CayleySubGraphMaker : MonoBehaviour {
     - Adds an edge to each vertex by following generator paths
     - The rest is handled by the GraphVisualizer.
     **/
-    public void RegenerateSubgroup(IEnumerable<string> generators) {
+    public void RegenerateSubgroup(IEnumerable<string> generators, GroupVertex neutralElement) {
         // Delete previous subgraph
         ResetSubgraph(generators);
         GenerateSubgroup();
+        this.neutralElement = neutralElement;
+        SubgroupHighlight(false);
     }
 
     public void GenerateSubgroup() {
+        generatorNames = (
+                from genIndex in Enumerable.Range(0, generatorList.Count)
+                select (char)(genIndex + '0')
+            ).ToList();
+
         // Add edges to the subgraph
         for (int genIndex = 0; genIndex < generatorList.Count; genIndex++) {
             foreach(GroupVertex startVertex in graphVisualizer.graphManager.GetVertices()) {
                 GroupVertex endVertex = startVertex.FollowGeneratorPath(generatorList[genIndex]);
-                if (endVertex != null) {
-                    graphVisualizer.CreateSubgroupEdge(startVertex, endVertex, (char)(genIndex + '0'));
-                }
+                if (endVertex == null) continue;
+                graphVisualizer.CreateSubgroupEdge(startVertex, endVertex, generatorNames[genIndex]);
+                // todo: if any of the vertices are subgroup highlighted, subgroup highlight!
             }
         }
     }
@@ -43,14 +52,24 @@ public class CayleySubGraphMaker : MonoBehaviour {
      * This is done by deleting all edges with a number as label.
      **/
     void ResetSubgraph(IEnumerable<string> generators) {
+        SubgroupHighlight(true);
         // Delete all edges from the previous subgraph
-        for(int i = 0; i < generatorList.Count; i++) {
-            graphVisualizer.graphManager.DestroyEdges((char)(i + '0'));
-        }
+        foreach (var label in generatorNames) 
+            graphVisualizer.graphManager.DestroyEdges(label);
+        
 
         // Set the generatorList to the new generators
         generatorList = new List<string>(generators);
     }
 
+    public void SubgroupHighlight(bool removeHighlight) {
+        HashSet<char> subgroupGenerators = generatorNames.ToHashSet();
+
+        if (neutralElement != null) 
+            neutralElement.Highlight(HighlightType.Subgroup, FollowEdges, "", removeHighlight, false);
+        return;
+
+        (IEnumerable<char>, IEnumerable<char>) FollowEdges (string path) => (subgroupGenerators, subgroupGenerators);
+    }
 
 }

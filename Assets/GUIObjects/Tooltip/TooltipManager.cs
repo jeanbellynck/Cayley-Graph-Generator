@@ -56,14 +56,17 @@ public class TooltipManager : MonoBehaviour {
                 if (tooltipObject != lastHoverObject) {
                     lastHoverObject = tooltipObject;
                     if (tooltipObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing))
-                        OnHoverBegin(tooltipThing, false);
+                        OnHoverBegin(tooltipThing, false, kamera);
                     else
-                        OnHoverEnd();
+                        OnHoverEnd(tooltipThing);
                 }
             }
             else {
+                OnHoverEnd(
+                    lastHoverObject != null && lastHoverObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing)
+                    ? tooltipThing
+                    : null);
                 lastHoverObject = null;
-                OnHoverEnd();
             }
         }
 
@@ -88,12 +91,13 @@ public class TooltipManager : MonoBehaviour {
         tooltipPanel.position = new(mousePosition.x + 10, mousePosition.y - 10);
     }
 
-    public void OnHoverBegin(ITooltipOnHover tooltipThing, bool fromUI = true) {
+    public void OnHoverBegin(ITooltipOnHover tooltipThing, bool fromUI = true, Kamera kamera = null) {
         timer = Time.time;
         lastTooltipThing = tooltipThing;
         content = tooltipThing.GetTooltip();
         uiActivated = fromUI;
         objectActivated = !fromUI;
+        tooltipThing.OnHover(kamera);
     }
 
     void ShowTooltip()
@@ -113,10 +117,12 @@ public class TooltipManager : MonoBehaviour {
 
 
 
-    public void OnHoverEnd() {
+    public void OnHoverEnd(ITooltipOnHover tooltip) {
         uiActivated = false;
         objectActivated = false;
         isActive = false;
         tooltipPanel.gameObject.SetActive(false);
+        if (tooltip != null)
+            tooltip.OnHoverEnd();
     }
 }

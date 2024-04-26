@@ -39,6 +39,8 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     [SerializeField] GroupMode groupMode = GroupMode.Group;
 
+    public GroupVertex neutralElement { get; private set; }
+
     bool _running;
     public bool Running {
         get => _running;
@@ -54,7 +56,7 @@ public class CayleyGraphMaker : MonoBehaviour {
         if (groupMode == GroupMode.SemiGroup) 
             Debug.LogWarning("Semigroups without neutral element aren't implemented yet!");
 
-        GroupVertex neutralElement = CreateVertex(null, default);
+        neutralElement = CreateVertex(null, default);
         neutralElement.semiGroup = groupMode != GroupMode.Group; 
         // todo: to Initialize (it is currently just a weird way of initializing the neutral element)
         neutralElement.transform.localScale *= 1.6f;
