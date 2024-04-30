@@ -406,7 +406,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
             () => Highlight(mode, followEdges, path, removeHighlight, keepGoingWhenAlreadyDone, id),
             id
         ));
-        while (plannedActions.Count > highlightStepsPerFrame * 10) {
+        while (plannedActions.Count > highlightStepsPerFrame * 100) {
             CancelActions(plannedActions.Peek().Item2);
             // this is very ad hoc, but sometimes the plannedActions queue gets flooded with highlight removal actions
         }
