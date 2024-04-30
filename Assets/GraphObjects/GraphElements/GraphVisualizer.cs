@@ -72,6 +72,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
                     kamera.centerPointer = vertex.centerPointer;
         };
         UpdateGeneratorLabels(generators);
+        StartCoroutine(Vertex.ExecutePlannedActions());
     }
 
     public void UpdateGeneratorLabels(IEnumerable<char> generators) {
@@ -171,11 +172,25 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         simulationDimensionality = dim;
     }
 
-    
 }
 
 public enum HighlightType {
     Subgroup,
     Path,
     PrimaryPath
+}
+public static class HighlightTypeExtensions {
+    public static bool IsPath(this HighlightType type) => 
+        type is HighlightType.Path or HighlightType.PrimaryPath;
+
+    public static int ToActionType(this HighlightType type, bool remove = false) =>
+        remove ? -1 :
+        type switch {
+            HighlightType.Subgroup => 0,
+            _ => 1
+        };
+
+    public static int ToInt(this HighlightType type, bool remove = false) {
+        return remove ? -1 : (int)type;
+    }
 }

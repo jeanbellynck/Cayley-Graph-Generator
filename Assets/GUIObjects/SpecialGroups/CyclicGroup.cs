@@ -16,7 +16,7 @@ public class CyclicGroup : PresentationExample
         if (int.TryParse(parameters[0].value, out int n) && n >= 1)
         {
             generators = new string[]{"a"};
-            string relator = "a^" + n.ToString();
+            string relator = "a^" + n;
             relators = new string[]{relator};
         }
     }

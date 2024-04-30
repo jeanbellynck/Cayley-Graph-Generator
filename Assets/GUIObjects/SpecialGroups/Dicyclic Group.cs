@@ -19,13 +19,13 @@ public class DicyclicGroup : PresentationExample
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0].value, out int n) && n >= 1)
+        if (int.TryParse(parameters[0].value, out int n) && n is >= 0 and <= 10)
         {
             List<string> gen = new List<string>{"r", "f"};
             List<string> rel = new List<string>
             {
-                "r^" + (2*n).ToString(),
-                "r^" + (n).ToString() + "F^2",
+                "r^" + (2*n),
+                "r^" + (n) + "F^2",
                 "frFr"
             };
        

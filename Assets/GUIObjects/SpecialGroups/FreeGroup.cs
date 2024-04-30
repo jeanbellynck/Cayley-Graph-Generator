@@ -15,19 +15,13 @@ public class FreeGroup : PresentationExample
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0].value, out int n) && n >= 0)
-        {
-            List<string> gen = new List<string>();
-            List<string> Gen = new List<string>(); // Uppercase
+        if (!int.TryParse(parameters[0].value, out int n) || n is < 0 or > 10) return;
+        List<string> gen = new List<string>();
             
-            for (int i = 0; i < n; i++)
-            {
-                gen.Add(((char) ('a' + i)).ToString()) ;
-                Gen.Add(((char) ('A' + i)).ToString()) ;
-            }
+        for (int i = 0; i < n; i++) 
+            gen.Add(((char) ('a' + i)).ToString()) ;
        
-            generators = gen.ToArray();
-            relators = new string[]{};
-        }
+        generators = gen.ToArray();
+        relators = new string[]{};
     }
 }

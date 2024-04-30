@@ -12,7 +12,7 @@ public class CayleySubgraphUI : MonoBehaviour
      */
     public void DrawSubgroup() {
         IEnumerable<string> generators = subgroupGenerators.GetRelators();
-        cayleyGraphMain.DrawSubgroup(generators, 1f, 0f);
+        cayleyGraphMain.DrawSubgroup(generators, 1f, 0.1f);
     }
 
     /**

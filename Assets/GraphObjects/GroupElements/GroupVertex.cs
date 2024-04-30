@@ -221,9 +221,10 @@ public class GroupVertex : Vertex {
         var secondaryPathsToNeutralElement = 
             from path in PathsFromNeutralElement.Skip(1).Take(4)
             select RelatorDecoder.InvertSymbol(path);
+        CancelActions(name);
 
-        Highlight(HighlightType.PrimaryPath, FollowPaths(primaryPathsToIdentity), "", removeHighlight, true);
-        Highlight(HighlightType.Path, FollowPaths(secondaryPathsToNeutralElement), "", removeHighlight, true);
+        Highlight(HighlightType.PrimaryPath, FollowPaths(primaryPathsToIdentity), removeHighlight, true);
+        Highlight(HighlightType.Path, FollowPaths(secondaryPathsToNeutralElement), removeHighlight, true);
         return;
 
         Func<string, (IEnumerable<char>, IEnumerable<char>)> FollowPaths(IEnumerable<string> pathsToFollow) {

@@ -17,7 +17,7 @@ public class TorusGroup : PresentationExample
         if (int.TryParse(parameters[0].value, out int m) && m >= 1 && int.TryParse(parameters[1].value, out int n) && n >= 1)
         {
             generators = new string[]{"a", "b"};
-            relators = new string[]{"abAB", "a^" + m.ToString(), "b^" + n.ToString()};
+            relators = new string[]{"abAB", "a^" + m, "b^" + n};
         }
     }
 }

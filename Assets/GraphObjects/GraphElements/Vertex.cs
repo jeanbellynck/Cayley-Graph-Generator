@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -28,7 +30,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     [field:SerializeField] public float radius { get; protected set; }
     public float Age => Time.time - creationTime;
 
-    protected readonly List<HighlightType> activeHighlightTypes = new();
+    protected readonly HashSet<HighlightType> activeHighlightTypes = new();
 
     public virtual float EdgeCompletion {
         get => 1f;
@@ -61,12 +63,15 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     // this is a workaround for the subclasses where a vertex might get merged with another vertex and the outside would still point to the old vertex (often destroyed at that point)
     public CenterPointer centerPointer => _centerPointer ??= new() { center = transform }; // lazy initialization
 
+    static Queue<(Action, string)> plannedActions = new();
 
     protected virtual void Start() {
         if (Mass == 0) {
             Mass = 0.1f;
         }
         Mr = GetComponent<Renderer>();
+        //StartCoroutine(ExecutePlannedActions()); 
+        // this has to be run from a GameObject that will not be destroyed, so it is now run from the GraphVisualizer
     }
 
     public virtual void Initialize(VectorN position, GraphVisualizer graphVisualizer) {
@@ -91,6 +96,23 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     protected virtual void Update() {
+    }
+
+    static bool executingPlannedActions = false;
+    public static IEnumerator ExecutePlannedActions() {
+        if (executingPlannedActions) yield break;
+        executingPlannedActions = true;
+        while (true) {
+            for (int steps = 0; steps < highlightStepsPerFrame && plannedActions.TryDequeue(out var action); steps++) 
+                action.Item1.Invoke();
+            yield return null;
+        }
+    }
+
+    public static void CancelActions(string id) {
+        plannedActions = new(plannedActions.Where(
+            action => !( action.Item2 == id )
+        )); 
     }
 
     public void OnDrawGizmos() {
@@ -343,38 +365,64 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     public void Center() => OnCenter?.Invoke(null); // this is a workaround for the fact that events can only be called from the class they are defined in (not even subclasses)
 
-    public void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges, string path, bool removeHighlight, bool keepGoingWhenAlreadyDone) {
-        // I only split the in and out labels in followEdges bc. I want to implement this for Vertices, not GroupVertices AND we don't have the "toUpper" for inverses of the generators of the subgroup!
+    public virtual void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges,
+        bool removeHighlight, bool keepGoingWhenAlreadyDone)
+    => Highlight(
+        mode, followEdges, "", removeHighlight,
+        keepGoingWhenAlreadyDone, mode switch {
+            HighlightType.Subgroup when removeHighlight => "-SG",
+            HighlightType.Subgroup => "+SG",
+            _ => name
+        });
+
+    protected virtual void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges, string path, bool removeHighlight, bool keepGoingWhenAlreadyDone, string id) {
 
         var wasAlreadyDone = removeHighlight ? !UnHighlight(mode) : !Highlight(mode);
         if (wasAlreadyDone && !keepGoingWhenAlreadyDone) 
             return;
 
+        // I only split the in and out labels in followEdges bc. I want to implement this for Vertices, not GroupVertices AND we don't have the "toUpper" for inverses of the generators of the subgroup!
         var (outLabels, inLabels) = followEdges(path);
         foreach (var label in outLabels) {
-            foreach (var edge in GetOutgoingEdges(label)) { // todo: only highlight the first edge? in a monoid there might actually be more than one here, but only one leads back to the identity!
+            foreach (var edge in GetOutgoingEdges(label).Take(1)) { 
+                // todo: only highlight the first edge? in a monoid there might actually be more than one here, but only one leads back to the identity!
                 edge.Highlight(mode, removeHighlight);
-                edge.EndPoint.Highlight(mode, followEdges, path + label, removeHighlight, keepGoingWhenAlreadyDone);
+                edge.EndPoint.PlanHighlight(mode, followEdges, path + label, removeHighlight, keepGoingWhenAlreadyDone, id);
             }
         }
 
         foreach (var label in inLabels) {
-            foreach (var edge in GetIncomingEdges(label)) {
+            foreach (var edge in GetIncomingEdges(label).Take(1)) {
                 edge.Highlight(mode, removeHighlight);
-                edge.StartPoint.Highlight(mode, followEdges, path + char.ToUpper(label), removeHighlight, keepGoingWhenAlreadyDone); 
+                edge.StartPoint.PlanHighlight(mode, followEdges, path + char.ToUpper(label), removeHighlight, keepGoingWhenAlreadyDone, id); 
                 // here, we call ToUpper also for the generators of the subgroup (0,1,2,...) but it doesn't matter, since in this case the input to FollowEdges is ignored anyway
             }
         }
-        // todo: Make this a coroutine, so it doesn't block the main thread
     }
 
-    Color unhighlightedColor;
-    public bool Highlight(HighlightType mode) {
+    protected virtual void PlanHighlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges,
+        string path, bool removeHighlight, bool keepGoingWhenAlreadyDone, string id) {
+        plannedActions.Enqueue((
+            () => Highlight(mode, followEdges, path, removeHighlight, keepGoingWhenAlreadyDone, id),
+            id
+        ));
+        while (plannedActions.Count > highlightStepsPerFrame * 10) {
+            CancelActions(plannedActions.Peek().Item2);
+            // this is very ad hoc, but sometimes the plannedActions queue gets flooded with highlight removal actions
+        }
+    }
+
+
+    Color unhighlightedColor = Color.clear;
+    const int highlightStepsPerFrame = 30;
+
+    protected virtual bool Highlight(HighlightType mode) {
 
         if (activeHighlightTypes.Contains(mode))
             return false;
         activeHighlightTypes.Add(mode);
-        unhighlightedColor = Mr.material.color;
+        if (unhighlightedColor == Color.clear)
+            unhighlightedColor = Mr.material.color;
         switch (mode) { // todo
             case HighlightType.Subgroup:
                 Mr.material.color = Color.red;
@@ -383,13 +431,13 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         return true;
     }
 
-    public bool UnHighlight(HighlightType mode) {
+    protected virtual bool UnHighlight(HighlightType mode) {
 
         if (!activeHighlightTypes.Contains(mode))
             return false;
         activeHighlightTypes.Remove(mode);
-        // todo
-        Mr.material.color = unhighlightedColor;
+        if (!activeHighlightTypes.Contains(HighlightType.Subgroup))
+            Mr.material.color = unhighlightedColor;
         return true;
     }
 

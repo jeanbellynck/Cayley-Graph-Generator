@@ -16,7 +16,7 @@ public class PlacticMonoid : PresentationExample
 
     public override void updatePresentation() {
         
-        if (!int.TryParse(parameters[0].value, out int n) || n < 0) return;
+        if (!int.TryParse(parameters[0].value, out int n) || n < 0 || n > 10) return;
 
         List<string> gen = new();
         HashSet<string> rel = new();

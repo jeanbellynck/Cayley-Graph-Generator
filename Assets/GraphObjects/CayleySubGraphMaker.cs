@@ -65,11 +65,13 @@ public class CayleySubGraphMaker : MonoBehaviour {
     public void SubgroupHighlight(bool removeHighlight) {
         HashSet<char> subgroupGenerators = generatorNames.ToHashSet();
 
+        Vertex.CancelActions(removeHighlight ? "+SG" : "-SG");
+
         if (neutralElement != null) 
-            neutralElement.Highlight(HighlightType.Subgroup, FollowEdges, "", removeHighlight, false);
+            neutralElement.Highlight(HighlightType.Subgroup, FollowAllSubgroupEdges, removeHighlight, false);
         return;
 
-        (IEnumerable<char>, IEnumerable<char>) FollowEdges (string path) => (subgroupGenerators, subgroupGenerators);
+        (IEnumerable<char>, IEnumerable<char>) FollowAllSubgroupEdges (string path) => (subgroupGenerators, subgroupGenerators);
     }
 
 }

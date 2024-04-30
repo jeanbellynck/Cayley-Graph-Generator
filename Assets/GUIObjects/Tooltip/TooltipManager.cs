@@ -54,18 +54,14 @@ public class TooltipManager : MonoBehaviour {
             if (Physics.Raycast(ray, out var hit, maxDistance: 2000, layerMask)) { 
                 var tooltipObject = hit.transform;
                 if (tooltipObject != lastHoverObject) {
+                    OnHoverEnd();
                     lastHoverObject = tooltipObject;
                     if (tooltipObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing))
                         OnHoverBegin(tooltipThing, false, kamera);
-                    else
-                        OnHoverEnd(tooltipThing);
                 }
             }
             else {
-                OnHoverEnd(
-                    lastHoverObject != null && lastHoverObject.TryGetComponent<ITooltipOnHover>(out var tooltipThing)
-                    ? tooltipThing
-                    : null);
+                OnHoverEnd();
                 lastHoverObject = null;
             }
         }
@@ -79,7 +75,8 @@ public class TooltipManager : MonoBehaviour {
 
         if (Input.GetMouseButtonUp(0)) {
             if (objectActivated) {
-                if (cameraManager.TryGetKamera(mousePosition, out kamera)) lastTooltipThing?.OnClick(kamera);
+                if (cameraManager.TryGetKamera(mousePosition, out kamera)) 
+                    lastTooltipThing?.OnClick(kamera);
             } else if (uiActivated) {
                 lastTooltipThing?.OnClick(null);
             }
@@ -117,12 +114,14 @@ public class TooltipManager : MonoBehaviour {
 
 
 
-    public void OnHoverEnd(ITooltipOnHover tooltip) {
+    public void OnHoverEnd() {
         uiActivated = false;
         objectActivated = false;
         isActive = false;
         tooltipPanel.gameObject.SetActive(false);
-        if (tooltip != null)
-            tooltip.OnHoverEnd();
+        if (lastTooltipThing != null)
+            lastTooltipThing?.OnHoverEnd();
+        lastTooltipThing = null;
+        lastHoverObject = null;
     }
 }

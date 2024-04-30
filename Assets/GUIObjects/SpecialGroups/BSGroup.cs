@@ -15,7 +15,7 @@ public class BSGroup : PresentationExample
         // A non-negative number integer 
         if (int.TryParse(parameters[0].value, out int n) && int.TryParse(parameters[1].value, out int m) && m >= 1)
         {
-            string relator = "a^" + n.ToString() + "=ba^" + m.ToString() + "B";    
+            string relator = "a^" + n + "=ba^" + m + "B";    
             generators = new string[]{"a", "b"};
             relators = new string[]{relator};
         }

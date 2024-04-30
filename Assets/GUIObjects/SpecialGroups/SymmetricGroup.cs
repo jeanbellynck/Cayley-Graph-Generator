@@ -15,16 +15,14 @@ public class SymmetricGroup : PresentationExample
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0].value, out int n) && n >= 1)
+        if (int.TryParse(parameters[0].value, out int n) && n >= 1 && n <= 10)
         {
             List<string> gen = new List<string>();
-            List<string> Gen = new List<string>(); // Uppercase
             List<string> rel = new List<string>();
             
             for (int i = 0; i < n-1; i++)
             {
                 gen.Add(((char) ('a' + i)).ToString()) ;
-                Gen.Add(((char) ('A' + i)).ToString()) ;
             }
             for (int i = 0; i < n-1; i++)
             {

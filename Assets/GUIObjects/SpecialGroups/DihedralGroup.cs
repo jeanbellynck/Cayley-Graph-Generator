@@ -15,18 +15,13 @@ public class DihedralGroup : PresentationExample
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0].value, out int n) && n >= 1)
-        {
-            List<string> gen = new List<string>(){"r", "s"};
-            List<string> rel = new List<string>
-            {
-                "rsrs",
-                "s^2",
-                "r^" + n.ToString()
-            };
-       
-            generators = gen.ToArray();
-            relators = rel.ToArray();
-        }
+        if (!int.TryParse(parameters[0].value, out int n) || n < 1) return;
+
+        generators = new[] {"r", "s"};
+        relators = new[] {
+            "rsrs",
+            "s^2",
+            "r^" + n
+        };
     }
 }

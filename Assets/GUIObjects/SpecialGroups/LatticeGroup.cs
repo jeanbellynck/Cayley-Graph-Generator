@@ -15,27 +15,21 @@ public class LatticeGroup : PresentationExample
 
     public override void updatePresentation() {
         // A non-negative number integer 
-        if (int.TryParse(parameters[0].value, out int n) && n >= 0)
-        {
-            List<string> gen = new List<string>();
-            //List<string> Gen = new List<string>(); // Uppercase
-            List<string> rel = new List<string>();
+        if (!int.TryParse(parameters[0].value, out int n) || n is < 0 or > 10) return;
+        List<string> gen = new List<string>();
+        List<string> rel = new List<string>();
             
-            for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) 
+            gen.Add(((char) ('a' + i)).ToString()) ;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < i; j++)
             {
-                gen.Add(((char) ('a' + i)).ToString()) ;
-                //Gen.Add(((char) ('A' + i)).ToString()) ;
+                rel.Add("[" + gen[j] +","+ gen[i]+ "]");
             }
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < i; j++)
-                {
-                    rel.Add("[" + gen[j] +","+ gen[i]+ "]");
-                }
-            }
-       
-            generators = gen.ToArray();
-            relators = rel.ToArray();
         }
+       
+        generators = gen.ToArray();
+        relators = rel.ToArray();
     }
 }

@@ -242,12 +242,15 @@ public class Edge : MonoBehaviour {
     float unhighlightedWidthMultiplier; // will be 1 unless we use that somewhere else
     int currentType = -1;
     public void Highlight(HighlightType mode, bool removeHighlight) {
+        var newType = mode.ToInt(removeHighlight);
+        if (removeHighlight && currentType == -1) 
+            return;
+        if (!removeHighlight && currentType >= newType) // don't overwrite with a less important highlight mode
+            return;
         if (unhighlightedWidthMultiplier <= 0)
             unhighlightedWidthMultiplier = lineRenderer.widthMultiplier;
-        if (!removeHighlight && currentType > (int)mode) // don't overwrite with a lower highlight mode
-            return;
 
-        currentType = removeHighlight ? -1 : (int)mode;
+        currentType = newType;
 
         var a = removeHighlight ? 1f :
             mode switch {

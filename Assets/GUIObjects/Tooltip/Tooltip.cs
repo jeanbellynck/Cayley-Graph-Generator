@@ -10,7 +10,7 @@ public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     }
 
     public void OnPointerExit(PointerEventData eventData) {
-        TooltipManager.Instance?.OnHoverEnd(this);
+        TooltipManager.Instance?.OnHoverEnd();
     }
 
     public TooltipContent GetTooltip() => content;
