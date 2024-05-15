@@ -148,8 +148,8 @@ public class Edge : MonoBehaviour {
         Vector3 startPointWithSpacing = startPosition + lineDirection * EndPoint.radius;
         Vector3 endPointWithSpacing = endPosition - lineDirection * StartPoint.radius;
 
-        startColor.a = StartPoint.EdgeCompletion;
-        endColor.a = EndPoint.EdgeCompletion;
+        startColor.a = StartPoint.Importance;
+        endColor.a = EndPoint.Importance;
         lineRenderer.startColor = startColor;
         lineRenderer.endColor = endColor;
 
@@ -174,8 +174,8 @@ public class Edge : MonoBehaviour {
         var startPoint = StartPoint;
         var endPoint = EndPoint; // in case we update how the property works
 
-        startColor.a = StartPoint.EdgeCompletion;
-        endColor.a = EndPoint.EdgeCompletion;
+        startColor.a = StartPoint.Importance;
+        endColor.a = EndPoint.Importance;
         splineRenderer.colorModifier.keys[0].color = startColor;
         splineRenderer.colorModifier.keys[1].color = endColor;
         
@@ -240,17 +240,17 @@ public class Edge : MonoBehaviour {
     //public virtual char ReverseLabel => RelatorDecoder.invertGenerator(Label); // This should be in the subclass
 
     float unhighlightedWidthMultiplier; // will be 1 unless we use that somewhere else
-    int currentType = -1;
+    int highlightType = -1;
     public void Highlight(HighlightType mode, bool removeHighlight) {
         var newType = mode.ToInt(removeHighlight);
-        if (removeHighlight && currentType == -1) 
+        if (removeHighlight && highlightType == -1) 
             return;
-        if (!removeHighlight && currentType >= newType) // don't overwrite with a less important highlight mode
+        if (!removeHighlight && highlightType >= newType) // don't overwrite with a less important highlight mode
             return;
         if (unhighlightedWidthMultiplier <= 0)
             unhighlightedWidthMultiplier = lineRenderer.widthMultiplier;
 
-        currentType = newType;
+        highlightType = newType;
 
         var a = removeHighlight ? 1f :
             mode switch {
@@ -263,6 +263,8 @@ public class Edge : MonoBehaviour {
         lineRenderer.widthMultiplier = unhighlightedWidthMultiplier * a;
         splineRenderer.size = splineWidth * a;
     }
-
+    
+    public bool IsHighlighted(HighlightType mode) => highlightType == mode.ToInt();
+    public bool IsHighlighted() => highlightType != -1;
 
 }

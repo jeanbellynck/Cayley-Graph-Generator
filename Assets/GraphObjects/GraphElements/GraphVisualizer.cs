@@ -172,6 +172,12 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         simulationDimensionality = dim;
     }
 
+    public void GreyOut(bool greyedOut, Func<Vertex, bool> vertexSelector, Func<Edge, bool> edgeSelector) {
+        //foreach (var e in graphManager.GetEdges().Where(edgeSelector))
+        //    e.GreyOut(greyedOut);
+        foreach (var v in graphManager.GetVertices().Where(vertexSelector))
+            v.GreyOut(greyedOut);
+    }
 }
 
 public enum HighlightType {

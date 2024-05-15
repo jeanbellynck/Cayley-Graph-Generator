@@ -32,10 +32,9 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     protected readonly HashSet<HighlightType> activeHighlightTypes = new();
 
-    public virtual float EdgeCompletion {
-        get => 1f;
-        protected set => throw new NotImplementedException();
-    }
+    public virtual float Importance => MathF.Min(1, baseImportance);
+    public float baseImportance = 1;
+
 
     public event Action OnEdgeChange;
 
@@ -111,7 +110,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     public static void CancelActions(string id) {
         plannedActions = new(plannedActions.Where(
-            action => !( action.Item2 == id )
+            action => action.Item2 != id
         )); 
     }
 
@@ -441,8 +440,17 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         return true;
     }
 
+    public bool IsHighlighted(HighlightType mode) => activeHighlightTypes.Contains(mode);
+
     public virtual void SetRadius(float radius) {
         this.radius = radius;
         transform.localScale = Vector3.one * radius * 2;
     }
+    protected void SetRadius() => SetRadius(radius);
+
+    public void GreyOut(bool greyedOut) {
+        baseImportance = greyedOut ? 0.3f : 1f;
+        SetRadius();
+    }
+
 }

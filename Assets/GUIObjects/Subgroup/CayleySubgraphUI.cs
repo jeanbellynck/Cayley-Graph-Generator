@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Methods referenced from UI
 public class CayleySubgraphUI : MonoBehaviour
 {
     public RelatorMenu subgroupGenerators;
@@ -22,5 +23,9 @@ public class CayleySubgraphUI : MonoBehaviour
     public void ClusterBySubgroup() {
         IEnumerable<string> generators = subgroupGenerators.GetRelators();
         cayleyGraphMain.DrawSubgroup(generators, 0.1f, 1f);
+    }
+
+    public void GreyOutComplement(bool greyedOut) {
+        cayleyGraphMain.GreyOutComplement(greyedOut);
     }
 }

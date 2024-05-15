@@ -104,6 +104,7 @@ MonoBehaviour:
     text: 
     url: 
   <radius>k__BackingField: 0.13
+  baseImportance: 1
   splineDirectionFactor: 0.2
   orthogonalSplineDirectionFactor: 0.07
   preferEights: 0

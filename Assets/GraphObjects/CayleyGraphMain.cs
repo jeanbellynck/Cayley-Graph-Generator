@@ -108,6 +108,10 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     public void DrawSubgroup(IEnumerable<string> generators, float ambientEdgeStrength, float subgroupEdgeStrength) {
         graphVisualizer.AmbientEdgeStrength = ambientEdgeStrength;
         graphVisualizer.SubgroupEdgeStrength = subgroupEdgeStrength;
-        cayleySubGraphMaker.RegenerateSubgroup(generators, cayleyGraphMaker.neutralElement);
+        cayleySubGraphMaker.RegenerateSubgroup(generators, cayleyGraphMaker.NeutralElement);
     }
+
+    public void GreyOutComplement(bool greyedOut) {
+        graphVisualizer.GreyOut(greyedOut, v => !v.IsHighlighted(HighlightType.Subgroup), e => !e.IsHighlighted(HighlightType.Subgroup));
+    } 
 }

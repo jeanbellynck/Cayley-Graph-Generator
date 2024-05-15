@@ -15,7 +15,9 @@ public class GroupVertex : Vertex {
     public List<string> PathsFromNeutralElement { get => pathsFromNeutralElement; protected set => pathsFromNeutralElement = value; }
 
 
-    public override float EdgeCompletion { get; protected set; }
+    float edgeCompletion;
+    public override float Importance => MathF.Min(edgeCompletion * baseImportance, 1);
+
 
     [SerializeField] public bool semiGroup;
 
@@ -42,12 +44,13 @@ public class GroupVertex : Vertex {
 
     void CalculateEdgeCompletion()
     {
-        EdgeCompletion = graphVisualizer.LabelCount > 0 ? 0.8f * (
+        edgeCompletion = graphVisualizer.LabelCount > 0 ? 0.8f * (
             LabeledIncomingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty()) +
             LabeledOutgoingEdges.Values.Count(edgeSet => !edgeSet.IsEmpty())
         ) / graphVisualizer.LabelCount + 0.2f : 1f;
         SetRadius();
     }
+
 
     protected override void Start() {
         base.Start();
@@ -71,10 +74,8 @@ public class GroupVertex : Vertex {
 
     public override void SetRadius(float radius) {
         base.SetRadius(radius);
-        transform.localScale = Vector3.one * EdgeCompletion * radius * 2;
+        transform.localScale = Vector3.one * Importance * radius * 2;
     }
-
-    void SetRadius() => SetRadius(radius);
 
     public Dictionary<char, List<GroupEdge>> GetEdges() {
         Dictionary<char, List<GroupEdge>> edges = LabeledOutgoingEdges.Keys.ToDictionary(op => op, op => GetOutgoingEdges(op).Cast<GroupEdge>().ToList());

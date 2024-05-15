@@ -39,7 +39,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
     [SerializeField] GroupMode groupMode = GroupMode.Group;
 
-    public GroupVertex neutralElement { get; private set; }
+    public GroupVertex NeutralElement { get; private set; }
 
     bool _running;
     public bool Running {
@@ -56,11 +56,12 @@ public class CayleyGraphMaker : MonoBehaviour {
         if (groupMode == GroupMode.SemiGroup) 
             Debug.LogWarning("Semigroups without neutral element aren't implemented yet!");
 
-        neutralElement = CreateVertex(null, default);
-        neutralElement.semiGroup = groupMode != GroupMode.Group; 
+        NeutralElement = CreateVertex(null, default);
+        NeutralElement.semiGroup = groupMode != GroupMode.Group; 
         // todo: to Initialize (it is currently just a weird way of initializing the neutral element)
-        neutralElement.SetRadius( 1.6f * neutralElement.radius );
-        neutralElement.Center();
+        NeutralElement.SetRadius( 1.6f * NeutralElement.radius );
+        NeutralElement.baseImportance = 2; // only needed for the neutral element in a monoid, bc. EdgeCompletion often will only be 0.5
+        NeutralElement.Center();
         
 
         ContinueVisualization();
