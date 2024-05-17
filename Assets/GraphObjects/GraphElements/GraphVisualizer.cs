@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using MathNet.Numerics.Interpolation;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -26,6 +28,10 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     [SerializeField] GameObject edgePrefab;
     [SerializeField] IActivityProvider activityProvider;
     float _ambientEdgeStrength, _subgroupEdgeStrength;
+    public float baseImportance = 1;
+
+    public event Action<Vertex> OnVertexAdded;
+
     public float AmbientEdgeStrength {
         get => _ambientEdgeStrength;
         set {
@@ -72,14 +78,12 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
                     kamera.centerPointer = vertex.centerPointer;
         };
         UpdateGeneratorLabels(generators);
-        StartCoroutine(Vertex.ExecutePlannedActions());
     }
 
     public void UpdateGeneratorLabels(IEnumerable<char> generators) {
         generatorLabels = generators.ToList();
         UpdateLabels();
     }
-
 
     public void UpdateLabels()
     { 
@@ -95,7 +99,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         groupColorPanel.updateView(labelColors);
     }
 
-    Color RandomColor() {
+    static Color RandomColor() {
         return Random.ColorHSV(0, 1, 0.9f, 1);
     }
 
@@ -116,15 +120,18 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         else
             newVertex.InitializeFromPredecessor(predecessor, op, hyperbolicity);
         graphManager.AddVertex(newVertex);
+        newVertex.baseImportance = baseImportance;
 
+        OnVertexAdded?.Invoke(newVertex);
         return newVertex;
     }
 
-    public GroupEdge CreateSubgroupEdge(GroupVertex startVertex, GroupVertex endVertex, char op) {
-        // Create edge
-        GroupEdge newEdge = CreateEdge(startVertex, endVertex, op, 1);
+    public GroupEdge CreateSubgroupEdge([NotNull] GroupVertex startVertex, [NotNull] GroupVertex endVertex, char op) {
+        //var edge = startVertex.GetOutgoingEdges(op).FirstOrDefault();
+        //if (edge is GroupEdge) return null;
+
+        var newEdge = CreateEdge(startVertex, endVertex, op, 1);
         newEdge.Strength = SubgroupEdgeStrength;
-        // Set layer to subgroup
         newEdge.gameObject.layer = LayerMask.NameToLayer("SubgroupOnly");
         return newEdge;
     }
@@ -178,6 +185,45 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         foreach (var v in graphManager.GetVertices().Where(vertexSelector))
             v.GreyOut(greyedOut);
     }
+
+    Queue<(Action, string, int)> plannedActions = new();
+    readonly HashSet<string> executedActions = new();
+    int steps;
+    void Update() {
+        executedActions.Clear();
+        for (steps = 0; steps < highlightStepsPerFrame && plannedActions.TryDequeue(out var action); steps += action.Item3) {
+            action.Item1.Invoke();
+            executedActions.Add(action.Item2);
+        }
+    }
+    void LateUpdate() {
+        for (; steps < highlightStepsPerFrame && plannedActions.TryDequeue(out var action); steps += action.Item3) {
+            action.Item1.Invoke();
+            executedActions.Add(action.Item2);
+        }
+        if (steps > 0)
+            Debug.Log($"This frame, we executed {steps} planned actions of types {string.Join(", ", executedActions)}, {plannedActions.Count} left");
+
+    }
+
+    public void CancelActions(string id) {
+        plannedActions = new(plannedActions.Where(
+            action => action.Item2 != id
+        )); 
+    }
+
+    public void PlanAction((Action, string, int) plan)
+    {
+        plannedActions.Enqueue(plan);
+        while (plannedActions.Count > highlightStepsPerFrame * 100) {
+            var floodedRemovalAction = plannedActions.FirstOrDefault(a => a.Item2.StartsWith("~")).Item2;
+            if (floodedRemovalAction != default) CancelActions(floodedRemovalAction);
+            // this is very ad hoc, but sometimes the plannedActions queue gets flooded with highlight removal actions. Sometimes also with highlight adding actions. 
+            // TODO: The highlighting of the paths to the identity for some reason is very weird as in it adds exponentially many actions to the queue. This should be fixed.
+        }
+    }
+
+    const int highlightStepsPerFrame = 30;
 }
 
 public enum HighlightType {

@@ -32,7 +32,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     protected readonly HashSet<HighlightType> activeHighlightTypes = new();
 
-    public virtual float Importance => MathF.Min(1, baseImportance);
+    public virtual float Importance => IsHighlighted() ? 1 : MathF.Min(1, baseImportance);
     public float baseImportance = 1;
 
 
@@ -62,18 +62,13 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     // this is a workaround for the subclasses where a vertex might get merged with another vertex and the outside would still point to the old vertex (often destroyed at that point)
     public CenterPointer centerPointer => _centerPointer ??= new() { center = transform }; // lazy initialization
 
-    static Queue<(Action, string)> plannedActions = new();
-
     protected virtual void Start() {
-        if (Mass == 0) {
-            Mass = 0.1f;
-        }
+        if (Mass == 0) Mass = 0.1f;
         Mr = GetComponent<Renderer>();
-        //StartCoroutine(ExecutePlannedActions()); 
-        // this has to be run from a GameObject that will not be destroyed, so it is now run from the GraphVisualizer
     }
 
     public virtual void Initialize(VectorN position, GraphVisualizer graphVisualizer) {
+        Start();
         creationTime = Time.time;
 
         this.graphVisualizer = graphVisualizer;
@@ -95,23 +90,6 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     protected virtual void Update() {
-    }
-
-    static bool executingPlannedActions = false;
-    public static IEnumerator ExecutePlannedActions() {
-        if (executingPlannedActions) yield break;
-        executingPlannedActions = true;
-        while (true) {
-            for (int steps = 0; steps < highlightStepsPerFrame && plannedActions.TryDequeue(out var action); steps++) 
-                action.Item1.Invoke();
-            yield return null;
-        }
-    }
-
-    public static void CancelActions(string id) {
-        plannedActions = new(plannedActions.Where(
-            action => action.Item2 != id
-        )); 
     }
 
     public void OnDrawGizmos() {
@@ -371,11 +349,12 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         keepGoingWhenAlreadyDone, mode switch {
             HighlightType.Subgroup when removeHighlight => "-SG",
             HighlightType.Subgroup => "+SG",
-            _ => name
+            _ when removeHighlight => "~" + name,
+            _ => "#" + name
         });
 
     protected virtual void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges, string path, bool removeHighlight, bool keepGoingWhenAlreadyDone, string id) {
-
+        if (this == null) return;
         var wasAlreadyDone = removeHighlight ? !UnHighlight(mode) : !Highlight(mode);
         if (wasAlreadyDone && !keepGoingWhenAlreadyDone) 
             return;
@@ -401,19 +380,15 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     protected virtual void PlanHighlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges,
         string path, bool removeHighlight, bool keepGoingWhenAlreadyDone, string id) {
-        plannedActions.Enqueue((
+        graphVisualizer.PlanAction((
             () => Highlight(mode, followEdges, path, removeHighlight, keepGoingWhenAlreadyDone, id),
-            id
+            id,
+            1
         ));
-        while (plannedActions.Count > highlightStepsPerFrame * 100) {
-            CancelActions(plannedActions.Peek().Item2);
-            // this is very ad hoc, but sometimes the plannedActions queue gets flooded with highlight removal actions
-        }
     }
 
 
     Color unhighlightedColor = Color.clear;
-    const int highlightStepsPerFrame = 30;
 
     protected virtual bool Highlight(HighlightType mode) {
 
@@ -441,6 +416,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     }
 
     public bool IsHighlighted(HighlightType mode) => activeHighlightTypes.Contains(mode);
+    public bool IsHighlighted() => activeHighlightTypes.Count > 0;
 
     public virtual void SetRadius(float radius) {
         this.radius = radius;

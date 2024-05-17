@@ -42,6 +42,8 @@ public class CayleyGraphMaker : MonoBehaviour {
     public GroupVertex NeutralElement { get; private set; }
 
     bool _running;
+    public event Action OnStopVisualization;
+
     public bool Running {
         get => _running;
         protected set { _running = value; onStateChanged?.Invoke(value); }
@@ -112,6 +114,7 @@ public class CayleyGraphMaker : MonoBehaviour {
             return;
         DrawMeshes();
         physik.BeginShutDown();
+        OnStopVisualization?.Invoke();
     }
 
     public void AbortVisualization() {

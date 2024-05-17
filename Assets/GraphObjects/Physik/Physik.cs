@@ -119,8 +119,10 @@ public class Physik : MonoBehaviour, IActivityProvider {
      * Similar to BeginShutDown. For a few seconds the physics engine is reactivated
      **/
     public void RunShortly(float time = -1f) {
+        var wasRunning = running;
         Run(false);
-        BeginShutDown(time);
+        if (!wasRunning)
+            BeginShutDown(time);
     }
 
     public void Run(bool stopDecay = true) {

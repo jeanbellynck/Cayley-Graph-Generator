@@ -60,6 +60,7 @@ public class Edge : MonoBehaviour {
     }
 
     public void Initialize(Vertex startPoint, Vertex endPoint, char label, GraphVisualizer graphVisualizer) {
+        Start();
         this.StartPoint = startPoint;
         this.EndPoint = endPoint;
         this.Label = label;
@@ -104,14 +105,21 @@ public class Edge : MonoBehaviour {
     //float MidDisplacementScaling(float x) => scalingB * Mathf.Log(scalingC + x);
     float MidDisplacementScaling(float x) => scalingD * Mathf.Sqrt(scalingC + x) + scalingE;
 
-
+    (float, float) importances;
     protected virtual void LateUpdate() {
         if (StartPoint == null || EndPoint == null) return;
         if (splinificationType != lastSplinificationType || Activity > 0) {
             lastSplinificationType = splinificationType;
             finished = false;
         }
+
+        var newImportances = (StartPoint.Importance, EndPoint.Importance);
+        if (importances != newImportances) {
+            importances = newImportances;
+            finished = false;
+        }
         if (finished) return;
+        if (Activity == 0) finished = true;
 
         switch (splinificationType) {
             case SplinificationType.Never:
@@ -130,7 +138,6 @@ public class Edge : MonoBehaviour {
                 break;
             default: break;
         }
-        if (Activity == 0) finished = true;
 
         if (useSplines)
             UpdateSpline();
@@ -148,8 +155,7 @@ public class Edge : MonoBehaviour {
         Vector3 startPointWithSpacing = startPosition + lineDirection * EndPoint.radius;
         Vector3 endPointWithSpacing = endPosition - lineDirection * StartPoint.radius;
 
-        startColor.a = StartPoint.Importance;
-        endColor.a = EndPoint.Importance;
+        (startColor.a, endColor.a) = importances;
         lineRenderer.startColor = startColor;
         lineRenderer.endColor = endColor;
 
@@ -174,8 +180,7 @@ public class Edge : MonoBehaviour {
         var startPoint = StartPoint;
         var endPoint = EndPoint; // in case we update how the property works
 
-        startColor.a = StartPoint.Importance;
-        endColor.a = EndPoint.Importance;
+        (startColor.a, endColor.a) = importances;
         splineRenderer.colorModifier.keys[0].color = startColor;
         splineRenderer.colorModifier.keys[1].color = endColor;
         
@@ -206,17 +211,7 @@ public class Edge : MonoBehaviour {
             midDisplacementDirection = Vector3.ProjectOnPlane(midDisplacementDirectionNonOrthogonal, vector.normalized);
         float l = midDisplacementDirection.magnitude;
         float lambda = MathF.Sqrt(startDirection.sqrMagnitude + endDirection.sqrMagnitude);
-        /* overly complicated (and non-working) way to get a random vector orthogonal to vector and not needed bc. the midDisplacement doesn't have to be large.
-        while (l < 0.1 * lambda) {
-            // replace by random vector (take old random vector if nothing changed)
-            if ((vectorForOldRandomMidDisplacement - midDisplacementDirectionNonOrthogonal).sqrMagnitude > 0.01) {
-                oldRandomMidDisplacement = Vector3.ProjectOnPlane(Random.insideUnitSphere, vector.normalized);
-                vectorForOldRandomMidDisplacement = vector;
-            }
-            midDisplacementDirection += oldRandomMidDisplacement;
-            l = midDisplacementDirection.magnitude;
-        }
-        */
+
         Vector3 midDisplacementVector = l > 0.001f ? midDisplacementFactor * MidDisplacementScaling(l / lambda) / l * midDisplacementDirection : Vector3.zero;
         Vector3 midPosition = startPosition + 0.5f * vector + midDisplacementVector;
         Vector3 midDirection = (vector - endDirection - startDirection) * midDirectionFactor;

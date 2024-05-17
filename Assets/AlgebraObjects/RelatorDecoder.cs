@@ -47,6 +47,8 @@ public class RelatorDecoder {
 
     static string[] DecodeEquation(string equation) {
         string[] sidesOfEquals = equation.Split('=');
+        if (sidesOfEquals.Length == 1)
+            return new[] { DecodeOneRelator(sidesOfEquals[0]) };
         var leftSideInverted = InvertSymbol( DecodeOneRelator(sidesOfEquals.FirstOrDefault()) );
         var res = sidesOfEquals
             .Skip(1)

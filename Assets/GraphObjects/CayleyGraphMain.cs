@@ -41,13 +41,11 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     public void SetVertexNumber(string vertexNumber) {
         if (int.TryParse(vertexNumber, out int num))
             cayleyGraphMaker.SetVertexNumber(num);
-        // TODO: also continue subgroup visualization
     }
 
     // referenced from UI
     public void ToggleActiveState() {
         cayleyGraphMaker.ToggleActiveState();
-        // TODO: also toggle subgroup visualization
     }
 
 
@@ -61,7 +59,6 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     public void StopVisualization() {
         physik.BeginShutDown();
         cayleyGraphMaker.StopVisualization();
-        // TODO: Subgroup
     }
 
     public void StartVisualization() {
@@ -74,8 +71,10 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
         physik.Initialize(graphVisualizer.graphManager, projectionDimension, generators.Length); // calls physik.Abort()
         int actualDimension = projectionDimension + 0;
         graphVisualizer.SetDimension(actualDimension);
+        cayleySubGraphMaker.ResetSubgraph();
         cayleyGraphMaker.Initialize(generators, relators, physik, graphVisualizer, (GroupMode) groupModeDropdown.value); // calls AbortVisualization()
         cayleyGraphMaker.StartVisualization(); // calls physik.Run() 
+
     }
 
 
@@ -101,17 +100,4 @@ public class CayleyGraphMain : MonoBehaviour, IActivityProvider {
     }
 
 
-    /**
-     * This method draws a subgroup inside the graph. 
-     * It also sets the strength of the subgroup edges and the ambient edges.
-     */
-    public void DrawSubgroup(IEnumerable<string> generators, float ambientEdgeStrength, float subgroupEdgeStrength) {
-        graphVisualizer.AmbientEdgeStrength = ambientEdgeStrength;
-        graphVisualizer.SubgroupEdgeStrength = subgroupEdgeStrength;
-        cayleySubGraphMaker.RegenerateSubgroup(generators, cayleyGraphMaker.NeutralElement);
-    }
-
-    public void GreyOutComplement(bool greyedOut) {
-        graphVisualizer.GreyOut(greyedOut, v => !v.IsHighlighted(HighlightType.Subgroup), e => !e.IsHighlighted(HighlightType.Subgroup));
-    } 
 }

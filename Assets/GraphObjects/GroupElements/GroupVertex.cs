@@ -16,7 +16,7 @@ public class GroupVertex : Vertex {
 
 
     float edgeCompletion;
-    public override float Importance => MathF.Min(edgeCompletion * baseImportance, 1);
+    public override float Importance => activeHighlightTypes.Count > 0 ? 1 : MathF.Min(edgeCompletion * baseImportance, 1);
 
 
     [SerializeField] public bool semiGroup;
@@ -222,7 +222,9 @@ public class GroupVertex : Vertex {
         var secondaryPathsToNeutralElement = 
             from path in PathsFromNeutralElement.Skip(1).Take(4)
             select RelatorDecoder.InvertSymbol(path);
-        CancelActions(name);
+
+        graphVisualizer.CancelActions(removeHighlight ? "#" + name : "~" + name);
+        // todo: bad practice (the # ~ are defined also in the overload for Highlight)
 
         Highlight(HighlightType.PrimaryPath, FollowPaths(primaryPathsToIdentity), removeHighlight, true);
         Highlight(HighlightType.Path, FollowPaths(secondaryPathsToNeutralElement), removeHighlight, true);
