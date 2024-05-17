@@ -2239,6 +2239,7 @@ RectTransform:
   - {fileID: 234608712}
   - {fileID: 1841760378}
   - {fileID: 227029322}
+  - {fileID: 853057317}
   m_Father: {fileID: 326132741}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4154,6 +4155,21 @@ MonoBehaviour:
   generatorMenu: {fileID: 1133094773}
   generateButton: {fileID: 1026804943}
   startRelators: '[a,b], a^5'
+  OnRelatorDrawChange:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 772353320}
+        m_TargetAssemblyTypeName: MeshManager, Assembly-CSharp
+        m_MethodName: SetActive
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &315231448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7360,6 +7376,9 @@ MonoBehaviour:
   generatorMenu: {fileID: 0}
   generateButton: {fileID: 354015294}
   startRelators: abb
+  OnRelatorDrawChange:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &465035932
 GameObject:
   m_ObjectHideFlags: 0
@@ -14093,6 +14112,10 @@ PrefabInstance:
       propertyPath: defaultState
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114334055161034980, guid: d0c460c7e3992194cb7ab7bc605d6985, type: 3}
+      propertyPath: overlayCloseOnPressed
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 224269059662225402, guid: d0c460c7e3992194cb7ab7bc605d6985, type: 3}
       propertyPath: m_Pivot.y
       value: 1
@@ -14215,9 +14238,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 224739566112570662, guid: d0c460c7e3992194cb7ab7bc605d6985, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1315594795}
-    - targetCorrespondingSourceObject: {fileID: 224739566112570662, guid: d0c460c7e3992194cb7ab7bc605d6985, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 853057317}
     - targetCorrespondingSourceObject: {fileID: 224739566112570662, guid: d0c460c7e3992194cb7ab7bc605d6985, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1891954157}
@@ -15872,7 +15892,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &853057317
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15886,12 +15906,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1475350241}
-  m_Father: {fileID: 1223529137}
+  m_Father: {fileID: 154412068}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 735, y: 118.08}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: -240}
+  m_SizeDelta: {x: 700, y: 400}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &853057319
 MonoBehaviour:

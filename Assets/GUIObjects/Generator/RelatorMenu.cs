@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class RelatorMenu : MonoBehaviour {
@@ -14,13 +15,14 @@ public class RelatorMenu : MonoBehaviour {
     readonly Dictionary<string, GameObject> relatorGameObjects = new();
     [SerializeField] Button generateButton;
     [SerializeField] string startRelators = "[a,b], a^5";
+    public UnityEvent<string, bool> OnRelatorDrawChange = new();
 
     public IEnumerable<string> Relators { // this is probably bad practice but fun (not used currently)
         get => GetRelators();
         set => SetRelators(value);
     }
 
-    public IEnumerable<string> GetRelators() => GetRelatorStrings().SelectMany(input => RelatorDecoder.DecodeRelatorStrings(input, false));
+    public IEnumerable<string> GetRelators() => GetRelatorStrings().SelectMany(input => RelatorDecoder.DecodeRelatorStrings(input, false)); // is already separated
     public IEnumerable<string> GetRelatorStrings() => from input in relatorInputs.Values select input.text;
 
     public void Start() {
@@ -67,6 +69,12 @@ public class RelatorMenu : MonoBehaviour {
 
             newInputField.text = relator;
             newInputField.onEndEdit.AddListener((s) => { AddRelatorString(s, newIndex); generateButton.Select(); });
+            newRelatorItemGameObject.GetComponentInChildren<Toggle>().onValueChanged.AddListener((b) => {
+                var decodedRelators = RelatorDecoder.DecodeRelatorStrings(newInputField.text);
+                foreach (var decodedRelator in decodedRelators) {
+                    OnRelatorDrawChange.Invoke(decodedRelator, b); // this will be listened to by the Mesh Manager, which manages one type of mesh for each relator; we had to separate the relators in a relation like ab=ba=t, because the Mesh Manager tags are the completely decoded ones, i.e. BAba, BAt.
+                }
+            });
 
             // Add the generators that are used in the relator to the generator menu
             foreach (var c in

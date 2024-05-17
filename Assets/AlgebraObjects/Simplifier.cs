@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Simplifier : MonoBehaviour {
     [SerializeField] RelatorMenu relatorMenu;
@@ -18,7 +19,7 @@ public class Simplifier : MonoBehaviour {
 
     void Start() {
         gapClient = new();
-        panel.SetActive(false);
+        SetActive(false);
     }
 
     public async void OnClick() {
@@ -33,7 +34,6 @@ public class Simplifier : MonoBehaviour {
             generators,
             relators
         );
-        // TODO: Timeouts and not allowing concurrent requests (cancelling)
         currentlyFetching = false;
 
         if (!worked) {
@@ -57,15 +57,14 @@ Right click to use this presentation, middle click to copy"; // \u21A6 is \mapst
     void Display(string text) {
         textField.text = text;
 
-        panel.SetActive(true);
-        panel.transform.SetAsLastSibling();
+        SetActive(true);
 
         StartCoroutine(WaitAndDeactivate());
         return;
 
         IEnumerator WaitAndDeactivate() {
             yield return new WaitForSeconds(timeout);
-            panel.SetActive(false);
+            SetActive(false);
             yield return null;
         }
     }
@@ -74,7 +73,7 @@ Right click to use this presentation, middle click to copy"; // \u21A6 is \mapst
         switch (button)
         {
             case 0:
-                panel.SetActive(false);
+                SetActive(false);
                 break;
             case 1:
                 generatorMenu.Generators = lastOptimizedGenerators.Where(s => !string.IsNullOrWhiteSpace(s)).Select(c => c[0]).ToArray();
@@ -85,5 +84,12 @@ Right click to use this presentation, middle click to copy"; // \u21A6 is \mapst
                 // TODO: fix this for mobile or WebGL
                 break;
         }
+    }
+
+    void SetActive(bool active) {
+
+        panel.SetActive(active);
+        //panel.transform.SetAsLastSibling();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(panel.transform.parent.GetComponent<RectTransform>());
     }
 }

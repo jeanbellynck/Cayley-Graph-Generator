@@ -18,14 +18,14 @@ public class RelatorDecoder {
 
     public static List<string> SeparateRelators(string relatorString)
     {
-        string[] commaSeperatedStrings = relatorString.Replace(" ", "").Split(new char[] { ',', ';' });
+        string[] commaSeparatedStrings = relatorString.Replace(" ", "").Split(new char[] { ',', ';' });
         List<string> relators = new List<string>();
 
-        // Quickly differentiates between seperator commas and commutator commas by counting square brackets
+        // Quickly differentiates between separator commas and commutator commas by counting square brackets
         StringBuilder relation = new ();
         int openSquareBracketCount = 0;
         int closeSquareBracketCount = 0;
-        foreach (var substring in commaSeperatedStrings) {
+        foreach (var substring in commaSeparatedStrings) {
             relation.Append(substring);
 
             openSquareBracketCount += substring.Count(c => c == '[');
@@ -45,16 +45,14 @@ public class RelatorDecoder {
         return relators;
     }
 
-    static string[] DecodeEquation(string equation) {
+    static IEnumerable<string> DecodeEquation(string equation) {
         string[] sidesOfEquals = equation.Split('=');
-        if (sidesOfEquals.Length == 1)
-            return new[] { DecodeOneRelator(sidesOfEquals[0]) };
-        var leftSideInverted = InvertSymbol( DecodeOneRelator(sidesOfEquals.FirstOrDefault()) );
-        var res = sidesOfEquals
+        var leftSide = DecodeOneRelator(sidesOfEquals.FirstOrDefault());
+        if (sidesOfEquals.Length > 1) leftSide = InvertSymbol( leftSide );
+        return sidesOfEquals
             .Skip(1)
             .DefaultIfEmpty("")
-            .Select(rightSide => leftSideInverted + DecodeOneRelator(rightSide));
-        return res.ToArray();
+            .Select(rightSide => leftSide + DecodeOneRelator(rightSide));
     }
 
     /**

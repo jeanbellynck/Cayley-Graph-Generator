@@ -79,4 +79,12 @@ public class MeshManager : MonoBehaviour {
         }
         
     }
+
+    // referenced from UI / coming from RelatorMenu
+    public void SetActive(string type, bool active) {
+        if (!typeColors.Keys.Contains(type))
+            Debug.LogWarning($"Tried to {(active ? "" : "de")}activate the mesh type {type}, but the only known types are {string.Join(", ", typeColors.Keys)}");
+        foreach (var mesh in meshList.Where(mesh => mesh.type == type)) 
+            mesh.gameObject.SetActive(active);
+    }
 }
