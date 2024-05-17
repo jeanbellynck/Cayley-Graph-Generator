@@ -19,9 +19,15 @@ PathOrString = Union[os.PathLike, str]
 
 #endregion
 
+#region Secrets - add in from environment variables
+ROUTE_OBFUSCATION = os.getenv("GAP_ROUTE", 'aosijfoaisdoifnCodnifaoGsinf')
+PORT = os.getenv("GAP_PORT", 63910)
+API_KEY = os.getenv("GAP_APIKEY", None)
+# currently not used because we have no way of storing the api key in the frontend securely and sending it with every request
+
+#endregion
+
 #region Constants
-ROUTE_OBFUSCATION = 'aosijfoaisdoifnCodnifaoGsinf' # todo: remove from git
-DEFAULT_PORT = 63910 # todo: remove from git
 START_LOG = '"start!"'
 HALT_LOG = '"return!"'
 PREPARED_LOG = "?help"
@@ -195,12 +201,12 @@ class GAPRunner:
 #region Server
 
 def runServer(port):
-    async def handle(request):
+    async def handle(request: web.Request):
         """ the request must come as text of the form 'texFile,outdir' """
         query = (await request.text())
         return web.Response(text=await do_execute(query), headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
 
-    async def handleStopServer(request):
+    async def handleStopServer(request: web.Request):
         try:
             raise KeyboardInterrupt("actually interrupted by call to stopServer", headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
         finally:
@@ -209,13 +215,20 @@ def runServer(port):
     async def startup():
         app = web.Application()
         app.add_routes([
-            web.post(f'/{ROUTE_OBFUSCATION}', handle),
-            web.get(f'/stopServer{ROUTE_OBFUSCATION}', handleStopServer),
+            web.post(f'/{ROUTE_OBFUSCATION}', secureByApiKey(handle)),
+            web.get(f'/stopServer{ROUTE_OBFUSCATION}', secureByApiKey(handleStopServer)),
             web.options(f'/{ROUTE_OBFUSCATION}', lambda x: web.Response(headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN, "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin"}))
         ])
         return app
 
     web.run_app(startup(), port=port)
+
+def secureByApiKey(func):
+    async def wrapper(request: web.Request):
+        if request.headers.get("api-key") == API_KEY:
+            return await func(request)
+        return web.Response(text="Unauthorized", status=401, headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
+    return wrapper
 
 runner = None
 async def do_execute(query):
@@ -255,4 +268,4 @@ async def do_execute(query):
 #endregion
 
 if __name__ == "__main__":
-    runServer(DEFAULT_PORT)
+    runServer(PORT)
