@@ -211,13 +211,20 @@ def runServer(port):
             raise KeyboardInterrupt("actually interrupted by call to stopServer", headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
         finally:
             print("Closed by call to /stopServer---")
+    
+    async def handleGet(request: web.Request):
+        noneStr = "'Not Running'"
+        return web.Response(text=f"GAP Server is running, and the runner has the state {noneStr if runner is None else await runner.getState()}.")
 
     async def startup():
         app = web.Application()
         app.add_routes([
+            web.get('/', lambda _: web.FileResponse('/files/static/index.html')),
+            web.get(f'/{ROUTE_OBFUSCATION}', handleGet),
             web.post(f'/{ROUTE_OBFUSCATION}', secureByApiKey(handle)),
             web.get(f'/stopServer{ROUTE_OBFUSCATION}', secureByApiKey(handleStopServer)),
-            web.options(f'/{ROUTE_OBFUSCATION}', lambda x: web.Response(headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN, "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin"}))
+            web.options(f'/{ROUTE_OBFUSCATION}', lambda _: web.Response(headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN, "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin"})),
+            web.static('/', '/files/static/'),
         ])
         return app
 
@@ -229,6 +236,7 @@ def secureByApiKey(func):
             return await func(request)
         return web.Response(text="Unauthorized", status=401, headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN})
     return wrapper
+
 
 runner = None
 async def do_execute(query):

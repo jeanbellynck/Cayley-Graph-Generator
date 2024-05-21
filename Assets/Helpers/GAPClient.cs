@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -10,7 +9,7 @@ using UnityEngine.Networking;
 
 public class GAPClient
 {
-    readonly string url = "http://49.13.201.239:63910/aosijfoaisdoifnCodnifaoGsinf";
+    readonly string url = "https://graphicayley.de/aosijfoaisdoifnCodnifaoGsinf";
     // readonly string apiKey = "wpqopgasdsefpwqe4"; 
     // Todo: add to header (not possible with UnityWebRequest, which is needed for cross-platform)
     // Todo: Store secretly. This seems to be extremely difficult, so we will just ignore the problem for now, but only allow requests coming from where we officially host this application. For your personal use, host the GAP server yourself and change the url.

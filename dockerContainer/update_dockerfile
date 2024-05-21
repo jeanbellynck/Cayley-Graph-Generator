@@ -1,0 +1,2 @@
+FROM johannesheissler/gap-server:1.0
+COPY ["GAP-Server Files/", "/files/"]
