@@ -2,9 +2,9 @@
 # builtin
 from enum import Enum
 import os
-import subprocess
 import time
 import contextlib
+from pathlib import Path
 
 # quasi builtin
 import asyncio
@@ -21,8 +21,10 @@ PathOrString = Union[os.PathLike, str]
 
 #region Secrets - add in from environment variables
 ROUTE_OBFUSCATION = os.getenv("GAP_ROUTE", 'aosijfoaisdoifnCodnifaoGsinf')
-PORT = os.getenv("GAP_PORT", 63910)
+PORT = int( os.getenv("PORT", 63910) )
 API_KEY = os.getenv("GAP_APIKEY", None)
+STATIC_PATH = Path( os.getenv("STATIC_PATH", "/files/static/") )
+REDIRECT_URL = os.getenv("REDIRECT_URL", "https://github.com/jeanbellynck/Cayley-Graph-Generator")
 # currently not used because we have no way of storing the api key in the frontend securely and sending it with every request
 
 #endregion
@@ -44,7 +46,7 @@ STARTUP_SLEEP_TIME = 0.5
 STARTUP_TIMEOUT = 10
 PROCESS_TIMEOUT = 60
 
-ACCESS_CONTROL_ORIGIN = "*"
+ACCESS_CONTROL_ORIGIN = os.getenv("ACCESS_CONTROL_ORIGIN", "*")
 
 #endregion
 
@@ -200,7 +202,7 @@ class GAPRunner:
 
 #region Server
 
-def runServer(port):
+def runServer(port: int):
     async def handle(request: web.Request):
         """ the request must come as text of the form 'texFile,outdir' """
         query = (await request.text())
@@ -218,14 +220,19 @@ def runServer(port):
 
     async def startup():
         app = web.Application()
+        if (STATIC_PATH / "index.html").is_file():
+            app.add_routes([web.get('/', lambda _: web.FileResponse(STATIC_PATH / "index.html", headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN}))])
+        else : 
+            if REDIRECT_URL is not None:
+                app.add_routes([web.get('/', lambda _: web.HTTPFound(REDIRECT_URL))])
         app.add_routes([
-            web.get('/', lambda _: web.FileResponse('/files/static/index.html')),
             web.get(f'/{ROUTE_OBFUSCATION}', handleGet),
             web.post(f'/{ROUTE_OBFUSCATION}', secureByApiKey(handle)),
             web.get(f'/stopServer{ROUTE_OBFUSCATION}', secureByApiKey(handleStopServer)),
             web.options(f'/{ROUTE_OBFUSCATION}', lambda _: web.Response(headers={"Access-Control-Allow-Origin": ACCESS_CONTROL_ORIGIN, "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Origin"})),
-            web.static('/', '/files/static/'),
         ])
+        if STATIC_PATH.is_dir():
+            app.add_routes([web.static('/', '/files/static/')])
         return app
 
     web.run_app(startup(), port=port)
