@@ -25,17 +25,32 @@ public class Kamera : MonoBehaviour
             Cam = cam;
     }
 
+    const float movementSpeed = 3f;
+
     void Update()
     {
+        var goalPosition = transform.position;
+        var goalRotation = transform.rotation;
         if (parentKamera != null) {
-            transform.position = parentKamera.transform.position;
-            transform.rotation = parentKamera.transform.rotation;
+            goalPosition = parentKamera.transform.position;
+            goalRotation = parentKamera.transform.rotation;
             Cam.orthographicSize = parentKamera.Cam.orthographicSize;
             return;
         }
 
         Vector3 mousePosition = Input.touchCount > 0 ? Input.touches.First().position : Input.mousePosition;
-        if (centerPointer?.center != null) transform.position = centerPointer.center.position;
+        if (centerPointer?.position != null) goalPosition = (Vector3) centerPointer.position;
+
+        var movement = (goalPosition - transform.position);
+        var maxDistanceThisFrame = movementSpeed * Time.deltaTime;
+        if (movement.sqrMagnitude > maxDistanceThisFrame * maxDistanceThisFrame) {
+            movement = movement.normalized * maxDistanceThisFrame;
+        }
+        transform.position += movement;
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, goalRotation, Time.deltaTime * 5);
+
+
         // Camera movement should only be possible when the sideMenu states are closed
         if (!IsMouseInViewport(mousePosition) ||
             sideMenues.Any(sideMenu => sideMenu.TargetState == State.Open))
@@ -71,10 +86,7 @@ public class Kamera : MonoBehaviour
         }
 
         // If mouse or finger is down, rotate the camera
-        if (Input.GetMouseButton(0) &&
-            Input.touchCount != 2 &&
-            !pinching
-            ) {
+        if (Input.GetMouseButton(0) && !pinching) {
             float h = Input.GetAxis("Mouse X") * rotationSpeed * 5;
             float v = Input.GetAxis("Mouse Y") * rotationSpeed * 5;
 
@@ -130,5 +142,18 @@ public class Kamera : MonoBehaviour
 
 [Serializable]
 public class CenterPointer {
-    public Transform center;
+    public virtual Vector3? position => null;
+    public event Action<Kamera> OnCenter;
+    public void Center() => OnCenter?.Invoke(null);
+}
+
+[Serializable]
+public class CenterPointerToTransform : CenterPointer {
+    public override Vector3? position => transform == null ? null : transform.position;
+    public Transform transform;
+}
+
+public class CenterPointerToPosition : CenterPointer {
+    public override Vector3? position => center;
+    public Vector3 center;
 }

@@ -27,6 +27,10 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     [SerializeField] GameObject vertexPrefab;
     [SerializeField] GameObject edgePrefab;
     [SerializeField] IActivityProvider activityProvider;
+    [SerializeField] ICenterProvider centerProvider;
+
+    [SerializeField] ElementFinder elementFinder;
+
     float _ambientEdgeStrength, _subgroupEdgeStrength;
     public float baseImportance = 1;
 
@@ -62,20 +66,28 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     public float Activity => activityProvider.Activity;
 
     public int LabelCount => graphManager.LabelCount;
+
+    public GroupVertex SelectedVertex { get => elementFinder.Vertex; set { elementFinder.SetVertex(value); } }
+
     //public Kamera kamera { get; protected set; }
 
     public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
+        if (centerProvider == null) centerProvider = elementFinder; // todo? not elegant
 
         _ambientEdgeStrength = 1f;
         _subgroupEdgeStrength = 0f;
         graphManager.onEdgeAdded += UpdateLabel;
-        graphManager.OnCenterChanged += (vertex, activeKamera) => {
+        graphManager.OnCenterChanged += (centerPointer, activeKamera) => {
             if (activeKamera != null) 
-                activeKamera.centerPointer = vertex.centerPointer;
+                activeKamera.centerPointer = centerPointer;
             else
                 foreach (var kamera in kameras) 
-                    kamera.centerPointer = vertex.centerPointer;
+                    kamera.centerPointer = centerPointer;
+        }; // todo: Redundant?
+        centerProvider.OnCenterChanged += (centerPointer) => {
+                foreach (var kamera in kameras)
+                    kamera.centerPointer = centerPointer;
         };
         UpdateGeneratorLabels(generators);
     }
@@ -227,6 +239,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
 }
 
 public enum HighlightType {
+    Selected,
     Subgroup,
     Path,
     PrimaryPath

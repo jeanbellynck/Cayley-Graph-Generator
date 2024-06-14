@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public class BarnesQuadtree {
     // Baumvariablen
     BarnesQuadtree[] subtrees;
     List<Vertex> points = new List<Vertex>();
-    public VectorN schwerpunkt;
+    public VectorN centerOfMass;
     public float mass; // Mass is somewhat misleading since the points repel each other.
     float thetaSquared; // Determines how detailed the repulsion calculation is. Setting this to 0.1*radius means that cubes of the size smaller than 10 sitting at the boundary won't bw broken up. Is apparently usually set to a value 0.9
     float minimalDistanceSquared; // Gives a lower bound on the smallest possible cube. This was implemented after the program crashed when two points on the same points caused a recursion loop.
@@ -19,6 +20,7 @@ public class BarnesQuadtree {
     bool isLeaf = true;
     int treeDim = 3; // The dimension can by smaller than the dimension of the vertices. Thin should be ok, since the force always scales to the sqare of the distance.
     int vertexDim;
+
 
     public BarnesQuadtree(int dimension, VectorN position, float radius, float theta, float minimalDistanceSquared, float maximalDistanceSquared) {
         this.treeDim = dimension;
@@ -90,24 +92,24 @@ public class BarnesQuadtree {
      * Calculates the center of mass of this cube as well as all subcubes.
      **/
     public void BerechneSchwerpunkt() {
-        schwerpunkt = VectorN.Zero(vertexDim);
+        centerOfMass = VectorN.Zero(vertexDim);
         if (mass == 0) {
             // This cube is empty. Do nothing.
         }
         else if (isLeaf) {
             // This cube is a leaf, the center of mass is determined by the average of the points.
             foreach (Vertex punkt in points) {
-                schwerpunkt += punkt.Position * punkt.Mass;
+                centerOfMass += punkt.Position * punkt.Mass;
             }
-            schwerpunkt /= mass;
+            centerOfMass /= mass;
         }
         else {
             // This cube has benn split up in subcubes. The center of mass is the weighted average of the centers of mass of the subcubes.
             foreach (BarnesQuadtree subtree in subtrees) {
                 subtree.BerechneSchwerpunkt();
-                schwerpunkt += subtree.schwerpunkt * subtree.mass;
+                centerOfMass += subtree.centerOfMass * subtree.mass;
             }
-            schwerpunkt /= mass;
+            centerOfMass /= mass;
         }
     }
 
@@ -118,7 +120,7 @@ public class BarnesQuadtree {
         // This cube is empty. It does not repel the point.
         if (mass == 0) return VectorN.Zero(vertexDim);
 
-        VectorN diff = schwerpunkt - pointActedOn.Position;
+        VectorN diff = centerOfMass - pointActedOn.Position;
         float distanceSquared = diff.MagnitudeSquared();
 
 

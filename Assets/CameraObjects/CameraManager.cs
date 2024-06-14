@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,6 +12,34 @@ public class CameraManager : MonoBehaviour
     [SerializeField] UnityEvent<bool> onSecondaryToMainLock = new();
 
     [SerializeField] CameraLockState _cameraLockState;
+
+    [SerializeField] SplitSlider splitSlider;
+
+    [SerializeField] float leftViewport => LeftInset / Screen.width;
+    [SerializeField] float rightViewport => 1f - RightInset / Screen.width;
+
+    // referenced from UI
+    float leftInset = 0f;
+    public float LeftInset {
+        get => leftInset;
+        set {
+            leftInset = value;
+            splitSlider.LeftInset = value;
+            UpdateViewports();
+        }
+    }
+
+    // referenced from UI
+    float rightInset = 0f;
+    public float RightInset {
+        get => rightInset;
+        set {
+            rightInset = value;
+            splitSlider.RightInset = value;
+            UpdateViewports();
+        }
+    }
+
     CameraLockState cameraLockState {
         get => _cameraLockState;
         set {
@@ -76,10 +105,16 @@ public class CameraManager : MonoBehaviour
     //}
 
     // referenced from UI
-    public void UpdateViewports(float screenPercentage) {
-        mainKamera.Cam.rect = new(0, 0, screenPercentage, 1);
-        secondaryKamera.Cam.rect = new(screenPercentage, 0, 1 - screenPercentage, 1);
+    public void UpdateViewports(float splitPercentage) {
+        if (splitPercentage < leftViewport)
+            splitPercentage = leftViewport;
+        if (splitPercentage > rightViewport)
+            splitPercentage = rightViewport;
+        mainKamera.Cam.rect = new(leftViewport, 0, splitPercentage- leftViewport, 1);
+        secondaryKamera.Cam.rect = new(splitPercentage, 0, rightViewport - splitPercentage, 1);
     }
+
+    void UpdateViewports() => UpdateViewports(splitSlider.Value);
 
     // referenced from UI
     public void LockCameras(bool secondaryToMain) {

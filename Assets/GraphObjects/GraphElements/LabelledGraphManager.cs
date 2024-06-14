@@ -19,7 +19,7 @@ public class LabelledGraphManager {
 
     public delegate void OnEdgeAdded(Edge edge);
     public event OnEdgeAdded onEdgeAdded;
-    public event Action<Vertex, Kamera> OnCenterChanged;
+    public event Action<CenterPointer, Kamera> OnCenterChanged;
 
     public List<Vertex> GetVertices() {
         return vertices;
@@ -31,7 +31,11 @@ public class LabelledGraphManager {
         idCounter++;
         vertices.Add(vertex);
         //vertex.graphVisualizer = this;
-        vertex.OnCenter += kamera => OnCenterChanged?.Invoke(vertex, kamera); // Stupid workaround to allow vertex to indirectly change the kamera's centerPointer, since now the vertex has no reference to the kameras anymore.
+
+        CenterPointer centerPointer = vertex.centerPointer;
+        centerPointer.OnCenter += kamera => OnCenterChanged?.Invoke(centerPointer, kamera);
+        // Stupid workaround to allow vertex to indirectly change the kamera's centerPointer, since now the vertex has no reference to the kameras anymore.
+        // not really needed anymore (bc. of ICenterProvider)
     }
 
     public void ResetGraph() {

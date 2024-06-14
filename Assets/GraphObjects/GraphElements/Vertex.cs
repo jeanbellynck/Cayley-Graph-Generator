@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector3 = UnityEngine.Vector3;
@@ -56,11 +57,9 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     [SerializeField] float maxSpeed;
     protected float Activity => activityProvider.Activity;
 
-    public event Action<Kamera> OnCenter;
-
-    CenterPointer _centerPointer;
+    CenterPointerToTransform _centerPointer;
     // this is a workaround for the subclasses where a vertex might get merged with another vertex and the outside would still point to the old vertex (often destroyed at that point)
-    public CenterPointer centerPointer => _centerPointer ??= new() { center = transform }; // lazy initialization
+    public CenterPointerToTransform centerPointer => _centerPointer ??= new() { transform = transform }; // lazy initialization
 
     protected virtual void Start() {
         if (Mass == 0) Mass = 0.1f;
@@ -335,12 +334,12 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     // ITooltipOnHover
     public TooltipContent GetTooltip() => tooltipContent;
 
-    public virtual void OnClick(Kamera activeKamera) => OnCenter?.Invoke(activeKamera);
+    public virtual void OnClick(Kamera activeKamera) { } // => OnCenter?.Invoke(activeKamera);
     public virtual void OnHover(Kamera activeKamera) { }
 
     public virtual void OnHoverEnd() { }
 
-    public void Center() => OnCenter?.Invoke(null); // this is a workaround for the fact that events can only be called from the class they are defined in (not even subclasses)
+    public void Center() => centerPointer.Center(); // this is a workaround for the fact that events can only be called from the class they are defined in (not even subclasses)
 
     public virtual void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges,
         bool removeHighlight, bool keepGoingWhenAlreadyDone)
@@ -349,8 +348,12 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
         keepGoingWhenAlreadyDone, mode switch {
             HighlightType.Subgroup when removeHighlight => "-SG",
             HighlightType.Subgroup => "+SG",
-            _ when removeHighlight => "~" + name,
-            _ => "#" + name
+            HighlightType.Path when removeHighlight => "~" + name,
+            HighlightType.PrimaryPath when removeHighlight => "~" + name,
+            HighlightType.Path => "#" + name,
+            HighlightType.PrimaryPath => "#" + name,
+            HighlightType.Selected => "@" + name,
+            _ => "?" + name
         });
 
     protected virtual void Highlight(HighlightType mode, Func<string, (IEnumerable<char>, IEnumerable<char>)> followEdges, string path, bool removeHighlight, bool keepGoingWhenAlreadyDone, string id) {
@@ -389,29 +392,57 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
 
     Color unhighlightedColor = Color.clear;
+    float unhighlightedRadius = 0f;
+    [SerializeField] Mesh selectedMesh;
+    Mesh unselectedMesh;
 
-    protected virtual bool Highlight(HighlightType mode) {
+    void SetUnhighlightedValues(HighlightType mode) {
+        switch (mode) {
+            case HighlightType.Subgroup when unhighlightedColor == Color.clear:
+                unhighlightedColor = Mr.material.color;
+            break;
+            case HighlightType.Selected:
+                if (unhighlightedRadius == 0f)
+                    unhighlightedRadius = radius;
+                if (unselectedMesh == null)
+                    unselectedMesh = GetComponent<MeshFilter>().mesh;
+            break;
+        }
+    }
 
-        if (activeHighlightTypes.Contains(mode))
+    public virtual bool Highlight(HighlightType mode) {
+        SetUnhighlightedValues(mode);
+        if (IsHighlighted(mode))
             return false;
         activeHighlightTypes.Add(mode);
-        if (unhighlightedColor == Color.clear)
-            unhighlightedColor = Mr.material.color;
+        
         switch (mode) { // todo
             case HighlightType.Subgroup:
                 Mr.material.color = Color.red;
+                break;
+            case HighlightType.Selected:
+                SetRadius(unhighlightedRadius * 1.6f);
+                GetComponent<MeshFilter>().mesh = selectedMesh;
                 break;
         }
         return true;
     }
 
-    protected virtual bool UnHighlight(HighlightType mode) {
-
-        if (!activeHighlightTypes.Contains(mode))
+    public virtual bool UnHighlight(HighlightType mode) {
+        SetUnhighlightedValues(mode);
+        if (!IsHighlighted(mode))
             return false;
         activeHighlightTypes.Remove(mode);
-        if (!activeHighlightTypes.Contains(HighlightType.Subgroup))
-            Mr.material.color = unhighlightedColor;
+
+        switch(mode){
+            case HighlightType.Subgroup:
+                Mr.material.color = unhighlightedColor;
+            break;
+            case HighlightType.Selected:
+                SetRadius(unhighlightedRadius);
+                GetComponent<MeshFilter>().mesh = unselectedMesh;
+            break;
+        }
         return true;
     }
 

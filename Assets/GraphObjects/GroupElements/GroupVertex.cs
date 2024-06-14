@@ -160,7 +160,7 @@ public class GroupVertex : Vertex {
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
         Position = (Position + vertex2.Position) / 2;
-        vertex2.centerPointer.center = centerPointer.center; // Some Kamera might reference the old (redundant) Vertex as its center. We now point it to the kept equivalent vertex.
+        vertex2.centerPointer.transform = centerPointer.transform; // Some Kamera might reference the old (redundant) Vertex as its center. We now point it to the kept equivalent vertex.
         distanceToNeutralElement = Math.Min(vertex2.distanceToNeutralElement, distanceToNeutralElement);
         calculateVertexMass(hyperbolicity);
 
@@ -254,11 +254,16 @@ public class GroupVertex : Vertex {
 
     public override void OnHover(Kamera activeKamera) {
         base.OnHover(activeKamera);
-        HighlightPathsFromIdentity(false);
+        //HighlightPathsFromIdentity(false);
     }
 
     public override void OnHoverEnd() {
         base.OnHoverEnd();
-        HighlightPathsFromIdentity(true);
+        //HighlightPathsFromIdentity(true);
+    }
+
+    public override void OnClick(Kamera activeKamera) {
+        base.OnClick(activeKamera);
+        graphVisualizer.SelectedVertex = this;
     }
 }

@@ -132,3 +132,4 @@ MonoBehaviour:
   equalDirectionDisplacementFactor: 0.1
   graphVisualizer: {fileID: 0}
   maxSpeed: 8
+  selectedMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}

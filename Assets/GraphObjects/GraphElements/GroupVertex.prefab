@@ -111,6 +111,7 @@ MonoBehaviour:
   equalDirectionDisplacementFactor: 0.1
   graphVisualizer: {fileID: 0}
   maxSpeed: 8
+  selectedMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   distanceToNeutralElement: 0
   pathsFromNeutralElement: []
   semiGroup: 0
