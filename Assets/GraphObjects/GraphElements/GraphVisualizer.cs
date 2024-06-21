@@ -1,10 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using MathNet.Numerics.Interpolation;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 /**
@@ -27,9 +27,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
     [SerializeField] GameObject vertexPrefab;
     [SerializeField] GameObject edgePrefab;
     [SerializeField] IActivityProvider activityProvider;
-    [SerializeField] ICenterProvider centerProvider;
-
-    [SerializeField] ElementFinder elementFinder;
+    [SerializeField] ElementFinder centerProvider; // this should be of type ICenterProvider, but Unity doesn't show this.
 
     float _ambientEdgeStrength, _subgroupEdgeStrength;
     public float baseImportance = 1;
@@ -67,13 +65,14 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
 
     public int LabelCount => graphManager.LabelCount;
 
-    public GroupVertex SelectedVertex { get => elementFinder.Vertex; set { elementFinder.SetVertex(value); } }
+    GroupVertex selectedVertex;
+    public GroupVertex SelectedVertex { get => selectedVertex; set { selectedVertex = value; SelectedVertexChanged.Invoke(value); } }
+    public UnityEvent<GroupVertex> SelectedVertexChanged = new();
 
     //public Kamera kamera { get; protected set; }
 
     public void Initialize(IEnumerable<char> generators, IActivityProvider activityProvider) { 
         this.activityProvider = activityProvider;
-        if (centerProvider == null) centerProvider = elementFinder; // todo? not elegant
 
         _ambientEdgeStrength = 1f;
         _subgroupEdgeStrength = 0f;
@@ -145,6 +144,8 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         var newEdge = CreateEdge(startVertex, endVertex, op, 1);
         newEdge.Strength = SubgroupEdgeStrength;
         newEdge.gameObject.layer = LayerMask.NameToLayer("SubgroupOnly");
+        
+        startVertex.DistanceToSubgroup = endVertex.DistanceToSubgroup = Math.Min(startVertex.DistanceToSubgroup, endVertex.DistanceToSubgroup); // distance to subgroup is constant in the coset.
         return newEdge;
     }
 
@@ -152,15 +153,15 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
      * Creates a new edge and adds it to the graph. If the edge already exists, the existing edge is returned.
      * I moved it to the visualizer because the cayley graph maker and subgraph maker need this method.
      **/    
-    public GroupEdge CreateEdge(GroupVertex startvertex, GroupVertex endvertex, char op, float hyperbolicity) {
+    public GroupEdge CreateEdge(GroupVertex startVertex, GroupVertex endVertex, char op, float hyperbolicity) {
         // Check if the edge label has a colour assigned
         if (!labelColors.ContainsKey(op)) {
             labelColors[op] = RandomColor();
         }
 
-        foreach (var edgeList in startvertex.GetEdges().Values) {
+        foreach (var edgeList in startVertex.GetEdges().Values) {
             foreach (GroupEdge edge in edgeList) {     
-                if(edge.EndPoint.Equals(endvertex)) {
+                if(edge.EndPoint.Equals(endVertex)) {
                     if(edge.Label == op){
                         // If the edge already exists, no edge is created and the existing edge is returned
                         return edge;
@@ -174,9 +175,15 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
         }
 
         GroupEdge newEdge = Instantiate(edgePrefab, transform).GetComponent<GroupEdge>();
-        newEdge.Initialize(startvertex, endvertex, op, hyperbolicity, this);
+        newEdge.Initialize(startVertex, endVertex, op, hyperbolicity, this);
         newEdge.Strength = AmbientEdgeStrength;
         graphManager.AddEdge(newEdge);
+
+
+        if (startVertex.DistanceToSubgroup > endVertex.DistanceToSubgroup)
+            startVertex.DistanceToSubgroup = endVertex.DistanceToSubgroup + 1;
+        else if (endVertex.DistanceToSubgroup > startVertex.DistanceToSubgroup)
+            endVertex.DistanceToSubgroup = startVertex.DistanceToSubgroup + 1;
 
         return newEdge;
     }

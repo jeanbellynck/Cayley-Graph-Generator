@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /**
  * This class is used to manage the graph. It is responsible for storing the vertices and edges and for keeping track of the idCounter.   
@@ -82,6 +83,10 @@ public class LabelledGraphManager {
             result.AddRange(edgeList);
         }
         return result;
+    }
+
+    public int EdgeCount() {
+        return (from edgeList in edges.Values select edgeList.Count).Sum();
     }
 
     public int getDim() => vertices.Count > 0 ? vertices[0].Position.Size() : 0;

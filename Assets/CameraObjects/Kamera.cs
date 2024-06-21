@@ -37,9 +37,9 @@ public class Kamera : MonoBehaviour
             Cam.orthographicSize = parentKamera.Cam.orthographicSize;
             return;
         }
+        else if (centerPointer?.position != null) goalPosition = (Vector3) centerPointer.position;
 
         Vector3 mousePosition = Input.touchCount > 0 ? Input.touches.First().position : Input.mousePosition;
-        if (centerPointer?.position != null) goalPosition = (Vector3) centerPointer.position;
 
         var movement = (goalPosition - transform.position);
         var maxDistanceThisFrame = movementSpeed * Time.deltaTime;

@@ -152,8 +152,8 @@ public class Edge : MonoBehaviour {
         Vector3 startPosition = StartPoint.transform.position;
         Vector3 endPosition = EndPoint.transform.position;
         Vector3 lineDirection = (endPosition - startPosition).normalized;
-        Vector3 startPointWithSpacing = startPosition + lineDirection * EndPoint.radius;
-        Vector3 endPointWithSpacing = endPosition - lineDirection * StartPoint.radius;
+        Vector3 startPointWithSpacing = startPosition + lineDirection * EndPoint.Radius;
+        Vector3 endPointWithSpacing = endPosition - lineDirection * StartPoint.Radius;
 
         (startColor.a, endColor.a) = importances;
         lineRenderer.startColor = startColor;

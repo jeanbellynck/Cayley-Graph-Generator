@@ -11,11 +11,10 @@ public class ElementFinder : MonoBehaviour, ICenterProvider
     [SerializeField] CayleyGraphMaker cayleyMaker;
     [SerializeField] TMP_InputField inputField;
     [SerializeField] List<string> lastWords = new();
-    [SerializeField] CenterPointer centerPointer;
-    public CenterPointer CenterPointer => centerPointer;
 
-    int nextLastWordIndex = 0;
+    [SerializeField] int nextLastWordIndex = 0;
     [SerializeField] CenterPointer centerOfMassPointer;
+    [field: SerializeField] public CenterPointer CenterPointer { get; private set; }
 
     public event Action<CenterPointer> OnCenterChanged;
 
@@ -35,6 +34,8 @@ public class ElementFinder : MonoBehaviour, ICenterProvider
         }
     }
 
+
+    // Event handler from GraphVisualizer
     public void SetVertex(GroupVertex vertex) {
         if (vertex == null) return;
         string newVertexWord = vertex.PathsFromNeutralElement.FirstOrDefault();
@@ -70,7 +71,7 @@ public class ElementFinder : MonoBehaviour, ICenterProvider
         UpdateLastWords(word);
     }
 
-    private void SetFromWord(string word) {
+    void SetFromWord(string word) {
         bool bad = false;
         GroupVertex newVertex = null;
         if (cayleyMaker == null || cayleyMaker.NeutralElement == null) bad = true;
@@ -78,6 +79,7 @@ public class ElementFinder : MonoBehaviour, ICenterProvider
         if (newVertex == null) bad = true;
         if (bad) {
             inputField.textComponent.color = Color.red;
+            Debug.Log($"Vertex {word} not found");
             return;
         }
 
@@ -98,8 +100,8 @@ public class ElementFinder : MonoBehaviour, ICenterProvider
     // Button handler
     public void Center() {
         if (Vertex == null) return;
-        centerPointer = Vertex.centerPointer;
-        OnCenterChanged?.Invoke(centerPointer);
+        CenterPointer = Vertex.centerPointer;
+        OnCenterChanged?.Invoke(CenterPointer);
         // Vertex.Center();
     }
 
@@ -109,8 +111,9 @@ public class ElementFinder : MonoBehaviour, ICenterProvider
         OnEndEdit("");
     }
 
+    // Button handler
     public void CenterOnCenterOfMass() {
-        centerPointer = centerOfMassPointer;
+        CenterPointer = centerOfMassPointer;
         OnCenterChanged?.Invoke(CenterPointer);
     }
 }

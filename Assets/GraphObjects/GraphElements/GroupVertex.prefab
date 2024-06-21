@@ -103,7 +103,7 @@ MonoBehaviour:
   tooltipContent:
     text: 
     url: 
-  <radius>k__BackingField: 0.13
+  <Radius>k__BackingField: 0.13
   baseImportance: 1
   splineDirectionFactor: 0.2
   orthogonalSplineDirectionFactor: 0.07
@@ -112,8 +112,9 @@ MonoBehaviour:
   graphVisualizer: {fileID: 0}
   maxSpeed: 8
   selectedMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  distanceToNeutralElement: 0
-  pathsFromNeutralElement: []
+  <DistanceToNeutralElement>k__BackingField: 0
+  <PathsFromNeutralElement>k__BackingField: []
+  <DistanceToSubgroup>k__BackingField: 0
   semiGroup: 0
 --- !u!135 &-7652529086318207544
 SphereCollider:

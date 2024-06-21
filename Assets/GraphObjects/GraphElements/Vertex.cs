@@ -24,12 +24,9 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     protected Renderer Mr { get; private set; }
     [SerializeField] protected TooltipContent tooltipContent = new();
 
-    VectorN previousPosition; // This is the previous position of the vertex. It is used for smooth lerp animations
-
-    float creationTime; // = Time.time;
-
-    [field:SerializeField] public float radius { get; protected set; }
-    public float Age => Time.time - creationTime;
+    public float CreationTime { get; protected set; } // = Time.time;
+    [field: SerializeField] public float Radius { get; protected set; }
+    public float Age => Time.time - CreationTime;
 
     protected readonly HashSet<HighlightType> activeHighlightTypes = new();
 
@@ -68,7 +65,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
 
     public virtual void Initialize(VectorN position, GraphVisualizer graphVisualizer) {
         Start();
-        creationTime = Time.time;
+        CreationTime = Time.time;
 
         this.graphVisualizer = graphVisualizer;
         this.activityProvider = graphVisualizer;
@@ -403,7 +400,7 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
             break;
             case HighlightType.Selected:
                 if (unhighlightedRadius == 0f)
-                    unhighlightedRadius = radius;
+                    unhighlightedRadius = Radius;
                 if (unselectedMesh == null)
                     unselectedMesh = GetComponent<MeshFilter>().mesh;
             break;
@@ -450,10 +447,10 @@ public class Vertex : MonoBehaviour, ITooltipOnHover {
     public bool IsHighlighted() => activeHighlightTypes.Count > 0;
 
     public virtual void SetRadius(float radius) {
-        this.radius = radius;
+        this.Radius = radius;
         transform.localScale = Vector3.one * radius * 2;
     }
-    protected void SetRadius() => SetRadius(radius);
+    protected void SetRadius() => SetRadius(Radius);
 
     public void GreyOut(bool greyedOut) {
         baseImportance = greyedOut ? 0.3f : 1f;
