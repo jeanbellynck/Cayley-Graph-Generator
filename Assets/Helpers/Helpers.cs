@@ -34,7 +34,7 @@ public static class Helpers {
         }
     }
 
-    public static T Pop<T>(this List<T> list) {
+    public static T Pop<T>(this IList<T> list) {
         T res = default;
         try {
             res = list[0];
@@ -44,10 +44,20 @@ public static class Helpers {
     }
 
     public static T Pop<T>(this HashSet<T> list) {
-        var item = list.FirstOrDefault();
+        if (list.Count == 0) return default;
+        var item = list.First();
         list.Remove(item);
         return item;
     }
+    
+    public static TValue Pop<TKey, TValue>(this SortedDictionary<TKey, TValue> list) {
+        if (list.Count == 0) return default;
+        var (key, value) = list.First();
+        list.Remove(key);
+        return value;
+    }
+
+
 
     public static Color Desaturate(this Color color, float f) {
         // Copilot
