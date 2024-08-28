@@ -1856,8 +1856,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 433977040}
   m_HandleRect: {fileID: 433977039}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.7130853
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2518,7 +2518,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2357958
+  m_Size: 0.3364364
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5643,6 +5643,30 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: CayleySubgraphUI, Assembly-CSharp
         m_MethodName: ResetSubgroup
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2061742282}
+        m_TargetAssemblyTypeName: CayleySubgraphUI, Assembly-CSharp
+        m_MethodName: GreyOutComplement
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 728482378}
+        m_TargetAssemblyTypeName: UnityEngine.UI.Toggle, UnityEngine.UI
+        m_MethodName: set_isOn
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -23642,7 +23666,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 90257742}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6380657
+  m_Size: 0.9104002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
