@@ -84,7 +84,7 @@ public class GraphVisualizer : MonoBehaviour, IActivityProvider {
                 foreach (var kamera in kameras) 
                     kamera.centerPointer = centerPointer;
         }; // todo: Redundant?
-        if (centerProvider is not null)
+        if (centerProvider != null)
             centerProvider.OnCenterChanged += (centerPointer) => {
                     foreach (var kamera in kameras)
                         kamera.centerPointer = centerPointer;
