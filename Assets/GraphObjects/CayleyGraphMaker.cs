@@ -189,6 +189,7 @@ public class CayleyGraphMaker : MonoBehaviour {
 
 
     void AddBorderVertex(GroupVertex vertex) {
+        if (comparerFunction is null) UpdateBorderVertices();
         borderVertices[(comparerFunction(vertex.DistanceToNeutralElement, vertex.DistanceToSubgroup), vertex.Id)] = vertex;
     }
 

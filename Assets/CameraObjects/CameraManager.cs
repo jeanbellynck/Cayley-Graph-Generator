@@ -15,8 +15,8 @@ public class CameraManager : MonoBehaviour
 
     [SerializeField] SplitSlider splitSlider;
 
-    [SerializeField] float leftViewport => LeftInset / Screen.width;
-    [SerializeField] float rightViewport => 1f - RightInset / Screen.width;
+    float leftViewport => LeftInset / Screen.width;
+    float rightViewport => 1f - RightInset / Screen.width;
 
     // referenced from UI
     float leftInset = 0f;
@@ -114,7 +114,8 @@ public class CameraManager : MonoBehaviour
         secondaryKamera.Cam.rect = new(splitPercentage, 0, rightViewport - splitPercentage, 1);
     }
 
-    void UpdateViewports() => UpdateViewports(splitSlider.Value);
+    public void UpdateViewports() => UpdateViewports(splitSlider.Value);
+    
 
     // referenced from UI
     public void LockCameras(bool secondaryToMain) {
