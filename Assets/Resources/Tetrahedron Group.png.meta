@@ -143,7 +143,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Tetrahedron Group_0: 4245909832461025745
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

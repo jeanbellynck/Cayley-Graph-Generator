@@ -53,7 +53,7 @@ public class SurfaceMappingClassGroup : PresentationExample
                     let aj = a[j]
                     select $"{ai}{aj}{ai}={aj}{ai}{aj}"
                 );
-                const string threeChainRelation = "(abc)^3=f^2";
+                const string threeChainRelation = "(abc)^4=e^2";
                 const string hyperEllipticRelation = "(edcbaabcde)^2";
                 const string hyperEllipticRelation2 = "[edcbaabcde,a]";
 
