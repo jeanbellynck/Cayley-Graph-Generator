@@ -1708,8 +1708,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 433977040}
   m_HandleRect: {fileID: 433977039}
   m_Direction: 2
-  m_Value: 0.99640596
-  m_Size: 0.7130853
+  m_Value: 1
+  m_Size: 0.94985974
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2370,7 +2370,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2357958
+  m_Size: 0.3364364
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4626,11 +4626,12 @@ RectTransform:
   - {fileID: 1129470204}
   - {fileID: 2043239682}
   - {fileID: 1940787039}
+  - {fileID: 1133678777}
   m_Father: {fileID: 641185138}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 1.1105957}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &326132742
@@ -21549,6 +21550,101 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!1 &1133678776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1133678777}
+  - component: {fileID: 1133678780}
+  - component: {fileID: 1133678779}
+  - component: {fileID: 1133678778}
+  m_Layer: 5
+  m_Name: LiTConferenceGallery
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1133678777
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133678776}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 326132741}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 10, y: 0}
+  m_SizeDelta: {x: 660, y: 0}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1133678778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133678776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 396abbbcde1e42748953edc05f2cf2ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  examplePrefab: {fileID: 7511116124807839910, guid: f3386dfdcb96f8b4fad72f946baa4dc0, type: 3}
+  labelPrefab: {fileID: 8361087866446737624, guid: 671d53eb86a871c4685fa81ca76a1835, type: 3}
+  parent: {fileID: 326132741}
+  cayleyGraph: {fileID: 772353315}
+  labelText: 'LiT examples:'
+--- !u!114 &1133678779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133678776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &1133678780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133678776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 10
+    m_Right: 10
+    m_Top: 20
+    m_Bottom: 20
+  m_ChildAlignment: 0
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 1
+  m_ReverseArrangement: 0
 --- !u!1 &1139686282
 GameObject:
   m_ObjectHideFlags: 0
@@ -22785,7 +22881,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 90257742}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.6380657
+  m_Size: 0.9104002
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24240,7 +24336,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Jean-Baptiste Bellynck\n (Osaka University)"
+  m_text: "Jean-Baptiste Bellynck\n (University of Munich)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
   m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
@@ -32755,7 +32851,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2070879375}
   m_HandleRect: {fileID: 2070879374}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
