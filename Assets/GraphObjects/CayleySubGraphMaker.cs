@@ -108,7 +108,8 @@ public class CayleySubGraphMaker : MonoBehaviour {
     }
 
     void AddSubgroupEdge(Vertex vertex, string generator, char generatorName, bool inverse = false) {
-        if (vertex is not GroupVertex startVertex) return;
+        if (vertex is not GroupVertex startVertex || startVertex == null) return; 
+        // again, unity destruction doesn't imply C# nullness, only == null
         var edge = inverse
             ? vertex.GetIncomingEdges(generatorName).FirstOrDefault()
             : vertex.GetOutgoingEdges(generatorName).FirstOrDefault();

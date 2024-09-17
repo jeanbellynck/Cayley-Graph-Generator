@@ -26,6 +26,8 @@ public class Physik : MonoBehaviour, IActivityProvider {
     [SerializeField] LinkForce linkForce;
     [SerializeField] ProjectionForce projectionForce;
 
+    public readonly CenterPointerToPosition centerPointer = new();
+
     public void Initialize(LabelledGraphManager graphManager, int dimension, int generatorCount) {
         Abort();
         this.graphManager = graphManager;
@@ -34,6 +36,8 @@ public class Physik : MonoBehaviour, IActivityProvider {
         repulsionForce = new RepulsionForce(radius);
         linkForce = new LinkForce();
         projectionForce = new ProjectionForce(0.5f, dimension);
+        
+        repulsionForce.CenterOfMassCalculated += (center) => centerPointer.center = center;
         //dim = 2*generators.Length + 1;
         //alpha = alphaSetting;
         //StartCoroutine(LoopPhysics());

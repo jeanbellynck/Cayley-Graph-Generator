@@ -27,6 +27,9 @@ public class CayleySubgraphUI : MonoBehaviour
         graphVisualizer.SubgroupEdgeStrength = r;
     }
 
+    public void SetSubgroupDrawingPreference(float r) {
+        cayleyGraphMaker.UpdateSubgroupPreference(Mathf.Exp(-r));
+    }
 
     /**
      * This method draws a subgroup inside the graph.

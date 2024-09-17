@@ -5,21 +5,19 @@ using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
 public class GroupVertex : Vertex {
-    [SerializeField] int distanceToNeutralElement = 0; 
-    [SerializeField] List<string> pathsFromNeutralElement = new(); 
 
     public float Stress { get; private set; }
 
-    public int DistanceToNeutralElement { get => distanceToNeutralElement;
-        private set => distanceToNeutralElement = value; }
-    public List<string> PathsFromNeutralElement { get => pathsFromNeutralElement; protected set => pathsFromNeutralElement = value; }
-
+    [field: SerializeField] public int DistanceToNeutralElement { get; private set; }
+    [field: SerializeField] public List<string> PathsFromNeutralElement { get; protected set; } = new();
+    [field: SerializeField] public int DistanceToSubgroup { get; set; }
 
     float edgeCompletion;
     public override float Importance => activeHighlightTypes.Count > 0 ? 1 : MathF.Min(edgeCompletion * baseImportance, 1);
 
 
-    [SerializeField] public bool semiGroup;
+    /** not currently used **/
+    public bool semiGroup;
 
     public void Initialize(VectorN position, GraphVisualizer graphVisualizer, string name = null, IEnumerable<string> pathsFromNeutralElement = null, bool semiGroup = false) {
         if (!string.IsNullOrEmpty(name)) this.name = name;
@@ -74,7 +72,7 @@ public class GroupVertex : Vertex {
 
     public override void SetRadius(float radius) {
         base.SetRadius(radius);
-        transform.localScale = Vector3.one * Importance * radius * 2;
+        transform.localScale = 2 * Importance * radius * Vector3.one;
     }
 
     public Dictionary<char, List<GroupEdge>> GetEdges() {
@@ -155,13 +153,14 @@ public class GroupVertex : Vertex {
         transform.position = VectorN.ToVector3(Position);
 
         DistanceToNeutralElement = predecessor.DistanceToNeutralElement + 1;
+        DistanceToSubgroup = predecessor.DistanceToSubgroup + 1;
         calculateVertexMass(hyperbolicScaling);
     }
 
     public void Merge(GroupVertex vertex2, float hyperbolicity) {
         Position = (Position + vertex2.Position) / 2;
-        vertex2.centerPointer.center = centerPointer.center; // Some Kamera might reference the old (redundant) Vertex as its center. We now point it to the kept equivalent vertex.
-        distanceToNeutralElement = Math.Min(vertex2.distanceToNeutralElement, distanceToNeutralElement);
+        vertex2.centerPointer.transform = centerPointer.transform; // Some Kamera might reference the old (redundant) Vertex as its center. We now point it to the kept equivalent vertex.
+        DistanceToNeutralElement = Math.Min(vertex2.DistanceToNeutralElement, DistanceToNeutralElement);
         calculateVertexMass(hyperbolicity);
 
         // the following is just to merge the pathsFromNeutralElement without saving too many (we assume PathsFromNeutralElement is sorted by length)
@@ -254,11 +253,16 @@ public class GroupVertex : Vertex {
 
     public override void OnHover(Kamera activeKamera) {
         base.OnHover(activeKamera);
-        HighlightPathsFromIdentity(false);
+        //HighlightPathsFromIdentity(false);
     }
 
     public override void OnHoverEnd() {
         base.OnHoverEnd();
-        HighlightPathsFromIdentity(true);
+        //HighlightPathsFromIdentity(true);
+    }
+
+    public override void OnClick(Kamera activeKamera) {
+        base.OnClick(activeKamera);
+        graphVisualizer.SelectedVertex = this;
     }
 }

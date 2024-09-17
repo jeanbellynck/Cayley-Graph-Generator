@@ -53,7 +53,6 @@ MonoBehaviour:
   splineWidth: 0.07
   arrowWidth: 0.2
   PercentHead: 0.1
-  vertexRadius: 0.14
   useSplines: 0
   <Label>k__BackingField: 0
   <StartPoint>k__BackingField: {fileID: 0}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /**
  * This class is used to manage the graph. It is responsible for storing the vertices and edges and for keeping track of the idCounter.   
@@ -19,7 +20,7 @@ public class LabelledGraphManager {
 
     public delegate void OnEdgeAdded(Edge edge);
     public event OnEdgeAdded onEdgeAdded;
-    public event Action<Vertex, Kamera> OnCenterChanged;
+    public event Action<CenterPointer, Kamera> OnCenterChanged;
 
     public List<Vertex> GetVertices() {
         return vertices;
@@ -31,7 +32,11 @@ public class LabelledGraphManager {
         idCounter++;
         vertices.Add(vertex);
         //vertex.graphVisualizer = this;
-        vertex.OnCenter += kamera => OnCenterChanged?.Invoke(vertex, kamera); // Stupid workaround to allow vertex to indirectly change the kamera's centerPointer, since now the vertex has no reference to the kameras anymore.
+
+        CenterPointer centerPointer = vertex.centerPointer;
+        centerPointer.OnCenter += kamera => OnCenterChanged?.Invoke(centerPointer, kamera);
+        // Stupid workaround to allow vertex to indirectly change the kamera's centerPointer, since now the vertex has no reference to the kameras anymore.
+        // not really needed anymore (bc. of ICenterProvider)
     }
 
     public void ResetGraph() {
@@ -78,6 +83,10 @@ public class LabelledGraphManager {
             result.AddRange(edgeList);
         }
         return result;
+    }
+
+    public int EdgeCount() {
+        return (from edgeList in edges.Values select edgeList.Count).Sum();
     }
 
     public int getDim() => vertices.Count > 0 ? vertices[0].Position.Size() : 0;

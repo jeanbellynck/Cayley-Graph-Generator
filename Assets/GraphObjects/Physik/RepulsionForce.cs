@@ -18,6 +18,8 @@ public class RepulsionForce : Force {
     public float radius; // The radius of the BarnesQuadtree. This is the maximal distance between two points in the BarnesQuadtree. This is used to calculate the repulsion force.
     public float maximalForce;
 
+    public event Action<Vector3> CenterOfMassCalculated;
+
     public RepulsionForce(float radius, float repelForceFactor = 1.5f, float barnesQuadTreeMinimalDistance = 0.5f, float barnesQuadTreeMaximalDistance = 50, float QuadTreeTheta = 0.9f, float maximalForce = 10) {
         this.repelForceFactor = repelForceFactor;
         this.barnesQuadTreeMinimalDistance = barnesQuadTreeMinimalDistance;
@@ -41,6 +43,7 @@ public class RepulsionForce : Force {
         Profiler.EndSample();
         Profiler.BeginSample("BerechneSchwerpunkt");
         bqb.BerechneSchwerpunkt();
+        CenterOfMassCalculated?.Invoke(VectorN.ToVector3(bqb.centerOfMass));
         Profiler.EndSample();
 
         int vertexIndex = 0;
