@@ -53,7 +53,6 @@ MonoBehaviour:
   splineWidth: 0.14
   arrowWidth: 0.2
   PercentHead: 0.1
-  vertexRadius: 0.14
   useSplines: 0
   <Label>k__BackingField: 0
   <StartPoint>k__BackingField: {fileID: 0}
@@ -378,8 +377,8 @@ LineRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 979410281
-  m_SortingLayer: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}

@@ -2518,7 +2518,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 838827638}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.33321193
+  m_Size: 0.5593967
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2938,7 +2938,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Graphcayley (formerly the Cayley Graph Generator) visualizes <b>finitely
+  m_text: 'Graphicayley (formerly the Cayley Graph Generator) visualizes <b>finitely
     presented groups</b> by generating their <b>Cayley graphs</b> from a given <b>presentation</b>.
     A <b>presentation</b> consists of a set of <b>generators</b> and <b>relators</b>.
 
@@ -5972,6 +5972,85 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1 &363969786
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 363969787}
+  - component: {fileID: 363969789}
+  - component: {fileID: 363969788}
+  m_Layer: 5
+  m_Name: Subgroup Help section
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &363969787
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363969786}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1761048455}
+  - {fileID: 1188263992}
+  m_Father: {fileID: 706615119}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 481.5, y: 0}
+  m_SizeDelta: {x: 943, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &363969788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363969786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &363969789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363969786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &364651865
 GameObject:
   m_ObjectHideFlags: 0
@@ -9229,13 +9308,12 @@ MonoBehaviour:
     written from two letters \"a, b\" and their inverses \"A, B\" with the restrictions
     that the words need to be fully cancelled. (i.e. a symbol like a and its inverse
     A are not allowed to follow each other since then the generators can be cancelled).
-    Valid word might be \"aaba\" or \"a\" or \"aBa\" but not \"abB\".\nThe words
-    of length n are given by 4*3<sup>(n-1)</sup>, since we can choose 4 elements
-    to be the first symbol and then 3 letters for every other symbol. \nIn the graph
-    this exponential growth manifests itself by the edges becoming very long. This
-    is becaus the many vertices repel each other strongly. By choosing a hyperbolicity
-    value <1 like 0.5 we can represent F<sub>2</sub> in a different, more compact
-    way. "
+    Valid word might be \"aaba\" or \"a\" or \"aBa\" but not \"abB\".\nThere are
+    4*3<sup>(n-1)</sup> words of length n, since we can choose 4 elements to be the
+    first symbol and then 3 letters for every other symbol. \nIn the graph this exponential
+    growth manifests itself by the edges becoming very long. This is becaus the many
+    vertices repel each other strongly. By choosing a hyperbolicity value <1 like
+    0.5 we can represent F<sub>2</sub> in a different, more compact way. "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
   m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
@@ -13169,6 +13247,7 @@ RectTransform:
   - {fileID: 1485657827}
   - {fileID: 585542313}
   - {fileID: 620157571}
+  - {fileID: 363969787}
   - {fileID: 656224343}
   m_Father: {fileID: 876859992}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -17985,7 +18064,11 @@ MonoBehaviour:
     suffice to describe the group Z\xB2.\n\nFor the relators the following syntax
     can be used:\n- Brackets (): Defines evaluation order\n- Positive or Negative
     Exponents (ab)^3 <=> ababab, (ab)^-1 <=> BA\n- Equals sign ab = c <=> abC\n-
-    Commutators [a, b] <=> abAB\n\n"
+    Commutators [a, b] <=> abAB\n\nIt usually suffices to only input the relators,
+    as the program automatically adds all letters that appear as generators.\nYou
+    can therefore also copy your presentation as a single string that can be input
+    into the relator field: Hover on the word \"Relators\" in the main menu. This
+    probably currently doesn't work in the web application (it's complicated, sorry)."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
   m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
@@ -22212,7 +22295,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   examplePrefab: {fileID: 7511116124807839910, guid: f3386dfdcb96f8b4fad72f946baa4dc0, type: 3}
   labelPrefab: {fileID: 8361087866446737624, guid: 671d53eb86a871c4685fa81ca76a1835, type: 3}
-  parent: {fileID: 326132741}
+  parent: {fileID: 1133678777}
   cayleyGraph: {fileID: 772353315}
   labelText: 'LiT examples:'
 --- !u!114 &1133678779
@@ -22902,6 +22985,178 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174353399}
+  m_CullTransparentMesh: 1
+--- !u!1 &1188263991
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1188263992}
+  - component: {fileID: 1188263996}
+  - component: {fileID: 1188263995}
+  - component: {fileID: 1188263994}
+  - component: {fileID: 1188263993}
+  m_Layer: 5
+  m_Name: Subgroup Help Section Desc
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1188263992
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188263991}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 363969787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 471.5, y: 0}
+  m_SizeDelta: {x: 943, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1188263993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188263991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98af08d3beb287b45a7a5805e648e1c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  doesColorChangeOnHover: 1
+  hoverColor: {r: 0.23529412, g: 0.47058824, b: 1, a: 1}
+--- !u!114 &1188263994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188263991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &1188263995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188263991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: You can display (finitely generated) subgroups by using the subgroup menu
+    on the right. Enter the words that will be used as generator of the subgroup.
+    You can also add a second camera view and adjust the strengths of the subgroup
+    edges relative to the strength of the usual edges. The second slider is meant
+    to make the program prefer drawing new vertices that are closer to the subgroup
+    which should reduce clutter (parts of the group that are not very relevant to
+    the structure of the subgroup). This affects only the generation phase.
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
+  m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 30
+  m_fontSizeBase: 30
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 8
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: -20
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1188263996
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188263991}
   m_CullTransparentMesh: 1
 --- !u!1 &1192625872
 GameObject:
@@ -23773,8 +24028,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 90257743}
   m_HandleRect: {fileID: 90257742}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9104002
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -25516,7 +25771,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1315594795
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26733,7 +26988,9 @@ MonoBehaviour:
   m_text: "If a group can be described by a presentation with finite set of relators
     and finite set of generators, it is called <b>finitely generated</b>. \nNote
     that all <b>finite groups</b> are <b>finitely generated</b> but not all <b>finitely
-    generated groups</b> are <b>finite</b>. Z\xB2 is a simple counterexample.\n\n"
+    generated groups</b> are <b>finite</b>. Z\xB2 is a simple counterexample.\nThe
+    program can by its nature only display finitely presented groups. We also recommend
+    only displaying groups with up to 4 generators.\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
   m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
@@ -31606,7 +31863,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uE826"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 96ca82442a650e14a81bc5ae5a3ce2b8, type: 2}
   m_sharedMaterial: {fileID: 812922919649363297, guid: 96ca82442a650e14a81bc5ae5a3ce2b8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -32627,6 +32884,157 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &1761048454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1761048455}
+  - component: {fileID: 1761048458}
+  - component: {fileID: 1761048457}
+  - component: {fileID: 1761048456}
+  m_Layer: 5
+  m_Name: Subgroup Help Section Title
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1761048455
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761048454}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 363969787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 89.395, y: 0}
+  m_SizeDelta: {x: 178.79, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1761048456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761048454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &1761048457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761048454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: <b>Subgroups</b>
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
+  m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 35
+  m_fontSizeBase: 35
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 4
+  m_HorizontalAlignment: 8
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: -20
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1761048458
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761048454}
+  m_CullTransparentMesh: 1
 --- !u!1 &1763049326
 GameObject:
   m_ObjectHideFlags: 0
@@ -34152,7 +34560,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2070879375}
   m_HandleRect: {fileID: 2070879374}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -34623,14 +35031,19 @@ MonoBehaviour:
   m_text: "Given a set of generators and relators it is possible to draw a <b>Cayley
     Graph</b>. The graph can be generated by clicking on the generate button. Its
     vertices are the elements of a group. Two different vertices describe two different
-    group elements. The <b>neutral element</b> of the group is alwas centered and
-    can be found be zooming into the graph.\nThe directed edges describe what happens
-    to an element if we multiply a generator on the right side. We notice that starting
-    from the neutral element, following a relator always\ngets us back to the neutral
-    element. The relators therefore define loops inside the graph. \nThis visualisation
-    also includes panes which indicate the loops drawn by a relator. This is not
-    part of the <b>Cayley Graph</b> but part of a more general mathematical structure
-    called the <b>Cayley Complex</b>.\n\n"
+    group elements. The <b>neutral element</b> of the group is the starting point
+    and is displayed bigger.\nThe directed edges describe what happens to an element
+    if we multiply a generator on the right side. We notice that starting from the
+    neutral element, following a relator always\ngets us back to the neutral element.
+    The relators therefore define loops inside the graph. \nThis visualisation also
+    includes panes which indicate the loops drawn by a relator. This is not part
+    of the <b>Cayley Graph</b> but part of a more general mathematical structure
+    called the <b>Cayley Complex</b>.\n\nYou can click on any vertex (after hovering
+    over it) to highlight it or highlight any vertex by using the element finder
+    on the bottom: Enter a word in the generators that describes it (the program
+    traverses the graph as described by your word).\nAfterwards, you can center the
+    camera on this vertex.\nUse the \"center of gravity\" symbol to center the camera
+    there."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
   m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
@@ -36297,8 +36710,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 112.95, y: 0}
-  m_SizeDelta: {x: 225.9, y: 0}
+  m_AnchoredPosition: {x: 283.49, y: 0}
+  m_SizeDelta: {x: 566.98, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2001074398
 MonoBehaviour:
@@ -36334,7 +36747,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <b>Hyperbolicity</b>
+  m_text: <b>Hyperbolicity (currently disabled)</b>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}
   m_sharedMaterial: {fileID: -155764950854061191, guid: d90ebe24ec17fa24a98b7cfb96edb463, type: 2}

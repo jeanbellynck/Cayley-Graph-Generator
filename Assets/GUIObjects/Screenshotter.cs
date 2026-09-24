@@ -31,7 +31,7 @@ public class Screenshotter : MonoBehaviour
             Destroy(texture);
         #else
             // Code for Unity Editor and standalone builds
-            ScreenCapture.CaptureScreenshot("CCG_Screenshot.png", 2);
+            ScreenCapture.CaptureScreenshot("CCG_Screenshot.png", 4);
         #endif
 
         yield return null;

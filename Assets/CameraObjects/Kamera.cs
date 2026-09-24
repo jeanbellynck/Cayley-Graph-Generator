@@ -25,7 +25,7 @@ public class Kamera : MonoBehaviour
             Cam = cam;
     }
 
-    const float movementSpeed = 3f;
+    const float movementSpeed = 5f;
 
     void Update()
     {
@@ -35,7 +35,6 @@ public class Kamera : MonoBehaviour
             goalPosition = parentKamera.transform.position;
             goalRotation = parentKamera.transform.rotation;
             Cam.orthographicSize = parentKamera.Cam.orthographicSize;
-            return;
         }
         else if (centerPointer?.position != null) goalPosition = (Vector3) centerPointer.position;
 
@@ -153,6 +152,7 @@ public class CenterPointerToTransform : CenterPointer {
     public Transform transform;
 }
 
+[Serializable]
 public class CenterPointerToPosition : CenterPointer {
     public override Vector3? position => center;
     public Vector3 center;
